@@ -1,0 +1,37 @@
+{
+    "Navbar": {
+        "Login": "Login",
+        "SignUp": "Sign Up",
+        "Logo": "Loyalty Points System"
+    },
+    "DefaultLayout": {
+        "HowItWorks": "How It Works",
+        "PowerfulFeatures": "Powerful Features",
+        "TransformYourBusiness": "Transform Your Business with Smart Loyalty",
+        "ElevateYourCustomerExperience": "Elevate Your Customer Experience with Smart Loyalty",
+        "StartFreeTrial": "Start Free Trial",
+        "LearnMore": "Learn More",
+        "Smart":"Smart Points System ",
+        "Loyalty":"Loyalty",
+        "Points":"Points",
+        "Rewards":"Flexible Rewards",
+        "Insights":"Customer Insights",
+        "Auto":"Automated point calculation and tracking for every customer transaction.",
+        "Customizable":"Customizable point rules and redemption options.",
+        "Details":"Detailed analytics and reports to optimize your loyalty program.",
+        "Start":"Get started in minutes with our easy-to-use platform",
+        "Step1":"Step 1",
+        "Step2":"Step 2",
+        "Step3":"Step 3",
+        "Step4":"Step 4",
+        "Step5":"Step 5",
+        "Purchase":"Making a purchase",
+        "ScanQRCode":"Scan QR code",
+        "PointsCredited":"Points are credited",
+        "TrackPoints":"Track points via app",
+        "RedeemRewards":"Redeem rewards",
+        "ReadyToGetStarted":"Ready to Transform Your Business?",
+        "Join":"Join thousands of businesses already growing with our loyalty platform",
+        "ContactUs":"Contact Us"
+    }
+}
