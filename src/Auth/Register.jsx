@@ -1,4 +1,5 @@
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { 
   Box,
   TextField,
@@ -7,11 +8,16 @@ import {
   Container,
   Paper
 } from '@mui/material';
+import { notifyError, notifySuccess } from '../utilities/Toastify';
+import Spinner from '../utilities/Spinner';
 import { useNavigate } from 'react-router-dom';
-
+import Api from '../Config/Api';
+import Navbar from '../Components/Shared/Navbar';
+import { useTranslation } from 'react-i18next';
 const Register = () => {
+  const {t} =useTranslation()
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const validate = values => {
     const errors = {};
 
@@ -60,61 +66,72 @@ const Register = () => {
     initialValues: {
       firstName: '',
       lastName: '',
-      email: '',
       phone: '',
+      email: '',
       password: '',
       confirmPassword: ''
     },
     validate,
     onSubmit: async (values) => {
-      // Handle form submission here
-      console.log(values);
+      try {
+        setLoading(true);
+        const response = await Api.post('/api/auth/register', values);
+        notifySuccess('Account created successfully'); 
+        localStorage.setItem('user', JSON.stringify(values));    
+        localStorage.setItem('token', response.data.token);
+        navigate('/login');
+      } catch (error) {
+        notifyError(error.response.data.message);
+      } finally {
+        setLoading(false);
+      }
     }
   });
 
   return (
-    <Container component="main" maxWidth="sm">
+    <>
+      <Navbar />
+    <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Paper 
         elevation={3} 
         sx={{ 
           p: 4, 
-          mt: 8,
+          mt: 3,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center'
         }}
       >
         <Typography component="h1" variant="h5" color="primary" sx={{ mb: 3 }}>
-          Create New Account
+          {t('Register.createNewAccount')}
         </Typography>
 
         <Box component="form" onSubmit={formik.handleSubmit} sx={{ width: '100%' }}>
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <TextField
               fullWidth
-              
-              label="First Name"
+              name="firstName"
+              label={t('Register.firstName')}
               value={formik.values.firstName}
               onChange={formik.handleChange}
               error={formik.touched.firstName && Boolean(formik.errors.firstName)}
               helperText={formik.touched.firstName && formik.errors.firstName}
             />
-            
             <TextField
               fullWidth
-              
-              label="Last Name"
+              name="lastName"
+              label={t('Register.lastName')}
               value={formik.values.lastName}
               onChange={formik.handleChange}
               error={formik.touched.lastName && Boolean(formik.errors.lastName)}
               helperText={formik.touched.lastName && formik.errors.lastName}
-            />
+            />    
           </Box>
 
           <TextField
             fullWidth
-            
-            label="Email Address"
+            name="email"
+            label={t('Register.email')}
             type="email"
             sx={{ mb: 2 }}
             value={formik.values.email}
@@ -125,8 +142,8 @@ const Register = () => {
 
           <TextField
             fullWidth
-            
-            label="Phone Number"
+            name="phone"
+            label={t('Register.phone')}
             sx={{ mb: 2 }}
             value={formik.values.phone}
             onChange={formik.handleChange}
@@ -136,8 +153,8 @@ const Register = () => {
 
           <TextField
             fullWidth
-            
-            label="Password"
+            name="password"
+            label={t('Register.password')}
             type="password"
             sx={{ mb: 2 }}
             value={formik.values.password}
@@ -148,8 +165,8 @@ const Register = () => {
 
           <TextField
             fullWidth
-            
-            label="Confirm Password"
+            name="confirmPassword"
+            label={t('Register.confirmPassword')}
             type="password"
             sx={{ mb: 3 }}
             value={formik.values.confirmPassword}
@@ -164,28 +181,29 @@ const Register = () => {
             variant="contained"
             color="primary"
             size="large"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? <Spinner /> : t('Register.signUp')}
           </Button>
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Already have an account?{' '}
+              {t('Register.alreadyHaveAccount')}{' '}
               <Typography
                 component="span"
                 color="primary"
                 sx={{ cursor: 'pointer', fontWeight: 500 }}
                 onClick={() => navigate('/login')}
               >
-                Login
+                {t('Register.login')}
               </Typography>
             </Typography>
           </Box>
         </Box>
       </Paper>
     </Container>
+    </>
   );
 };
 
 export default Register;
-

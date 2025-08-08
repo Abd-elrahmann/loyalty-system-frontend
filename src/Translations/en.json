@@ -2,7 +2,9 @@
     "Navbar": {
         "Login": "Login",
         "SignUp": "Sign Up",
-        "Logo": "Loyalty Points System"
+        "Logo": "Loyalty Points System",
+        "Logout": "Logout",
+        "Welcome": "Welcome"
     },
     "DefaultLayout": {
         "HowItWorks": "How It Works",
@@ -20,11 +22,7 @@
         "Customizable":"Customizable point rules and redemption options.",
         "Details":"Detailed analytics and reports to optimize your loyalty program.",
         "Start":"Get started in minutes with our easy-to-use platform",
-        "Step1":"Step 1",
-        "Step2":"Step 2",
-        "Step3":"Step 3",
-        "Step4":"Step 4",
-        "Step5":"Step 5",
+        "Step":"Step",
         "Purchase":"Making a purchase",
         "ScanQRCode":"Scan QR code",
         "PointsCredited":"Points are credited",
@@ -33,5 +31,56 @@
         "ReadyToGetStarted":"Ready to Transform Your Business?",
         "Join":"Join thousands of businesses already growing with our loyalty platform",
         "ContactUs":"Contact Us"
+    },
+    "Footer": {
+        "AboutUs": "About Us",
+        "ContactUs": "Contact Us",
+        "PrivacyPolicy": "Privacy Policy",
+        "TermsOfService": "Terms of Service",
+        "Copyright": "Copyright © 2025 Loyalty Points System. All rights reserved.",
+        "QuickLinks": "Quick Links",
+        "Home": "Home",
+        "Login": "Login",
+        "SignUp": "Sign Up",
+        "Contact": "Contact",
+        "FollowUs": "Follow Us",
+        "Email": "Email"
+    },
+    "Login": {
+        "login": "Login",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot Password?",
+        "dontHaveAccount": "Don't have an account?",
+        "signUp": "Sign Up"
+    },
+    "Register": {
+        "createNewAccount": "Create New Account",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "alreadyHaveAccount": "Already have an account?",
+        "signUp": "Sign Up",
+        "login": "Login"    
+    },
+    "ForgetPassword": {
+        "enterEmail": "Enter your email address and we'll send you a link to reset your password.",
+        "email": "Email Address",
+        "sendResetLink": "Send Reset Link",
+        "backToLogin": "Back to Login"
+    },
+    "ResetPassword": {
+        "title": "Reset Password",
+        "enterNewPassword": "New Password",
+        "confirmPassword": "Confirm Password",
+        "resetPassword": "Reset Password",
+        "missMatchPassword": "Password and confirm password do not match",
+        "passwordRequired": "Password is required",
+        "confirmPasswordRequired": "Confirm password is required"
+    },
+    "Dashboard": {
     }
 }

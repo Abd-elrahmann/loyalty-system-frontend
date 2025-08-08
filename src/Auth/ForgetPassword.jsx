@@ -5,22 +5,25 @@ import {
   Button,
   Typography,
   Container,
-  Paper
+  Paper,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import Api from '../Config/Api';
+import { notifyError, notifySuccess } from '../utilities/Toastify';
+import Spinner from '../utilities/Spinner';
+import { useState } from 'react';
+import Navbar from '../Components/Shared/Navbar';
+import { useTranslation } from 'react-i18next';
 
 const ForgetPassword = () => {
-  const navigate = useNavigate();
-
+  const {t} =useTranslation()
+  const [loading, setLoading] = useState(false);
   const validate = values => {
     const errors = {};
 
-    if (!values.phone) {
-      errors.phone = 'Phone number is required';
-    } else if (!/^[0-9]+$/.test(values.phone)) {
-      errors.phone = 'Phone number must contain only digits';
-    } else if (values.phone.length < 10) {
-      errors.phone = 'Phone number must be at least 10 digits';
+    if (!values.email) {
+      errors.email = 'Email is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+      errors.email = 'Invalid email address';
     }
 
     return errors;
@@ -28,17 +31,28 @@ const ForgetPassword = () => {
 
   const formik = useFormik({
     initialValues: {
-      phone: ''
+      email: ''
     },
     validate,
-    onSubmit: (values) => {
-      // Handle password reset request here
-      console.log('Reset password request for:', values);
+    onSubmit: async (values) => {
+      try {
+        setLoading(true);
+        const response = await Api.post('/api/auth/request-reset-password', {
+          email: values.email
+        });
+        notifySuccess(response.data.message);
+      } catch (err) {
+        notifyError(err.response?.data?.message || 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
     },
   });
 
   return (
-    <Container component="main" maxWidth="md" sx={{ mt: 16, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <>
+      <Navbar />
+    <Container component="main" maxWidth="md" sx={{ mt: 13, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Paper elevation={1} sx={{ p: 4, borderRadius: 2, mt: 12 }}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
@@ -47,19 +61,20 @@ const ForgetPassword = () => {
             color="text.secondary"
             sx={{ mb: 3 }}
           >
-            Enter your phone number and we'll send you a code to reset your password.
+            {t('ForgetPassword.enterEmail')}
           </Typography>
 
           <TextField
             fullWidth
-            id="phone"
-            name="phone"
-            label="Phone Number"
+            id="email"
+            name="email"
+            label={t('ForgetPassword.email')}
+            type="email"
             sx={{ mb: 3 }}
-            value={formik.values.phone}
+            value={formik.values.email}
             onChange={formik.handleChange}
-            error={formik.touched.phone && Boolean(formik.errors.phone)}
-            helperText={formik.touched.phone && formik.errors.phone}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
 
           <Button
@@ -69,8 +84,9 @@ const ForgetPassword = () => {
             color="primary"
             size="large"
             sx={{ mb: 2 }}
+            disabled={loading}
           >
-            Send Reset Code
+            {loading ? <Spinner /> : t('ForgetPassword.sendResetLink')}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>
@@ -78,14 +94,14 @@ const ForgetPassword = () => {
               component="span"
               color="primary"
               sx={{ cursor: 'pointer', fontWeight: 500 }}
-              onClick={() => navigate('/login')}
             >
-              Back to Login
+              {t('ForgetPassword.backToLogin')}
             </Typography>
           </Box>
-        </Box>
-      </Paper>
+        </Box>        
+      </Paper>    
     </Container>
+    </>
   );
 };
 

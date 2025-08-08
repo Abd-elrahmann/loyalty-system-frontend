@@ -21,14 +21,15 @@ const theme = createTheme({
       contrastText: '#ffffff'
     },
     background: {
-      default: '#f0f0f0', 
+      default: '#f8f8f8',
       main: '#800080',
       paper: '#ffffff'     
     },
     text: {
       main: '#ffffff',
-      primary: '#2a2a2a',  // لون النص الرئيسي
-      secondary: '#800080' // موف لنصوص فرعية أو عناوين
+      primary: '#2a2a2a',
+      secondary: '#800080',
+      black: '#2a2a2a'
     }
   },
 

@@ -25,6 +25,7 @@ const fadeUp = {
 
 const DefaultLayout = () => {
   const { t } = useTranslation();
+  
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', alignItems: 'center' }}>
       <Navbar />
@@ -38,7 +39,7 @@ const DefaultLayout = () => {
         variants={fadeUp}
         sx={{
           position: 'relative',
-          py: { xs: 8, md: 1 },
+          py: { xs: 6, md: 1 },
           overflow: 'hidden',
           width: '100%',
           display: 'flex',
@@ -46,7 +47,7 @@ const DefaultLayout = () => {
         }}
       >
         <Container maxWidth="xl" sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Grid container spacing={4} alignItems="center" direction="row-reverse" justifyContent="center">
+          <Grid container spacing={3} alignItems="center" flexDirection="column" justifyContent="center">
             <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
               <Box
                 component={motion.img}
@@ -54,7 +55,7 @@ const DefaultLayout = () => {
                 alt="Loyalty System Platform"
                 sx={{
                   width: '100%',
-                  maxHeight: 500,
+                  maxHeight: 450,
                   borderRadius: 4,
                   objectFit: 'contain',
                 }}
@@ -72,15 +73,28 @@ const DefaultLayout = () => {
                   fontSize: { xs: '2.5rem', md: '2.1rem' },
                   fontWeight: 800,
                   lineHeight: 1.2,
-                  mb: 3
+                  mb: 2,
+                  position: 'relative',
+                  '&:after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: -8,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '80px',
+                    height: '3px',
+                    bgcolor: 'primary.main',
+                    borderRadius: '2px'
+                  }
                 }}
               >
                 {t('DefaultLayout.TransformYourBusiness')}
               </Typography>
               <Typography 
                 variant="h5" 
-                color="text.secondary" 
+                color="text.black" 
                 sx={{ 
+                  mt: 3,
                   mb: 4,
                   lineHeight: 1.6,
                   fontWeight: 400
@@ -112,15 +126,27 @@ const DefaultLayout = () => {
       </Box>
 
       {/* Features */}
-      <Container sx={{ py: { xs: 8, md: 12 }, mt: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' ,backgroundColor:'background.default'}}>
-        <Box sx={{ textAlign: 'center', mb: 8 }}>
+      <Container sx={{ py: { xs: 6, md: 8 },mt:3, display: 'flex', flexDirection: 'column', alignItems: 'center' ,backgroundColor:'background.default'}}>
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Typography
             variant="h2"
             color="primary"
             sx={{
               fontWeight: 700,
               mb: 2,
-              fontSize: { xs: '2rem', md: '2.5rem' }
+              fontSize: { xs: '2rem', md: '2.5rem' },
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '60px',
+                height: '3px',
+                bgcolor: 'primary.main',
+                borderRadius: '2px'
+              }
             }}
           >
             {t('DefaultLayout.PowerfulFeatures')}
@@ -128,7 +154,7 @@ const DefaultLayout = () => {
         </Box>
 
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <Grid container spacing={4} maxWidth="lg" justifyContent="center">
+          <Grid container spacing={3} maxWidth="lg" justifyContent="center">
             {[{
               icon: <StarsIcon sx={{ fontSize: 40 }} />,
               title: t('DefaultLayout.Smart'),
@@ -198,7 +224,7 @@ const DefaultLayout = () => {
 
       {/* How It Works */}
       <Box sx={{ 
-        py: { xs: 8, md: 7 }, 
+        py: { xs: 6, md: 8 }, 
         width: '100%',
         background: 'linear-gradient(135deg, #800080 0%, #4b004b 100%)'
       }}>
@@ -210,18 +236,30 @@ const DefaultLayout = () => {
               sx={{
                 fontWeight: 700,
                 mb: 2,
-                fontSize: { xs: '2rem', md: '2.5rem' }
+                fontSize: { xs: '2rem', md: '2.5rem' },
+                position: 'relative',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -8,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '60px',
+                  height: '3px',
+                  bgcolor: 'white',
+                  borderRadius: '2px'
+                }
               }}
             >
               {t('DefaultLayout.HowItWorks')}
             </Typography>
-            <Typography variant="h6" color="white" sx={{ opacity: 0.9 }}>
+            <Typography variant="h6" color="white" sx={{ opacity: 0.9, mt: 3 }}>
               {t('DefaultLayout.Start')}
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <Grid container spacing={4} maxWidth="lg" justifyContent="center">
+          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 2 }}>
+            <Grid container spacing={3} maxWidth="lg" justifyContent="center">
               {[
                 {
                   text: t('DefaultLayout.Purchase'),
@@ -232,7 +270,7 @@ const DefaultLayout = () => {
                   image: scanQr
                 },
                 {
-                        text: t('DefaultLayout.PointsCredited'),
+                  text: t('DefaultLayout.PointsCredited'),
                   image: points
                 },
                 {
@@ -296,7 +334,7 @@ const DefaultLayout = () => {
                       }}
                     />
                     <Typography variant="h5" color="white" gutterBottom>
-                      Step {i + 1}
+                    {t('DefaultLayout.Step')} {i + 1}
                     </Typography>
                     <Typography color="white" sx={{ fontSize: '14px', opacity: 0.9 }}>
                       {step.text}
@@ -310,7 +348,7 @@ const DefaultLayout = () => {
       </Box>
 
       {/* Call to Action */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.paper', width: '100%' }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'background.paper', width: '100%' }}>
         <Container sx={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ textAlign: 'center', maxWidth: 800 }}>
             <Typography 
@@ -319,7 +357,19 @@ const DefaultLayout = () => {
                 color: 'primary.main',
                 fontWeight: 700,
                 mb: 3,
-                fontSize: { xs: '2rem', md: '2.5rem' }
+                fontSize: { xs: '2rem', md: '2.5rem' },
+                position: 'relative',
+                '&:after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -8,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '60px',
+                  height: '3px',
+                  bgcolor: 'primary.main',
+                  borderRadius: '2px'
+                }
               }}
             >
               {t('DefaultLayout.ReadyToGetStarted')}
@@ -328,6 +378,7 @@ const DefaultLayout = () => {
               variant="h6" 
               sx={{ 
                 color: 'text.secondary',
+                mt: 3,
                 mb: 4,
                 fontWeight: 400
               }}

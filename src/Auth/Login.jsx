@@ -9,19 +9,25 @@ import {
   Link
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import Spinner from '../utilities/Spinner';
+import { notifyError, notifySuccess } from '../utilities/Toastify';
+import Api from '../Config/Api';
+import Navbar from '../Components/Shared/Navbar';
+import { useTranslation } from 'react-i18next';
+
 
 const Login = () => {
+  const {t} =useTranslation()
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const validate = values => {
     const errors = {};
 
-    if (!values.phone) {
-      errors.phone = 'Phone number is required';
-    } else if (!/^[0-9]+$/.test(values.phone)) {
-      errors.phone = 'Phone number must contain only digits';
-    } else if (values.phone.length < 10) {
-      errors.phone = 'Phone number must be at least 10 digits';
+    if (!values.email) {
+      errors.email = 'Email is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+      errors.email = 'Invalid email address';
     }
 
     if (!values.password) {
@@ -33,43 +39,64 @@ const Login = () => {
 
   const formik = useFormik({
     initialValues: {
-      phone: '',
+      email: '',
       password: ''
     },
     validate,
-    onSubmit: (values) => {
-      // Handle login submission here
-      console.log('Login values:', values);
+    onSubmit: async (values) => {
+      try {
+        setLoading(true);
+        const response = await Api.post('/api/auth/login', values);
+        
+        // Store token and user data in localStorage
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+        
+        notifySuccess('Login successful');
+        navigate('/dashboard');
+      } catch (error) {
+        notifyError(error.response?.data?.message || 'Login failed');
+      } finally {
+        setLoading(false);
+      }
     },
   });
 
   return (
-    <Container component="main" maxWidth="sm" sx={{ mt: 8, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Paper elevation={1} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
+    <>
+      <Navbar />
+    <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
             component="h1" 
-            variant="h4" 
+            variant="h5" 
             align="center" 
             color="primary"
             sx={{ mb: 4, fontWeight: 600 }}
           >
-            Login
+            {t('Login.login')}
           </Typography>
 
           <TextField
             fullWidth
-            label="Phone Number"
+            name="email"
+            label={t('Login.email')}
             sx={{ mb: 2 }}
-            value={formik.values.phone}
+            value={formik.values.email}
             onChange={formik.handleChange}
-            error={formik.touched.phone && Boolean(formik.errors.phone)}
-            helperText={formik.touched.phone && formik.errors.phone}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
 
           <TextField
             fullWidth
-            label="Password"
+            name="password"
+            label={t('Login.password')}
             type="password"
             sx={{ mb: 2 }}
             value={formik.values.password}
@@ -85,7 +112,7 @@ const Login = () => {
               onClick={() => navigate('/forgot-password')}
               sx={{ textDecoration: 'none' }}
             >
-              Forgot Password?
+              {t('Login.forgotPassword')}
             </Link>
           </Box>
 
@@ -96,25 +123,26 @@ const Login = () => {
             color="primary"
             size="large"
           >
-            Login
+            {loading ? <Spinner /> : t('Login.login')}
           </Button>
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Don't have an account?{' '}
+              {t('Login.dontHaveAccount')}{' '}
               <Typography
                 component="span"
                 color="primary"
                 sx={{ cursor: 'pointer', fontWeight: 500 }}
                 onClick={() => navigate('/signup')}
               >
-                Sign Up
+                {t('Login.signUp')}
               </Typography>
             </Typography>
           </Box>
         </Box>
       </Paper>
     </Container>
+    </>
   );
 };
 

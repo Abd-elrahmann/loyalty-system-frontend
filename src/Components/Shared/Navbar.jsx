@@ -2,18 +2,33 @@ import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/mater
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../assets/images/logo.webp';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
     i18n.changeLanguage(newLang);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'white',width: '100%' }}>
+    <AppBar position="static" sx={{ backgroundColor: 'white',width: '100%',boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)' }}>
       <Toolbar sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <img src={Logo} alt="Logo" style={{ width: '40px', height: '40px' }} />
@@ -43,22 +58,39 @@ const Navbar = () => {
             {i18n.language === 'en' ? 'Ar' : 'EN'}
           </Button>
 
-          {/* Auth Buttons */}
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate('/login')}
-          >
-            {t('Navbar.Login')}
-          </Button>
-          
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate('/signup')}
-          >
-            {t('Navbar.SignUp')}
-          </Button>
+          {/* Conditional Rendering based on auth state */}
+          {user ? (
+            <>
+              <Typography sx={{ color: 'text.primary' }}>
+                {t('Navbar.Welcome')} {user.firstName}
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleLogout}
+              >
+                {t('Navbar.Logout')}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => navigate('/login')}
+              >
+                {t('Navbar.Login')}
+              </Button>
+              
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/signup')}
+              >
+                {t('Navbar.SignUp')}
+              </Button>
+            </>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
