@@ -1,17 +1,16 @@
 import React from 'react';
-import Navbar from './Shared/Navbar';
-import Footer from './Shared/Footer';
+import MainLayout from './MainLayout';
 import { Box, Container, Typography, Grid, Button, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
-import heroImg from '../assets/images/hero.webp';
+import heroImg from '../../assets/images/hero.webp';
 import StarsIcon from '@mui/icons-material/Stars';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import purchase from '../assets/images/purchase.webp';
-import scanQr from '../assets/images/scan.webp';
-import points from '../assets/images/points.webp';
-import track from '../assets/images/track.webp';
-import rewards from '../assets/images/redeem.webp';
+import purchase from '../../assets/images/purchase.webp';
+import scanQr from '../../assets/images/scan.webp';
+import points from '../../assets/images/points.webp';
+import track from '../../assets/images/track.webp';
+import rewards from '../../assets/images/redeem.webp';
 import { useTranslation } from 'react-i18next';
 
 const fadeUp = {
@@ -23,14 +22,11 @@ const fadeUp = {
   }),
 };
 
-const DefaultLayout = () => {
+const Home = () => {
   const { t } = useTranslation();
   
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', alignItems: 'center' }}>
-      <Navbar />
-
-      {/* Hero Section */}
+    <MainLayout>
       <Box
         component={motion.div}
         initial="hidden"
@@ -125,7 +121,6 @@ const DefaultLayout = () => {
         </Container>
       </Box>
 
-      {/* Features */}
       <Container sx={{ py: { xs: 6, md: 8 },mt:3, display: 'flex', flexDirection: 'column', alignItems: 'center' ,backgroundColor:'background.default'}}>
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Typography
@@ -222,7 +217,6 @@ const DefaultLayout = () => {
         </Box>
       </Container>
 
-      {/* How It Works */}
       <Box sx={{ 
         py: { xs: 6, md: 8 }, 
         width: '100%',
@@ -347,7 +341,6 @@ const DefaultLayout = () => {
         </Container>
       </Box>
 
-      {/* Call to Action */}
       <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'background.paper', width: '100%' }}>
         <Container sx={{ display: 'flex', justifyContent: 'center' }}>
           <Box sx={{ textAlign: 'center', maxWidth: 800 }}>
@@ -406,10 +399,8 @@ const DefaultLayout = () => {
           </Box>
         </Container>
       </Box>
-
-      <Footer />
-    </Box>
+    </MainLayout>
   );
 };
 
-export default DefaultLayout;
+  export default Home;

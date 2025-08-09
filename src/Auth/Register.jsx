@@ -12,25 +12,27 @@ import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Spinner from '../utilities/Spinner';
 import { useNavigate } from 'react-router-dom';
 import Api from '../Config/Api';
-import Navbar from '../Components/Shared/Navbar';
+import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
+
 const Register = () => {
-  const {t} =useTranslation()
+  const {t} = useTranslation()
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
   const validate = values => {
     const errors = {};
 
-    if (!values.firstName) {
-      errors.firstName = 'First name is required';
-    } else if (values.firstName.length < 2) {
-      errors.firstName = 'First name must be at least 2 characters';
+    if (!values.enName) {
+      errors.enName = 'English name is required';
+    } else if (values.enName.length < 2) {
+      errors.enName = 'English name must be at least 2 characters';
     }
 
-    if (!values.lastName) {
-      errors.lastName = 'Last name is required';
-    } else if (values.lastName.length < 2) {
-      errors.lastName = 'Last name must be at least 2 characters';
+    if (!values.arName) {
+      errors.arName = 'Arabic name is required';
+    } else if (values.arName.length < 2) {
+      errors.arName = 'Arabic name must be at least 2 characters';
     }
 
     if (!values.email) {
@@ -64,8 +66,8 @@ const Register = () => {
 
   const formik = useFormik({
     initialValues: {
-      firstName: '',
-      lastName: '',
+      enName: '',
+      arName: '',
       phone: '',
       email: '',
       password: '',
@@ -75,10 +77,9 @@ const Register = () => {
     onSubmit: async (values) => {
       try {
         setLoading(true);
-        const response = await Api.post('/api/auth/register', values);
-        notifySuccess('Account created successfully'); 
-        localStorage.setItem('user', JSON.stringify(values));    
-        localStorage.setItem('token', response.data.token);
+        await Api.post('/api/auth/register', values);
+        localStorage.setItem('profile', JSON.stringify(values));
+        notifySuccess('Account created successfully');
         navigate('/login');
       } catch (error) {
         notifyError(error.response.data.message);
@@ -89,9 +90,8 @@ const Register = () => {
   });
 
   return (
-    <>
-      <Navbar />
-    <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <MainLayout>
+      <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Paper 
         elevation={3} 
         sx={{ 
@@ -110,21 +110,21 @@ const Register = () => {
           <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
             <TextField
               fullWidth
-              name="firstName"
-              label={t('Register.firstName')}
-              value={formik.values.firstName}
+              name="enName"
+              label={t('Register.enName')}
+              value={formik.values.enName}
               onChange={formik.handleChange}
-              error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-              helperText={formik.touched.firstName && formik.errors.firstName}
+              error={formik.touched.enName && Boolean(formik.errors.enName)}
+              helperText={formik.touched.enName && formik.errors.enName}
             />
             <TextField
               fullWidth
-              name="lastName"
-              label={t('Register.lastName')}
-              value={formik.values.lastName}
+              name="arName"
+              label={t('Register.arName')}
+              value={formik.values.arName}
               onChange={formik.handleChange}
-              error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-              helperText={formik.touched.lastName && formik.errors.lastName}
+              error={formik.touched.arName && Boolean(formik.errors.arName)}
+              helperText={formik.touched.arName && formik.errors.arName}
             />    
           </Box>
 
@@ -202,7 +202,7 @@ const Register = () => {
         </Box>
       </Paper>
     </Container>
-    </>
+    </MainLayout>
   );
 };
 

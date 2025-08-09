@@ -4,22 +4,27 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import Spinner from './utilities/Spinner';
 import Register from './Auth/Register';
 import Login from './Auth/Login';
 import { useTranslation } from 'react-i18next';
+import './App.css';
 import { useEffect, useMemo } from 'react';
 import ForgetPassword from './Auth/ForgetPassword';
-import DefaultLayout from './Components/DefaultLayout';
 import createCache from '@emotion/cache';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
-import Dashboard from './Pages/Dashboard';
 import ResetPassword from './Auth/ResetPassword';
+const Customers = React.lazy(() => import('./Pages/Customers'));
+const Profile = React.lazy(() => import('./Components/Shared/Profile'));
+const Home = React.lazy(() => import('./Components/Shared/Home'));
+const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
+const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 
-// Protected Route Component
+
+
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
   
@@ -30,7 +35,7 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Public Route Component
+
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
   
@@ -71,7 +76,7 @@ function App() {
           <Routes>
             <Route path="/" element={
               <PublicRoute>
-                <DefaultLayout />
+                <Home />
               </PublicRoute>
             } />
             <Route path="/signup" element={
@@ -98,10 +103,26 @@ function App() {
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <MainLayout>
+                    <Dashboard />
+                  </MainLayout>
                 </ProtectedRoute>
               } 
             />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Profile />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/customers" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Customers />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
           </Routes>
         </Suspense>
           <ToastContainer />

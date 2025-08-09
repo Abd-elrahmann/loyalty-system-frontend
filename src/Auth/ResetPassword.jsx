@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
-import Navbar from '../Components/Shared/Navbar';
+import MainLayout from '../Components/Shared/MainLayout';
 import Spinner from '../utilities/Spinner';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -63,8 +63,7 @@ const ResetPassword = () => {
     });
 
     return (
-        <>
-            <Navbar />
+        <MainLayout>
             <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
                     <Box component="form" onSubmit={formik.handleSubmit}>
@@ -132,7 +131,7 @@ const ResetPassword = () => {
                     </Box>
                 </Paper>
             </Container>
-        </>
+        </MainLayout>
     );
 };
 

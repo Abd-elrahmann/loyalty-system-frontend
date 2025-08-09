@@ -13,7 +13,7 @@ import { useState } from 'react';
 import Spinner from '../utilities/Spinner';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
-import Navbar from '../Components/Shared/Navbar';
+import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
 
 
@@ -48,14 +48,13 @@ const Login = () => {
         setLoading(true);
         const response = await Api.post('/api/auth/login', values);
         
-        // Store token and user data in localStorage
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
         }
         if (response.data.user) {
           localStorage.setItem('user', JSON.stringify(response.data.user));
         }
-        
+
         notifySuccess('Login successful');
         navigate('/dashboard');
       } catch (error) {
@@ -67,9 +66,8 @@ const Login = () => {
   });
 
   return (
-    <>
-      <Navbar />
-    <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <MainLayout>
+      <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
@@ -142,7 +140,7 @@ const Login = () => {
         </Box>
       </Paper>
     </Container>
-    </>
+    </MainLayout>
   );
 };
 

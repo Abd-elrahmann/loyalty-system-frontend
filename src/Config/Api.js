@@ -14,10 +14,8 @@ Api.interceptors.request.use(
     config.headers['lang'] = i18n.language;
     config.headers["page"] = window.location.pathname.split('/').pop();
     const token = localStorage.getItem("token")
-    const user = localStorage.getItem("user")
     if (token) {
-      config.headers.Authorization = token
-      config.headers.user = user
+      config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
@@ -40,7 +38,6 @@ export const handleApiError = (error) => {
       console.log('🚀 ~ handleApiError ~ errorMes:', errorMes)
       notifyError(errorMes)
     }
-    // notifyError(error?.response?.data?.error);
   } catch (error) {
     console.log(error)
   }
