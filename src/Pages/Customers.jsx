@@ -24,9 +24,11 @@ import AddIcon from "@mui/icons-material/Add";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import { useTranslation } from "react-i18next";
 import { Search } from "@mui/icons-material";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { FaTrash, FaEdit, FaPlus, FaQrcode } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
+import AddPointsModal from "../Components/Modals/AddPointsModal";
+import ScanQRModal from "../Components/Modals/ScanQRModal";
 const Customers = () => {
   const { t } = useTranslation();
   const [customers, setCustomers] = useState([]);
@@ -45,6 +47,9 @@ const Customers = () => {
   const [customer, setCustomer] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [openAddPointsModal, setOpenAddPointsModal] = useState(false);
+  const [customerToAddPoints, setCustomerToAddPoints] = useState(null);
+  const [openScanQR, setOpenScanQR] = useState(false);
 
   const fetchCustomers = async () => {
     try {
@@ -103,30 +108,34 @@ const Customers = () => {
             flexDirection: { xs: "column", sm: "row" },
           }}
         >
-          <Stack direction={"row"} spacing={2}>
-            <Stack direction={"row"}>
-              <InputBase
-                value={searchFilters.enName}
-                onChange={(e) => {
-                  setSearchFilters((prev) => ({
-                    ...prev,
-                    enName: e.target.value,
-                  }));
-                  setPage(1);
-                }}
-                placeholder={t("Customers.SearchName")}
-                sx={{
-                  color: "text.primary",
-                  textAlign: "center",
-                  width: "120px",
-                }}
-              />
-            </Stack>
+          <Stack direction={"row"} spacing={1}>
+                <InputBase
+                  value={searchFilters.email}
+                  onChange={(e) => {
+                    setSearchFilters((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }));
+                    setPage(1);
+                  }}
+                  placeholder={t("Customers.SearchEmail")}
+                  sx={{
+                    color: "text.primary",
+                    textAlign: "center",
+                    width: "180px",
+                  }}
+                />
             <IconButton
               sx={{ color: "primary.main", padding: 0 }}
               onClick={handleSearch}
             >
               <Search />
+            </IconButton>
+            <IconButton
+              sx={{ color: "primary.main", padding: 0 }}
+              onClick={() => setOpenScanQR(true)}
+            >
+              <FaQrcode />
             </IconButton>
           </Stack>
 
@@ -168,6 +177,9 @@ const Customers = () => {
               </StyledTableCell>
               <StyledTableCell align="center">
                 {t("Customers.Points")}
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                {t("Customers.AddPoints")}
               </StyledTableCell>
               <StyledTableCell align="center">
                 {t("Customers.Update")}
@@ -220,10 +232,18 @@ const Customers = () => {
                     {customer.points}
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <Box
-                      sx={{ display: "flex", gap: 2, justifyContent: "center" }}
-                    >
-                      <IconButton
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        setOpenAddPointsModal(true);
+                        setCustomerToAddPoints(customer);
+                      }}>
+                        <FaPlus />
+                      </IconButton>
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <IconButton
                         size="small"
                         color="primary"
                         onClick={() => {
@@ -233,19 +253,14 @@ const Customers = () => {
                       >
                         <FaEdit color="green" />
                       </IconButton>
-                    </Box>
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <Box
-                      sx={{ display: "flex", gap: 2, justifyContent: "center" }}
-                    >
-                      <IconButton size="small" color="error" onClick={() => {
-                        setOpenDeleteModal(true);
-                        setCustomerToDelete(customer);
-                      }}>
-                        <FaTrash />
-                      </IconButton>
-                    </Box>
+                    <IconButton size="small" color="error" onClick={() => {
+                      setOpenDeleteModal(true);
+                      setCustomerToDelete(customer);
+                    }}>
+                      <FaTrash />
+                    </IconButton>
                   </StyledTableCell>
                 </StyledTableRow>
               ))
@@ -280,6 +295,22 @@ const Customers = () => {
         title={t("Customers.DeleteCustomer")}
         onConfirm={handleDelete}
         isLoading={isLoading}
+      />
+      <AddPointsModal
+        open={openAddPointsModal}
+        onClose={() => setOpenAddPointsModal(false)}
+        customer={customerToAddPoints}
+        fetchCustomers={fetchCustomers}
+      />
+      <ScanQRModal
+        open={openScanQR}
+        onClose={() => setOpenScanQR(false)}
+        onScanSuccess={(email) => {
+          setSearchFilters(prev => ({
+            ...prev,
+            email: email
+          }));
+        }}
       />
     </Box>
   );

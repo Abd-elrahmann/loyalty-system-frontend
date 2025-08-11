@@ -9,45 +9,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
   const isRTL = i18n.language === 'ar';
   const isEdit = Boolean(customer);
 
-  const formik = useFormik({
-    initialValues: {
-    enName: '',
-    arName: '',
-    email: '',
-    phone: '',
-    points: '',
-    password: '',
-    confirmPassword: '',
-  },
-  onSubmit: handleSubmit,
-  });
-
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (customer) {
-      formik.setValues({
-        enName: customer.enName || '',
-        arName: customer.arName || '',
-        email: customer.email || '',
-        phone: customer.phone || '',
-        points: customer.points || 0,
-        password: '',
-        confirmPassword: ''
-      });
-    } else {
-      formik.setValues({
-        enName: '',
-        arName: '',
-        email: '',
-        phone: '',
-        points: '',
-        password: '',
-        confirmPassword: ''
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customer]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -72,27 +34,19 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
       if (formik.values.password !== formik.values.confirmPassword) {
         newErrors.confirmPassword = t('Validation.passwordMismatch');
       }
-      if (!formik.values.points) {
-        newErrors.points = t('Validation.required');
-      }
-      if (formik.values.points < 0) {
-        newErrors.points = t('Validation.points');
-      } else if (isNaN(formik.values.points)) {
-        newErrors.points = t('Validation.invalidPoints');
-      }
+      
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-    const handleSubmit = async (values) => {
+  const handleSubmit = async (values) => {
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
             const dataToSubmit = { 
         ...values,
-        points: parseInt(values.points) || 0
       };
         if (isEdit) {
           delete dataToSubmit.password;
@@ -112,6 +66,41 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
       setIsLoading(false);
     }
   };
+
+  const formik = useFormik({
+    initialValues: {
+      enName: '',
+      arName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    },
+    onSubmit: handleSubmit,
+  });
+
+  useEffect(() => {
+    if (customer) {
+      formik.setValues({
+        enName: customer.enName || '',
+        arName: customer.arName || '',
+        email: customer.email || '',
+        phone: customer.phone || '',
+        password: '',
+        confirmPassword: ''
+      });
+    } else {
+      formik.setValues({
+        enName: '',
+        arName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: ''
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customer]);
 
   return (
     <Dialog 
@@ -155,23 +144,9 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
             value={formik.values.phone}
             onChange={(e) => formik.setValues({...formik.values, phone: e.target.value})}
             error={!!errors.phone}
+            type="number"
             helperText={errors.phone}
             fullWidth
-          />
-          <TextField
-            label={t('Customers.Points')}
-            type="number"
-            value={formik.values.points}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === '' || (Number(value) >= 0 && !isNaN(value))) {
-                formik.setValues({...formik.values, points: value});
-              }
-            }}
-            error={!!errors.points}
-            helperText={errors.points}
-            fullWidth
-            inputProps={{ min: 0 }}
           />
           {!isEdit && (
             <>

@@ -5,7 +5,6 @@ import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
 import { useTranslation } from 'react-i18next';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,7 +13,7 @@ import DeleteModal from '../Components/Modals/DeleteModal';
 import Spinner from '../utilities/Spinner'
 const Products = () => {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState('cafe'); // Default to 'cafe'
+  const [activeTab, setActiveTab] = useState('cafe');
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -214,13 +213,7 @@ const Products = () => {
                   <Typography gutterBottom variant="h6" component="div">
                     {i18n.language === 'ar' ? product.arName : product.enName}
                   </Typography>
-                  
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, gap: 1 }}>
-                    <AttachMoneyIcon sx={{ color: 'green' }} />
-                    <Typography variant="body1">
-                      {t('Products.Price')}: ${product.price}
-                    </Typography>
-                  </Box>
+  
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <MonetizationOnIcon sx={{ color: 'gold' }} />
                     <Typography variant="body1">
