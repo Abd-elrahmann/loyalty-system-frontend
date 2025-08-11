@@ -195,6 +195,7 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
           width: drawerWidth,
           boxSizing: 'border-box',
           border: 'none',
+          
           borderRight: !isRTL ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
           borderLeft: isRTL ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
         },

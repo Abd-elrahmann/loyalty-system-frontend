@@ -53,7 +53,7 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) =>
           color="error"
           disabled={isLoading}
         >
-          {t('Customers.DeleteCustomer')}
+          {t('Customers.Delete')}
         </Button>
       </DialogActions>
     </Dialog>

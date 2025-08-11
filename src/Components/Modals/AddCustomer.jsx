@@ -3,13 +3,14 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, B
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
-
+import { useFormik } from 'formik';
 const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, customer = null }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const isEdit = Boolean(customer);
 
-  const [formData, setFormData] = useState({
+  const formik = useFormik({
+    initialValues: {
     enName: '',
     arName: '',
     email: '',
@@ -17,13 +18,15 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
     points: '',
     password: '',
     confirmPassword: '',
+  },
+  onSubmit: handleSubmit,
   });
 
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (customer) {
-      setFormData({
+      formik.setValues({
         enName: customer.enName || '',
         arName: customer.arName || '',
         email: customer.email || '',
@@ -33,7 +36,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         confirmPassword: ''
       });
     } else {
-      setFormData({
+      formik.setValues({
         enName: '',
         arName: '',
         email: '',
@@ -43,37 +46,38 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         confirmPassword: ''
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customer]);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.enName) newErrors.enName = t('Validation.required');
-    if (!formData.arName) newErrors.arName = t('Validation.required');
-    if (!formData.email) {
+    if (!formik.values.enName) newErrors.enName = t('Validation.required');
+    if (!formik.values.arName) newErrors.arName = t('Validation.required');
+    if (!formik.values.email) {
       newErrors.email = t('Validation.required');
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(formik.values.email)) {
       newErrors.email = t('Validation.invalidEmail');
     }
-    if (!formData.phone) newErrors.phone = t('Validation.required');
+    if (!formik.values.phone) newErrors.phone = t('Validation.required');
     
     if (!isEdit) {
-      if (!formData.password) {
+      if (!formik.values.password) {
         newErrors.password = t('Validation.required');
-      } else if (formData.password.length < 6) {
+      } else if (formik.values.password.length < 6) {
         newErrors.password = t('Validation.passwordLength');
       }
-      if (!formData.confirmPassword) {
+        if (!formik.values.confirmPassword) {
         newErrors.confirmPassword = t('Validation.required');
       }
-      if (formData.password !== formData.confirmPassword) {
+      if (formik.values.password !== formik.values.confirmPassword) {
         newErrors.confirmPassword = t('Validation.passwordMismatch');
       }
-      if (!formData.points) {
+      if (!formik.values.points) {
         newErrors.points = t('Validation.required');
       }
-      if (formData.points < 0) {
+      if (formik.values.points < 0) {
         newErrors.points = t('Validation.points');
-      } else if (isNaN(formData.points)) {
+      } else if (isNaN(formik.values.points)) {
         newErrors.points = t('Validation.invalidPoints');
       }
     }
@@ -81,14 +85,14 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
+    const handleSubmit = async (values) => {
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
             const dataToSubmit = { 
-        ...formData,
-        points: parseInt(formData.points) || 0
+        ...values,
+        points: parseInt(values.points) || 0
       };
         if (isEdit) {
           delete dataToSubmit.password;
@@ -124,32 +128,32 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
             label={t('Customers.EnglishName')}
-            value={formData.enName}
-            onChange={(e) => setFormData({...formData, enName: e.target.value})}
+            value={formik.values.enName}
+            onChange={(e) => formik.setValues({...formik.values, enName: e.target.value})}
             error={!!errors.enName}
             helperText={errors.enName}
             fullWidth
           />
           <TextField
             label={t('Customers.ArabicName')}
-            value={formData.arName}
-            onChange={(e) => setFormData({...formData, arName: e.target.value})}
+            value={formik.values.arName}
+            onChange={(e) => formik.setValues({...formik.values, arName: e.target.value})}
             error={!!errors.arName}
             helperText={errors.arName}
             fullWidth
           />
           <TextField
             label={t('Customers.Email')}
-            value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            value={formik.values.email}
+            onChange={(e) => formik.setValues({...formik.values, email: e.target.value})}
             error={!!errors.email}
             helperText={errors.email}
             fullWidth
           />
           <TextField
             label={t('Customers.Phone')}
-            value={formData.phone}
-            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            value={formik.values.phone}
+            onChange={(e) => formik.setValues({...formik.values, phone: e.target.value})}
             error={!!errors.phone}
             helperText={errors.phone}
             fullWidth
@@ -157,11 +161,11 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
           <TextField
             label={t('Customers.Points')}
             type="number"
-            value={formData.points}
+            value={formik.values.points}
             onChange={(e) => {
               const value = e.target.value;
               if (value === '' || (Number(value) >= 0 && !isNaN(value))) {
-                setFormData({...formData, points: value});
+                formik.setValues({...formik.values, points: value});
               }
             }}
             error={!!errors.points}
@@ -174,8 +178,8 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
               <TextField
                 type="password"
                 label={t('Customers.Password')}
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                value={formik.values.password}
+                onChange={(e) => formik.setValues({...formik.values, password: e.target.value})}
                 error={!!errors.password}
                 helperText={errors.password}
                 fullWidth
@@ -183,8 +187,8 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
               <TextField
                 type="password"
                 label={t('Customers.ConfirmPassword')}
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                value={formik.values.confirmPassword}
+                onChange={(e) => formik.setValues({...formik.values, confirmPassword: e.target.value})}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword}
                 fullWidth
@@ -197,7 +201,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         <Button onClick={onClose} disabled={isLoading}>
           {t('Customers.cancel')}
         </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={isLoading}>
+        <Button onClick={formik.handleSubmit} variant="contained" disabled={isLoading}>
           {isEdit ? t('Customers.Update') : t('Customers.add')}
         </Button>
       </DialogActions>

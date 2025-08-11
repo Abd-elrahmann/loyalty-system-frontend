@@ -6,7 +6,8 @@ import {
   Button,
   Typography,
   Container,
-  Paper
+  Paper,
+  IconButton
 } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Spinner from '../utilities/Spinner';
@@ -14,11 +15,23 @@ import { useNavigate } from 'react-router-dom';
 import Api from '../Config/Api';
 import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Register = () => {
   const {t} = useTranslation()
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const validate = values => {
     const errors = {};
@@ -155,7 +168,14 @@ const Register = () => {
             fullWidth
             name="password"
             label={t('Register.password')}
-            type="password"
+            type={showPassword ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={togglePasswordVisibility}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              )
+            }}
             sx={{ mb: 2 }}
             value={formik.values.password}
             onChange={formik.handleChange}
@@ -167,7 +187,14 @@ const Register = () => {
             fullWidth
             name="confirmPassword"
             label={t('Register.confirmPassword')}
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={toggleConfirmPasswordVisibility}>
+                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              )
+            }}
             sx={{ mb: 3 }}
             value={formik.values.confirmPassword}
             onChange={formik.handleChange}

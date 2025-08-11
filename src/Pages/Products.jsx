@@ -1,0 +1,283 @@
+import React, { useState, useEffect } from 'react';
+import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import AddProductModal from '../Components/Modals/AddProductsModal';
+import Api, { handleApiError } from '../Config/Api';
+import { useTranslation } from 'react-i18next';
+import { notifySuccess, notifyError } from '../utilities/Toastify';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import RedeemIcon from '@mui/icons-material/Redeem';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteModal from '../Components/Modals/DeleteModal';
+import Spinner from '../utilities/Spinner'
+const Products = () => {
+  const { t, i18n } = useTranslation();
+  const [activeTab, setActiveTab] = useState('cafe'); // Default to 'cafe'
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [productId, setProductId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [productToEdit, setProductToEdit] = useState(null);
+  useEffect(() => {
+    fetchProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  useEffect(() => {
+    const filtered = products.filter(product => 
+      product.enName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.arName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [searchTerm, products]);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const endpoint = activeTab === 'cafe' 
+        ? '/api/cafe-products/1' 
+        : '/api/restaurant-products/1';
+      
+      const response = await Api.get(endpoint);
+      setProducts(response.data.products || []);
+      setFilteredProducts(response.data.products || []);
+    } catch (error) {
+      handleApiError(error);
+      setProducts([]); 
+      setFilteredProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+    setSearchTerm('');
+  };
+
+  const handleOpenModal = (product) => {
+    setOpenModal(true);
+    setProductToEdit(product);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleAddProduct = async (productData) => {
+    try {
+      const endpoint = activeTab === 'cafe' 
+        ? '/api/cafe-products' 
+        : '/api/restaurant-products';
+      
+      await Api.post(endpoint, productData);
+      fetchProducts();
+      handleCloseModal();
+      notifySuccess(t('Products.ProductAdded'));
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
+
+  const handleUpdateProduct = async (productData) => {
+    setIsLoading(true);
+    try {
+      const endpoint = activeTab === 'cafe' 
+        ? `/api/cafe-products/${productData.id}` 
+        : `/api/restaurant-products/${productData.id}`;
+      await Api.put(endpoint, productData);
+      fetchProducts();
+      notifySuccess(t('Products.ProductUpdated'));
+    } catch (error) {
+      handleApiError(error);
+      notifyError(t('Products.ProductNotUpdated'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    setIsLoading(true);
+    setProductId(id);
+    setOpenDeleteModal(true);
+    try {
+      const endpoint = activeTab === 'cafe' 
+        ? `/api/cafe-products/${id}` 
+        : `/api/restaurant-products/${id}`;
+      
+      await Api.delete(endpoint);
+      fetchProducts();
+      notifySuccess(t('Products.ProductDeleted'));
+    } catch (error) {
+      handleApiError(error);
+      notifyError(t('Products.ProductNotDeleted'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs value={activeTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+          <Tab label={t('Products.Cafe')} value="cafe" />
+          <Tab label={t('Products.Restaurant')} value="restaurant" />
+        </Tabs>
+      </Box>
+
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 3,
+        gap: 2
+      }}>
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder={t('Products.Search')}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          sx={{
+            flexGrow: 1,
+            maxWidth: '250px',
+            backgroundColor: 'transparent',
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'transparent',
+              '& fieldset': {
+                borderColor: 'none',
+              },
+              '&:hover fieldset': {
+                borderColor: 'none',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'none',
+              },
+            },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="primary" />
+              </InputAdornment>
+            ),
+          }}
+        />
+        
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleOpenModal}
+        >
+          {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}
+        </Button>
+      </Box>
+      {loading && <Spinner />}
+      
+        <Grid container spacing={3}>
+          {filteredProducts.map((product) => (
+            <Grid item key={product.id}>
+              <Card sx={{ 
+                height: '100%', 
+                display: 'flex', 
+                
+                flexDirection: 'column',
+                borderRadius: '10px',
+                border: '1px solid #e0e0e0',
+                boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.2)',
+                width: 300,
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                  boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.1)'
+                }
+              }}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  loading="lazy"
+                  image={product.image}
+                  alt={product.enName}
+                  sx={{ objectFit: 'cover' }}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography gutterBottom variant="h6" component="div">
+                    {i18n.language === 'ar' ? product.arName : product.enName}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, gap: 1 }}>
+                    <AttachMoneyIcon sx={{ color: 'green' }} />
+                    <Typography variant="body1">
+                      {t('Products.Price')}: ${product.price}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <MonetizationOnIcon sx={{ color: 'gold' }} />
+                    <Typography variant="body1">
+                      {t('Products.Points')}: {product.points}
+                    </Typography>
+                  </Box>
+                </CardContent>
+                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                  <Button 
+                    variant="contained" 
+                    color="primary"
+                    size="small"
+                    startIcon={<RedeemIcon />}
+                  >
+                    {t('Products.Redeem')}
+                  </Button>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleOpenModal(product)}
+                    aria-label="edit"
+                  >
+                    <EditIcon sx={{ color: 'green' }} />
+                  </IconButton>
+                  <IconButton 
+                    color="error"
+                    onClick={() => setOpenDeleteModal(true)}
+                    aria-label="delete"
+                    >
+                      <DeleteIcon sx={{ color: 'red' }} />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+
+      <AddProductModal
+        open={openModal}
+        onClose={handleCloseModal}
+        onSubmit={handleAddProduct}
+        type={activeTab}
+        handleUpdateProduct={handleUpdateProduct}
+        productToEdit={productToEdit}
+      />
+      <DeleteModal
+        open={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        title={t('Products.DeleteProduct')}
+        message={t('Products.DeleteProductMessage')}
+        onConfirm={() => handleDeleteProduct(productId)}
+        isLoading={isLoading}
+      />
+    </Box>
+  );
+};
+
+export default Products;

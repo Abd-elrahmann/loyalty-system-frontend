@@ -54,7 +54,7 @@ const MainLayout = ({ children }) => {
             flexDirection: 'column',
             overflow: 'auto',
             backgroundColor: 'background.default',
-            width: shouldShowSidebar && !isMobile && sidebarVisible ? 'calc(100% - 280px)' : '100%',
+            width: shouldShowSidebar && !isMobile && sidebarVisible ? 'calc(100% - 200px)' : '100%',
             mt: 4
           }}
         >

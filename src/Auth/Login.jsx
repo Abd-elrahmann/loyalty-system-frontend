@@ -6,7 +6,8 @@ import {
   Typography,
   Container,
   Paper,
-  Link
+  Link,
+  IconButton
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -15,12 +16,17 @@ import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
 import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
-
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Login = () => {
   const {t} =useTranslation()
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   const validate = values => {
     const errors = {};
 
@@ -95,7 +101,14 @@ const Login = () => {
             fullWidth
             name="password"
             label={t('Login.password')}
-            type="password"
+            type={showPassword ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={togglePasswordVisibility}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              )
+            }}
             sx={{ mb: 2 }}
             value={formik.values.password}
             onChange={formik.handleChange}

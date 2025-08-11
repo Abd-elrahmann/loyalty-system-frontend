@@ -98,7 +98,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5,mr:2 }}>
                 <MonetizationOnIcon sx={{ color: '#FFD700', fontSize: '20px' }} />
                 <Typography sx={{ color: 'text.primary', fontSize: '16px', fontWeight: 'bold' }}>
-                  {profile?.points || ''}
+                  {profile?.points || '0'}
                 </Typography>
               </Box>
               

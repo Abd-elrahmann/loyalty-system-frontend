@@ -22,7 +22,7 @@ const Profile = React.lazy(() => import('./Components/Shared/Profile'));
 const Home = React.lazy(() => import('./Components/Shared/Home'));
 const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
-
+const Products = React.lazy(() => import('./Pages/Products'));
 
 
 const ProtectedRoute = ({ children }) => {
@@ -120,6 +120,13 @@ function App() {
               <ProtectedRoute>
                 <MainLayout>
                   <Customers />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/products" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Products />
                 </MainLayout>
               </ProtectedRoute>
             } />

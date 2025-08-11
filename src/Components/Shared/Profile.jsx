@@ -96,7 +96,7 @@ const Profile = () => {
         },
       });
       setProfile(prev => ({...prev, profileImage: response.data.user.profileImage}));
-      notifySuccess(t('Profile.ImageUpdated'));
+      notifySuccess(t('Profile.ImageUploaded'));
     } catch (err) {
       notifyError(err.response?.data?.message || 'Error uploading image');
     }

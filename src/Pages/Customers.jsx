@@ -61,11 +61,9 @@ const Customers = () => {
         setCustomers([]);
         setTotalPages(0);
       }
-      setIsLoading(false);
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
-      setCustomers([]);
-      setTotalPages(0);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -94,7 +92,7 @@ const Customers = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3 }}>
       <Box sx={{ p: 2, mb: 2 }}>
         <Box
           sx={{
@@ -278,8 +276,9 @@ const Customers = () => {
           setOpenDeleteModal(false);
           setCustomerToDelete(null);
         }}
-        onConfirm={handleDelete}
+        message={t("Customers.DeleteCustomerMessage")}
         title={t("Customers.DeleteCustomer")}
+        onConfirm={handleDelete}
         isLoading={isLoading}
       />
     </Box>
