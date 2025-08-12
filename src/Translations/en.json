@@ -109,7 +109,9 @@
         "NameUpdated": "Name updated successfully",
         "PasswordUpdated": "Password updated successfully",
         "Update": "Update",
-        "ImageUploaded": "Image uploaded successfully"
+        "ImageUploaded": "Image uploaded successfully",
+        "QRCode": "QR Code",
+        "NoQRCode": "No QR code found"
     },
     "Customers": {
         "AddCustomer": "Add Customer",
@@ -152,13 +154,16 @@
         "ScanQRCodeHint": "Scan QR code from image",
         "uploadQRCode": "Upload QR code",
         "uploadQRCodeMessage": "Upload QR code from image",
-        "uploadQRCodeSuccess": "QR code uploaded successfully",
-        "uploadQRCodeFailed": "QR code upload failed",
+        "uploadQRCodeSuccess": "QR code scanned successfully",
+        "uploadQRCodeFailed": "This account is not registered in the system",
         "uploadQRCodeNotFound": "QR code not found",
         "uploadQRCodeNotDeleted": "QR code not deleted",
         "ScanQRCode": "Scan QR code",
         "or": "or",
-        "SearchEmail": "Search Email"
+        "SearchEmail": "Search Email",
+        "ScanQR": "Scan QR",
+        "ExportCSV": "Export CSV",
+        "ExportPDF": "Export PDF"
     },
     "Products": {
         "Cafe": "Cafe",
@@ -197,5 +202,40 @@
         "DeleteProductMessage": "Are you sure you want to delete the product?",
         "EditProduct": "Edit Product",
         "UpdateProduct": "Update Product"
+    },
+    "Transactions": {
+        "Search": "Search",
+        "ExportCSV": "Export CSV",
+        "ExportPDF": "Export PDF",
+        "ExportedSuccessfully": "Exported successfully",
+        "NoTransactions": "No transactions found",
+        "RowsPerPage": "Rows per page",
+        "ID": "ID",
+        "CustomerEnName": "English Name",
+        "CustomerArName": "Arabic Name",
+        "Points": "Points",
+        "Type": "Type",
+        "Date": "Date",
+        "Delete": "Delete",
+        "Reset": "Reset",
+        "FromDate": "From Date",
+        "ToDate": "To Date",
+        "SearchTransactions": "Search Transactions",
+        "Earn": "earn",
+        "Redeem": "redeem",
+        "DeleteTransaction": "Delete Transaction",
+        "DeleteTransactionMessage": "Are you sure you want to delete the transaction?",
+        "DeleteTransactionSuccess": "Transaction deleted successfully",
+        "DeleteTransactionFailed": "Transaction not deleted",
+        "DeleteTransactionNotFound": "Transaction not found",
+        "DeleteTransactionNotDeleted": "Transaction not deleted",
+        "DeleteTransactionNotUpdated": "Transaction not updated",
+        "TransactionDeleted": "Transaction deleted successfully",
+        "TransactionNotDeleted": "Transaction not deleted",
+        "TransactionNotFound": "Transaction not found",
+        "TransactionNotUpdated": "Transaction not updated",
+        "TransactionUpdated": "Transaction updated successfully",
+        "TransactionNotAdded": "Transaction not added",
+        "TransactionAdded": "Transaction added successfully"
     }
 }

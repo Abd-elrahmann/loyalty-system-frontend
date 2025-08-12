@@ -15,14 +15,18 @@
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
+    "@mui/x-date-pickers": "^8.10.0",
     "axios": "^1.11.0",
     "chart.js": "^4.5.0",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
+    "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "framer-motion": "^12.23.12",
     "i18next": "^25.3.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.539.0",
     "qr-scanner": "^1.4.2",
     "react": "^19.1.0",
@@ -47,6 +51,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "terser": "^5.43.1",
     "vite": "^7.0.4"
   }
 }

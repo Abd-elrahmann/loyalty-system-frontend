@@ -10,7 +10,8 @@ import {
   TextField,
   Button,
   Alert,
-  IconButton
+  IconButton,
+  useMediaQuery
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
@@ -24,6 +25,7 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width: 400px)');
 
   const [nameForm, setNameForm] = useState({ enName: '', arName: '' });
   const [passwordForm, setPasswordForm] = useState({
@@ -120,7 +122,7 @@ const Profile = () => {
 
   return (
     <Container 
-      maxWidth="md" 
+      maxWidth={isMobile ? "xs" : "md"} 
       sx={{ 
         display: 'flex', 
         justifyContent: 'center', 
@@ -183,54 +185,78 @@ const Profile = () => {
           </Typography>
 
           <Box sx={{ mt: 2, width: '100%' }}>
-            <Grid container spacing={4} sx={{ mb: 4 }}>
-              <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+              {/* Names Row */}
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Paper elevation={1} sx={{ p: 2, width: '250px' }}>
                   <Typography variant="subtitle1" color="text.secondary">
                     {t('Profile.enName')}
                   </Typography>
                   <Typography variant="body1">{profile?.enName}</Typography>
                 </Paper>
-              </Grid>
-              <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, width: '250px' }}>
                   <Typography variant="subtitle1" color="text.secondary">
                     {t('Profile.arName')}
                   </Typography>
                   <Typography variant="body1">{profile?.arName}</Typography>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
 
-            <Grid container spacing={4} sx={{ mb: 2 }}>
-              <Grid item xs={12} md={6}>
+              {/* Contact Info Row */}
+              <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Paper elevation={1} sx={{ p: 2, width: '250px' }}>
                   <Typography variant="subtitle1" color="text.secondary">
                     {t('Profile.Email')}
                   </Typography>
                   <Typography variant="body1">{profile?.email}</Typography>
                 </Paper>
-              </Grid>
-              <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, width: '250px' }}>
                   <Typography variant="subtitle1" color="text.secondary">
                     {t('Profile.Phone')}
                   </Typography>
                   <Typography variant="body1">{profile?.phone}</Typography>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
 
-            <Grid container spacing={4} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <Grid item xs={12} md={6}>
-                <Paper elevation={1} sx={{ p: 2, width: '250px' }}>
+              {/* Points Row */}
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Paper elevation={1} sx={{ p: 2, width: '250px', height: 'fit-content' }}>
                   <Typography variant="subtitle1" color="text.secondary">
                     {t('Profile.Points')}
                   </Typography>
                   <Typography variant="body1">{profile?.points || 0}</Typography>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+
+              {/* QR Code Row */}
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Paper elevation={1} sx={{ p: 2, width: '300px', height: 'fit-content' }}>
+                  <Typography variant="subtitle1" color="text.secondary" align="center">
+                    {t('Profile.QRCode')}
+                  </Typography>
+                  {profile?.qrCode ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                      <Box
+                        component="img"
+                        src={profile.qrCode}
+                        alt="QR Code"
+                        sx={{
+                          width: isMobile ? 150 : 200,
+                          height: isMobile ? 150 : 200,
+                          objectFit: 'contain',
+                          borderRadius: 1,
+                          border: '1px solid #eee'
+                        }}
+                      />
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" align="center">
+                      {t('Profile.NoQRCode')}
+                    </Typography>
+                  )}
+                </Paper>
+              </Box>
+            </Box>
           </Box>
 
           <Box sx={{ mt: 4, width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -238,7 +264,7 @@ const Profile = () => {
               {t('Profile.UpdateName')}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   label={t('Profile.enName')}
@@ -246,7 +272,7 @@ const Profile = () => {
                   onChange={(e) => setNameForm({ ...nameForm, enName: e.target.value })}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   label={t('Profile.arName')}
@@ -265,7 +291,7 @@ const Profile = () => {
               {t('Profile.UpdatePassword')}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   type="password"
@@ -276,7 +302,7 @@ const Profile = () => {
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   type="password"
@@ -287,7 +313,7 @@ const Profile = () => {
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }} >
                 <TextField
                   fullWidth
                   type="password"

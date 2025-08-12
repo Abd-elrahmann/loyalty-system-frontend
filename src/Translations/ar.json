@@ -109,7 +109,9 @@
     "NameUpdated": "تم تحديث الاسم بنجاح",
     "PasswordUpdated": "تم تحديث كلمة المرور بنجاح",
     "ImageUploaded": "تم رفع الصورة بنجاح",
-    "Update": "تحديث"
+    "Update": "تحديث",
+    "QRCode": "كود الاستجابة السريعة",
+    "NoQRCode": "لا يوجد كود الاستجابة السريعة"
   },
   "Customers": {
     "AddCustomer": "إضافة عميل",
@@ -152,12 +154,15 @@
     "ScanQRCodeHint": "قراءة كود الاستجابة السريعة من الصورة",
     "uploadQRCode": "رفع كود الاستجابة السريعة",
     "uploadQRCodeMessage": "رفع كود الاستجابة السريعة من الصورة",
-    "uploadQRCodeSuccess": "تم رفع كود الاستجابة السريعة بنجاح",
-    "uploadQRCodeFailed": "فشل رفع كود الاستجابة السريعة",
+    "uploadQRCodeSuccess": "تم قراءة كود الاستجابة السريعة بنجاح",
+    "uploadQRCodeFailed": "هذا الحساب غير مسجل في النظام",
     "uploadQRCodeNotFound": "كود الاستجابة السريعة غير موجود",
     "uploadQRCodeNotDeleted": "فشل حذف كود الاستجابة السريعة",
     "or": "أو",
-    "SearchEmail": "بحث عن البريد الإلكتروني"
+    "SearchEmail": "بحث عن البريد الإلكتروني",
+    "ScanQR": "قراءة كود الاستجابة السريعة",
+    "ExportCSV": "تصدير CSV",
+    "ExportPDF": "تصدير PDF"
   },
   "Products": {
     "Cafe": "المقهى",
@@ -196,5 +201,40 @@
     "DeleteProductMessage": "هل أنت متأكد من الحذف ؟",
     "EditProduct": "تعديل المنتج",
     "UpdateProduct": "تحديث المنتج"
+  },
+  "Transactions": {
+    "Search": "بحث",
+    "ExportCSV": "تصدير CSV",
+    "ExportPDF": "تصدير PDF",
+    "ExportedSuccessfully": "تم التصدير بنجاح",
+    "NoTransactions": "لا يوجد تحويلات",
+    "RowsPerPage": "عدد الصفوف في الصفحة",
+    "ID": "المسلسل",
+    "CustomerEnName": "الاسم الانجليزي للعميل",
+    "CustomerArName": "الاسم العربي للعميل",
+    "Points": "النقاط",
+    "Type": "النوع",
+    "Date": "التاريخ",
+    "Delete": "حذف",
+    "Reset": "إعادة تعيين",
+    "FromDate": "من تاريخ",
+    "ToDate": "إلى تاريخ",
+    "SearchTransactions": "بحث عن تحويلات",
+    "Earn": "كسب",
+    "Redeem": "استرجاع",
+    "DeleteTransaction": "حذف التحويل",
+    "DeleteTransactionMessage": "هل أنت متأكد من حذف التحويل ؟",
+    "DeleteTransactionSuccess": "تم حذف التحويل بنجاح",
+    "DeleteTransactionFailed": "فشل حذف التحويل",
+    "DeleteTransactionNotFound": "التحويل غير موجود",
+    "DeleteTransactionNotDeleted": "فشل حذف التحويل",
+    "DeleteTransactionNotUpdated": "فشل تحديث التحويل",
+    "TransactionDeleted": "تم حذف التحويل بنجاح",
+    "TransactionNotDeleted": "فشل حذف التحويل",
+    "TransactionNotFound": "التحويل غير موجود",
+    "TransactionNotUpdated": "فشل تحديث التحويل",
+    "TransactionUpdated": "تم تحديث التحويل بنجاح",
+    "TransactionNotAdded": "فشل إضافة التحويل",
+    "TransactionAdded": "تم إضافة التحويل بنجاح"
   }
 }

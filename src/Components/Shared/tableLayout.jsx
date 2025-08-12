@@ -21,7 +21,7 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
     borderBottom: `1px solid ${theme.palette.primary.dark}`
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: '0.875rem',
+    fontSize: '0.9rem',
     padding: "12px 16px",
     color: theme.palette.text.primary,
     borderBottom: `1px solid ${theme.palette.secondary.light}`

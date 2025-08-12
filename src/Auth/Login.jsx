@@ -73,8 +73,8 @@ const Login = () => {
 
   return (
     <MainLayout>
-      <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
+      <Container component="main" maxWidth="sm" sx={{ mt: 8, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 8}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
             component="h1" 

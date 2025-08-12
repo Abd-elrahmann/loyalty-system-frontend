@@ -29,12 +29,20 @@ import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
 import ScanQRModal from "../Components/Modals/ScanQRModal";
+import Spinner from '../utilities/Spinner';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as xlsx from 'xlsx';
+
 const Customers = () => {
   const { t } = useTranslation();
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  // eslint-disable-next-line no-unused-vars
+  const [totalItems, setTotalItems] = useState(0); // Added total items count
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Default to 5 rows
   const [searchFilters, setSearchFilters] = useState({
     id: "",
     enName: "",
@@ -57,14 +65,17 @@ const Customers = () => {
       Object.entries(searchFilters).forEach(([key, value]) => {
         if (value) queryParams.append(key, value);
       });
+      queryParams.append('limit', rowsPerPage);
 
       const response = await Api.get(`/api/users/${page}?${queryParams}`);
       if (response?.data?.users) {
         setCustomers(response.data.users);
         setTotalPages(response.data.totalPages);
+        setTotalItems(response.data.total); // Store total items count
       } else {
         setCustomers([]);
         setTotalPages(0);
+        setTotalItems(0);
       }
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
@@ -76,7 +87,7 @@ const Customers = () => {
   useEffect(() => {
     fetchCustomers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchFilters]);
+  }, [page, searchFilters, rowsPerPage]);
 
   const handleSearch = () => {
     setPage(1);
@@ -87,12 +98,101 @@ const Customers = () => {
     
     try {
       await Api.delete(`/api/users/${customerToDelete.id}`);
-      notifySuccess(t("Success.customerDeleted"));
+      notifySuccess(t("Customers.CustomerDeleted"));
       await fetchCustomers();
       setOpenDeleteModal(false);
       setCustomerToDelete(null);
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1);
+  };
+
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Add Amiri font for Arabic text
+      doc.addFont("./src/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
+      doc.addFont("./src/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
+      
+      // Add title
+      doc.setFontSize(16);
+      doc.text('Customers Report', 14, 15);
+      
+      // Define table columns
+      const columns = [
+        'ID',
+        'English Name',
+        'Arabic Name',
+        'Role',
+        'Email',
+        'Phone',
+        'Points'
+      ];
+      
+      // Prepare data rows
+      const rows = customers.map(customer => [
+        customer.id,
+        customer.enName,
+        customer.arName,
+        customer.role,
+        customer.email,
+        customer.phone,
+        customer.points
+      ]);
+
+      // Add table using the imported autoTable plugin
+      autoTable(doc, {
+        startY: 25,
+        head: [columns],
+        body: rows,
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [66, 139, 202] },
+        columnStyles: {
+          2: { // Arabic Name column (0-based index)
+            font: "Amiri",
+            fontStyle: "bold",
+            halign: 'right', // Right align Arabic text
+            cellWidth: 40, // Make Arabic column wider
+            direction: 'rtl' // Add RTL direction for Arabic text
+          }
+        },
+        didDrawCell: function(data) {
+          // For Arabic text cells only
+          if (data.column.index === 2 && data.cell.section === 'body') {
+            // Get the text and ensure proper Arabic display
+            const text = data.cell.text[0];
+            if (text && /[\u0600-\u06FF]/.test(text)) { // Test if contains Arabic
+              // Don't reverse the text since we're using RTL direction
+              data.cell.text = [text];
+            }
+          }
+        }
+      });
+
+      doc.save('customers_report.pdf');
+    } catch (error) {
+      console.log(error);
+      notifyError(t("Errors.generalError"));
+    }
+  };
+
+  const exportToCSV = () => {
+    try {
+      const fields = ['id', 'enName', 'arName', 'role', 'email', 'phone', 'points'];
+      const csv = xlsx.utils.json_to_sheet(customers, { header: fields });
+      const workbook = xlsx.utils.book_new();
+      xlsx.utils.book_append_sheet(workbook, csv, 'Customers');
+      xlsx.writeFile(workbook, 'customers_report.xlsx');
+    } catch (error) {
+      console.log(error);
+      notifyError(t("Errors.generalError"));
     }
   };
 
@@ -122,7 +222,7 @@ const Customers = () => {
                   sx={{
                     color: "text.primary",
                     textAlign: "center",
-                    width: "180px",
+                    width: "200px",
                   }}
                 />
             <IconButton
@@ -134,6 +234,7 @@ const Customers = () => {
             <IconButton
               sx={{ color: "primary.main", padding: 0 }}
               onClick={() => setOpenScanQR(true)}
+              title={t("Customers.ScanQR")}
             >
               <FaQrcode />
             </IconButton>
@@ -152,6 +253,20 @@ const Customers = () => {
           </Button>
         </Box>
       </Box>
+      <Stack direction="row" spacing={4} sx={{ mb: 2 }}>
+              <Button
+                variant="contained"
+                onClick={exportToCSV}
+              >
+                {t("Customers.ExportCSV")}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={exportToPDF}
+              >
+                {t("Customers.ExportPDF")}
+              </Button>
+            </Stack>
 
       <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
         <Table stickyHeader>
@@ -193,7 +308,7 @@ const Customers = () => {
             {isLoading ? (
               <StyledTableRow>
                 <StyledTableCell colSpan={9} align="center">
-                  <CircularProgress />
+                  <Spinner />
                 </StyledTableCell>
               </StyledTableRow>
             ) : !customers || customers.length === 0 ? (
@@ -203,7 +318,7 @@ const Customers = () => {
                 </StyledTableCell>
               </StyledTableRow>
             ) : (
-              customers.map((customer) => (
+              customers.slice(0, rowsPerPage).map((customer) => (
                 <StyledTableRow key={customer.id}>
                   <StyledTableCell align="center">
                     {customer.id}
@@ -211,7 +326,7 @@ const Customers = () => {
                   <StyledTableCell align="center">
                     {customer.enName}
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" >
                     {customer.arName}
                   </StyledTableCell>
                   <StyledTableCell align="center">
@@ -269,11 +384,12 @@ const Customers = () => {
         </Table>
         <TablePagination
           component="div"
-          count={totalPages * 10}
+          count={totalPages * 20}
           page={page - 1}
           onPageChange={(e, newPage) => setPage(newPage + 1)}
-          rowsPerPage={10}
-          rowsPerPageOptions={[10]}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[5, 10, 20]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={t("Customers.RowsPerPage")}
         />
       </TableContainer>

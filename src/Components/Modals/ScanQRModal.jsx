@@ -15,6 +15,7 @@ import { QrReader } from 'react-qr-reader';
 import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
+import Spinner from '../../utilities/Spinner';
 
 const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
         const response = await Api.post('/api/users/scan-qr', {
           qrData: result?.text
         });
-        
+    
         if (response?.data?.qrData?.email) {
           onScanSuccess(response.data.qrData.email);
           onClose();
@@ -110,7 +111,7 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
             >
-              {t("Customers.uploadQRCode")}
+              {isLoading ? <Spinner /> : t("Customers.uploadQRCode")}
             </Button>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               {t("Customers.uploadQRCodeMessage")}

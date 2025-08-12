@@ -29,11 +29,11 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
 
     setIsLoading(true);
     try {
-      await Api.post(`/api/users/${customer?.id}/points`, {
+      await Api.post(`/api/users/add-points/${customer?.id}`, {
         points: Number(points)
       });
       
-      notifySuccess(t("Customers.pointsAdded"));
+      notifySuccess(`${points} ${t("Customers.pointsAdded")}`);
       await fetchCustomers();
       handleClose();
     } catch (error) {

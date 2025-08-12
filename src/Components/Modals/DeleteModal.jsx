@@ -2,6 +2,7 @@ import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { FaExclamationTriangle } from 'react-icons/fa';
+import Spinner from '../../utilities/Spinner';
 
 const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) => {
   const { t, i18n } = useTranslation();
@@ -38,6 +39,7 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) =>
         gap: 2,
         flexDirection: isRTL ? 'row-reverse' : 'row',
         px: 2,
+        py: 2,
         pb: 2
       }}>
         <Button 
@@ -53,7 +55,7 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) =>
           color="error"
           disabled={isLoading}
         >
-          {t('Customers.Delete')}
+          {isLoading? <Spinner /> : t('Customers.Delete')}
         </Button>
       </DialogActions>
     </Dialog>

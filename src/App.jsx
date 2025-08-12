@@ -4,8 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import React, { Suspense } from 'react';
-import Spinner from './utilities/Spinner';
+import React from 'react';
 import Register from './Auth/Register';
 import Login from './Auth/Login';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +22,7 @@ const Home = React.lazy(() => import('./Components/Shared/Home'));
 const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 const Products = React.lazy(() => import('./Pages/Products'));
-
+const Transactions = React.lazy(() => import('./Pages/Transactions'));
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
@@ -72,7 +71,6 @@ function App() {
     <ThemeProvider theme={theme}>
       <CacheProvider value={cacheRtl}>
       <BrowserRouter> 
-        <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={
               <PublicRoute>
@@ -130,8 +128,14 @@ function App() {
                 </MainLayout>
               </ProtectedRoute>
             } />
+            <Route path="/transactions" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Transactions />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
           </Routes>
-        </Suspense>
           <ToastContainer />
         </BrowserRouter>
       </CacheProvider>

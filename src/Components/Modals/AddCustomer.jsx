@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useFormik } from 'formik';
+
 const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, customer = null }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -28,13 +29,12 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
       } else if (formik.values.password.length < 6) {
         newErrors.password = t('Validation.passwordLength');
       }
-        if (!formik.values.confirmPassword) {
+      if (!formik.values.confirmPassword) {
         newErrors.confirmPassword = t('Validation.required');
       }
       if (formik.values.password !== formik.values.confirmPassword) {
         newErrors.confirmPassword = t('Validation.passwordMismatch');
       }
-      
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,20 +45,24 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
 
     setIsLoading(true);
     try {
-            const dataToSubmit = { 
+      const dataToSubmit = { 
         ...values,
       };
-        if (isEdit) {
-          delete dataToSubmit.password;
-          delete dataToSubmit.confirmPassword;
+      if (isEdit) {
+        delete dataToSubmit.password;
+        delete dataToSubmit.confirmPassword;
           
-          await Api.patch(`/api/users/${customer.id}`, dataToSubmit);
+        await Api.patch(`/api/users/${customer.id}`, dataToSubmit);
         notifySuccess(t('Customers.CustomerUpdated'));
+        formik.resetForm();
+        onClose();
       } else {
+        delete dataToSubmit.points;
         await Api.post('/api/users', dataToSubmit);
         notifySuccess(t('Customers.CustomerAdded'));
+        formik.resetForm();
+        onClose();
       }
-      onClose();
       await fetchCustomers();
     } catch (error) {
       notifyError(error.response?.data?.message || t('Errors.generalError'));
@@ -73,6 +77,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
       arName: '',
       email: '',
       phone: '',
+      points: 0,
       password: '',
       confirmPassword: '',
     },
@@ -86,6 +91,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         arName: customer.arName || '',
         email: customer.email || '',
         phone: customer.phone || '',
+        points: customer.points || 0,
         password: '',
         confirmPassword: ''
       });
@@ -95,6 +101,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         arName: '',
         email: '',
         phone: '',
+        points: 0,
         password: '',
         confirmPassword: ''
       });
@@ -148,6 +155,17 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
             helperText={errors.phone}
             fullWidth
           />
+          {isEdit && (
+            <TextField
+              label={t('Customers.Points')}
+              value={formik.values.points}
+              onChange={(e) => formik.setValues({...formik.values, points: e.target.value})}
+              error={!!errors.points}
+              type="number"
+              helperText={errors.points}
+              fullWidth
+            />
+          )}
           {!isEdit && (
             <>
               <TextField

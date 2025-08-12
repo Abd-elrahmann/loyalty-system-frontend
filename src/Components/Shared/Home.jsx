@@ -2,7 +2,7 @@ import React from 'react';
 import MainLayout from './MainLayout';
 import { Box, Container, Typography, Grid, Button, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
-import heroImg from '../../assets/images/hero.webp';
+import heroImg from '../../assets/images/online-loyalty-program-examples.png';
 import StarsIcon from '@mui/icons-material/Stars';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
@@ -12,6 +12,7 @@ import points from '../../assets/images/points.webp';
 import track from '../../assets/images/track.webp';
 import rewards from '../../assets/images/redeem.webp';
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from '@mui/material';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -24,7 +25,7 @@ const fadeUp = {
 
 const Home = () => {
   const { t } = useTranslation();
-  
+  const isMobile = useMediaQuery('(max-width: 400px)');
   return (
     <MainLayout>
       <Box
@@ -42,22 +43,18 @@ const Home = () => {
           justifyContent: 'center'
         }}
       >
-        <Container maxWidth="xl" sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Container maxWidth="xl" sx={{ display: 'flex', justifyContent: 'center',flexDirection: 'column' }}>
           <Grid container spacing={3} alignItems="center" flexDirection="column" justifyContent="center">
-            <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center',width: '100%' }}>
               <Box
                 component={motion.img}
                 src={heroImg}
+                loading="lazy"
                 alt="Loyalty System Platform"
                 sx={{
-                  width: '100%',
-                  maxHeight: 450,
-                  borderRadius: 4,
-                  objectFit: 'contain',
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { duration: 0.3 }
+                  width:isMobile ? '90vw' : '100%',
+                  height: isMobile ? '300px' : '600px',
+                  objectFit: 'cover',
                 }}
               />
             </Grid>
@@ -66,10 +63,11 @@ const Home = () => {
                 variant="h1" 
                 color="primary" 
                 sx={{
-                  fontSize: { xs: '2.5rem', md: '2.1rem' },
+                  fontSize: isMobile ? '1.5rem' : '2.2rem',
                   fontWeight: 800,
-                  lineHeight: 1.2,
-                  mb: 2,
+                  lineHeight:isMobile ? 1.1 : 1.2,
+                  mb: isMobile ? 1 : 2,
+                  mt: isMobile ? 3 : 4,
                   position: 'relative',
                   '&:after': {
                     content: '""',
@@ -87,13 +85,13 @@ const Home = () => {
                 {t('DefaultLayout.TransformYourBusiness')}
               </Typography>
               <Typography 
-                variant="h5" 
                 color="text.black" 
                 sx={{ 
                   mt: 3,
-                  mb: 4,
-                  lineHeight: 1.6,
-                  fontWeight: 400
+                  mb: isMobile ? 2 : 4,
+                  lineHeight: isMobile ? 1.1 : 1.2,
+                  fontWeight: 400,
+                  fontSize: isMobile ? '1.2rem' : '1.5rem'
                 }}
               >
                 {t('DefaultLayout.ElevateYourCustomerExperience')}
@@ -103,7 +101,7 @@ const Home = () => {
                   variant="contained" 
                   color="primary" 
                   size="large"
-                  sx={{ py: 1.5, px: 4 }}
+                  sx={{ py: isMobile ? 1 : 1.5, px: isMobile ? 2 : 4 }}
                 >
                   {t('DefaultLayout.StartFreeTrial')}
                 </Button>
@@ -121,7 +119,7 @@ const Home = () => {
         </Container>
       </Box>
 
-      <Container sx={{ py: { xs: 6, md: 8 },mt:3, display: 'flex', flexDirection: 'column', alignItems: 'center' ,backgroundColor:'background.default'}}>
+      <Container sx={{ py: isMobile ? 2 : 6,mt:3, display: 'flex', flexDirection: 'column', alignItems: 'center' ,backgroundColor:'background.default'}}>
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Typography
             variant="h2"
@@ -129,7 +127,7 @@ const Home = () => {
             sx={{
               fontWeight: 700,
               mb: 2,
-              fontSize: { xs: '2rem', md: '2.5rem' },
+              fontSize: isMobile ? '1.7rem' : '2.2rem',
               position: 'relative',
               '&:after': {
                 content: '""',
@@ -193,6 +191,7 @@ const Home = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     textAlign: 'center',
+                    boxShadow: '0 10px 30px rgba(128, 0, 128, 0.1)',
                     '&:hover': {
                       transform: 'translateY(-8px)',
                       boxShadow: '0 10px 30px rgba(128, 0, 128, 0.1)',
@@ -228,9 +227,9 @@ const Home = () => {
               variant="h2"
               color="white"
               sx={{
-                fontWeight: 700,
+                fontWeight:isMobile ? 600 : 700,
                 mb: 2,
-                fontSize: { xs: '2rem', md: '2.5rem' },
+                fontSize: isMobile ? '1.7rem' : '2.2rem',
                 position: 'relative',
                 '&:after': {
                   content: '""',
@@ -247,7 +246,7 @@ const Home = () => {
             >
               {t('DefaultLayout.HowItWorks')}
             </Typography>
-            <Typography variant="h6" color="white" sx={{ opacity: 0.9, mt: 3 }}>
+            <Typography  color="white" sx={{ opacity: 0.9, mt: 3,fontSize: isMobile ? '1rem' : '1.5rem' }}>
               {t('DefaultLayout.Start')}
             </Typography>
           </Box>
@@ -301,7 +300,8 @@ const Home = () => {
                       border: '1px solid',
                       borderColor: 'rgba(255, 255, 255, 0.2)',
                       maxWidth: 300,
-                      width: '150px',
+                      width: isMobile ? '250px' : '210px',
+                      height: isMobile ? '230px' : '280px',
                       transition: 'all 0.3s ease',
                       '&:hover': {
                         transform: 'translateY(-8px)',
@@ -315,6 +315,7 @@ const Home = () => {
                       component="img"
                       src={step.image}
                       alt={step.text}
+                      loading="lazy"
                       sx={{
                         width: 130,
                         height: 100,
@@ -327,10 +328,10 @@ const Home = () => {
                         }
                       }}
                     />
-                    <Typography variant="h5" color="white" gutterBottom>
+                    <Typography color="white" gutterBottom sx={{ fontSize: isMobile ? '1rem' : '1.2rem' }}>
                     {t('DefaultLayout.Step')} {i + 1}
                     </Typography>
-                    <Typography color="white" sx={{ fontSize: '14px', opacity: 0.9 }}>
+                    <Typography color="#FFD700" sx={{ fontSize: isMobile ? '1rem' : '1.1rem', opacity: 0.9 }}>
                       {step.text}
                     </Typography>
                   </Paper>
@@ -350,7 +351,7 @@ const Home = () => {
                 color: 'primary.main',
                 fontWeight: 700,
                 mb: 3,
-                fontSize: { xs: '2rem', md: '2.5rem' },
+                fontSize: isMobile ? '1.3rem' : '2.2rem',
                 position: 'relative',
                 '&:after': {
                   content: '""',
@@ -368,12 +369,12 @@ const Home = () => {
               {t('DefaultLayout.ReadyToGetStarted')}
             </Typography>
             <Typography 
-              variant="h6" 
               sx={{ 
-                color: 'text.secondary',
+                color: 'black',
                 mt: 3,
                 mb: 4,
-                fontWeight: 400
+                fontWeight: 400,
+                fontSize: isMobile ? '1rem' : '1.5rem'
               }}
             >
               {t('DefaultLayout.Join')}
@@ -383,7 +384,7 @@ const Home = () => {
                 variant="contained" 
                 color="primary"
                 size="large" 
-                sx={{ py: 1.5, px: 4 }}
+                sx={{ py: isMobile ? 1 : 1.5, px: isMobile ? 2 : 4 }}
               >
                 {t('DefaultLayout.StartFreeTrial')}
               </Button>
@@ -391,7 +392,7 @@ const Home = () => {
                 variant="outlined" 
                 color="primary"
                 size="large"
-                sx={{ py: 1.5, px: 4 }}
+                sx={{ py: isMobile ? 1 : 1.5, px: isMobile ? 2 : 4 }}
               >
                 {t('DefaultLayout.ContactUs')}
               </Button>

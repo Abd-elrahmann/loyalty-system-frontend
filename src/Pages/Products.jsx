@@ -90,9 +90,10 @@ const Products = () => {
       const endpoint = activeTab === 'cafe' 
         ? `/api/cafe-products/${productData.id}` 
         : `/api/restaurant-products/${productData.id}`;
-      await Api.put(endpoint, productData);
+      await Api.patch(endpoint, productData);
       fetchProducts();
       notifySuccess(t('Products.ProductUpdated'));
+      handleCloseModal();
     } catch (error) {
       handleApiError(error);
       notifyError(t('Products.ProductNotUpdated'));

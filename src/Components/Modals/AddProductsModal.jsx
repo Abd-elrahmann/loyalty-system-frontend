@@ -181,17 +181,6 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label={t("Products.Price")}
-                name="price"
-                type="number"
-                value={formik.values.price}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
                 label={t("Products.Points")}
                 name="points"
                 type="number"

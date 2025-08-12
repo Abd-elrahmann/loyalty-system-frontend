@@ -17,7 +17,8 @@ import {
   Inventory as ProductsIcon,
   CardGiftcard as RewardsIcon,
   Settings as SettingsIcon,
-  Support as SupportIcon
+  Support as SupportIcon,
+  ReceiptLong as ReceiptLongIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +30,7 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isRTL = i18n.language === 'ar';
 
   useLayoutEffect(() => {
@@ -49,6 +50,12 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
       arName: 'العملاء', 
       path: '/customers',
       icon: <PeopleIcon />
+    },
+    {
+      name: 'Transactions',
+      arName: 'المعاملات', 
+      path: '/transactions',
+      icon: <ReceiptLongIcon />
     },
     {
       name: 'Products',
@@ -186,19 +193,26 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
   return (
     <Drawer
       key={isRTL}
-      variant="permanent"
+      variant={isMobile ? "temporary" : "permanent"}
       anchor={isRTL ? 'right' : 'left'}
+      open={sidebarVisible}
+      onClose={onToggle}
       sx={{
-        display: sidebarVisible ? 'block' : 'none',
+        display: { xs: 'block', sm: sidebarVisible ? 'block' : 'none' },
         '& .MuiDrawer-paper': {
-          position: 'relative',
+          position: isMobile ? 'fixed' : 'relative',
           width: drawerWidth,
           boxSizing: 'border-box',
           border: 'none',
-          
           borderRight: !isRTL ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
           borderLeft: isRTL ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
+          height: '100%',
+          zIndex: (theme) => theme.zIndex.drawer
         },
+      }}
+      ModalProps={{
+        keepMounted: true,
+        onClose: onToggle
       }}
     >
       {drawerContent}
