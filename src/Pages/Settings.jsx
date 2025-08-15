@@ -137,7 +137,7 @@ const Settings = () => {
             }
             return i18n.language === 'ar' ? option.arValue : option.enValue;
           }}
-          renderInput={(params) => <TextField {...params} label={t('Settings.Currency')} />}
+          renderInput={(params) => <TextField {...params} label={t('Settings.enCurrency')} />}
           noOptionsText={t('Settings.NoCurrencies')}
         />
          

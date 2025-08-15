@@ -51,7 +51,7 @@ const Transactions = () => {
   const [transactionToDelete, setTransactionToDelete] = useState(null);
   const [customerInfo, setCustomerInfo] = useState(null);
   const [totalPoints, setTotalPoints] = useState(0);
-  
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const fetchTransactions = async () => {
     try {
       const queryParams = new URLSearchParams();
@@ -86,7 +86,10 @@ const Transactions = () => {
     }
   };
 
-  
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1);
+  };  
 
   useEffect(() => {
     fetchTransactions();
@@ -362,13 +365,15 @@ const Transactions = () => {
           </TableBody>
         </Table>
         <TablePagination
-          component="div"
-          count={totalItems}
-          page={page - 1}
-          onPageChange={(e, newPage) => setPage(newPage + 1)}
-          rowsPerPage={10}
-          rowsPerPageOptions={[10]}
-          labelRowsPerPage={t("Transactions.RowsPerPage")}
+           component="div"
+           count={totalItems}
+           page={page - 1}
+           onPageChange={(e, newPage) => setPage(newPage + 1)}
+           rowsPerPage={rowsPerPage}
+           rowsPerPageOptions={[5, 10, 20]}
+           onRowsPerPageChange={handleChangeRowsPerPage}
+           labelRowsPerPage={t("Transactions.RowsPerPage")}
+           sortLabel={t("Transactions.Sort")}
         />
       </TableContainer>
 

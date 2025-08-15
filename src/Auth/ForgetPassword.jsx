@@ -13,8 +13,10 @@ import Spinner from '../utilities/Spinner';
 import { useState } from 'react';
 import Navbar from '../Components/Shared/Navbar';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const ForgetPassword = () => {
+  const navigate = useNavigate();
   const {t} =useTranslation()
   const [loading, setLoading] = useState(false);
   const validate = values => {
@@ -94,6 +96,7 @@ const ForgetPassword = () => {
               component="span"
               color="primary"
               sx={{ cursor: 'pointer', fontWeight: 500 }}
+              onClick={() => navigate('/login')}
             >
               {t('ForgetPassword.backToLogin')}
             </Typography>

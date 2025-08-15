@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, useMediaQuery, CircularProgress } from '@mui/material';
+import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, useMediaQuery, CircularProgress, Pagination } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
@@ -23,12 +23,15 @@ const Products = () => {
   const [productId, setProductId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const isMobile = useMediaQuery('(max-width: 400px)');
 
   useEffect(() => {
     setProducts([]);
     setFilteredProducts([]);
     setLoading(true);
+    setCurrentPage(1);
     fetchProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
@@ -44,12 +47,13 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const endpoint = activeTab === 'cafe' 
-        ? '/api/cafe-products/1' 
-        : '/api/restaurant-products/1';
+        ? `/api/cafe-products/${currentPage}` 
+        : `/api/restaurant-products/${currentPage}`;
       
       const response = await Api.get(endpoint);
       setProducts(response.data.products || []);
       setFilteredProducts(response.data.products || []);
+      setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       handleApiError(error);
       setProducts([]); 
@@ -59,9 +63,19 @@ const Products = () => {
     }
   };
 
+  useEffect(() => {
+    fetchProducts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     setSearchTerm('');
+    setCurrentPage(1);
   };
 
   const handleOpenModal = (product) => {
@@ -204,76 +218,88 @@ const Products = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Grid container spacing={3} sx={{
-          justifyContent: isMobile ? 'center' : 'flex-start',
-        }}>
-          {filteredProducts.map((product) => (
-            <Grid item key={product.id}>
-              <Card sx={{ 
-                height: '100%', 
-                display: 'flex', 
-                
-                flexDirection: 'column',
-                borderRadius: '10px',
-                border: '1px solid #e0e0e0',
-                boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.2)',
-                width: 300,
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.1)'
-                }
-              }}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  loading="lazy"
-                  image={product.image}
-                  alt={product.enName}
-                  sx={{ objectFit: 'cover' }}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {i18n.language === 'ar' ? product.arName : product.enName}
-                  </Typography>
-  
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <MonetizationOnIcon sx={{ color: 'gold' }} />
-                    <Typography variant="body1">
-                      {t('Products.Points')}: {product.points}
+        <>
+          <Grid container spacing={3} sx={{
+            justifyContent: isMobile ? 'center' : 'flex-start',
+          }}>
+            {filteredProducts.map((product) => (
+              <Grid item key={product.id}>
+                <Card sx={{ 
+                  height: '100%', 
+                  display: 'flex', 
+                  
+                  flexDirection: 'column',
+                  borderRadius: '10px',
+                  border: '1px solid #e0e0e0',
+                  boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.2)',
+                  width: 300,
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.1)'
+                  }
+                }}>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    loading="lazy"
+                    image={product.image}
+                    alt={product.enName}
+                    sx={{ objectFit: 'cover' }}
+                  />
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography gutterBottom variant="h6" component="div">
+                      {i18n.language === 'ar' ? product.arName : product.enName}
                     </Typography>
-                  </Box>
-                </CardContent>
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-                  <Button 
-                    variant="contained" 
-                    color="primary"
-                    size="small"
-                    startIcon={<RedeemIcon />}
-                  >
-                    {t('Products.Redeem')}
-                  </Button>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleOpenModal(product)}
-                    aria-label="edit"
-                  >
-                    <EditIcon sx={{ color: 'green' }} />
-                  </IconButton>
-                  <IconButton 
-                    color="error"
-                    onClick={() => setOpenDeleteModal(true)}
-                    aria-label="delete"
+    
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <MonetizationOnIcon sx={{ color: 'gold' }} />
+                      <Typography variant="body1">
+                        {t('Products.Points')}: {product.points}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                  <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                    <Button 
+                      variant="contained" 
+                      color="primary"
+                      size="small"
+                      startIcon={<RedeemIcon />}
                     >
-                      <DeleteIcon sx={{ color: 'red' }} />
+                      {t('Products.Redeem')}
+                    </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleOpenModal(product)}
+                      aria-label="edit"
+                    >
+                      <EditIcon sx={{ color: 'green' }} />
                     </IconButton>
+                    <IconButton 
+                      color="error"
+                      onClick={() => setOpenDeleteModal(true)}
+                      aria-label="delete"
+                      >
+                        <DeleteIcon sx={{ color: 'red' }} />
+                      </IconButton>
+                    </Box>
                   </Box>
-                </Box>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+            <Pagination 
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size={isMobile ? "small" : "medium"}
+            />
+          </Box>
+        </>
       )}
 
       <AddProductModal

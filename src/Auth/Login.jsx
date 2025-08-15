@@ -73,7 +73,7 @@ const Login = () => {
 
   return (
     <MainLayout>
-      <Container component="main" maxWidth="sm" sx={{ mt: 8, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Container component="main" maxWidth="sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 8}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
@@ -95,6 +95,7 @@ const Login = () => {
             onChange={formik.handleChange}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
+            disabled={loading}
           />
 
           <TextField
@@ -104,7 +105,7 @@ const Login = () => {
             type={showPassword ? 'text' : 'password'}
             InputProps={{
               endAdornment: (
-                <IconButton onClick={togglePasswordVisibility}>
+                <IconButton onClick={togglePasswordVisibility} disabled={loading}>
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               )
@@ -114,14 +115,20 @@ const Login = () => {
             onChange={formik.handleChange}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
+            disabled={loading}
           />
 
           <Box sx={{ mb: 3, textAlign: 'left' }}>
             <Link
               component="button"
+              type="button"
               variant="body2"
-              onClick={() => navigate('/forgot-password')}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/forgot-password');
+              }}
               sx={{ textDecoration: 'none' }}
+              disabled={loading}
             >
               {t('Login.forgotPassword')}
             </Link>
@@ -133,6 +140,7 @@ const Login = () => {
             variant="contained"
             color="primary"
             size="large"
+            disabled={loading}
           >
             {loading ? <Spinner /> : t('Login.login')}
           </Button>
@@ -143,8 +151,8 @@ const Login = () => {
               <Typography
                 component="span"
                 color="primary"
-                sx={{ cursor: 'pointer', fontWeight: 500 }}
-                onClick={() => navigate('/signup')}
+                sx={{ cursor: loading ? 'default' : 'pointer', fontWeight: 500, opacity: loading ? 0.5 : 1 }}
+                onClick={() => !loading && navigate('/signup')}
               >
                 {t('Login.signUp')}
               </Typography>

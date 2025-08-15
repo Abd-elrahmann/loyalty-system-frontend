@@ -245,13 +245,16 @@
     "Currency": "العملة",
     "TransactionUpdated": "تم تحديث التحويل بنجاح",
     "TransactionNotAdded": "فشل إضافة التحويل",
-    "TransactionAdded": "تم إضافة التحويل بنجاح"
+    "TransactionAdded": "تم إضافة التحويل بنجاح",
+    "Sort": "ترتيب",
+    "SortBy": "ترتيب حسب"
   },
   "Settings": {
     "CurrencySettings": "إعدادات العملة",
     "TimezoneSettings": "إعدادات التوقيت",
     "PointsSettings": "إعدادات النقاط",
-    "Currency": "العملة",
+    "enCurrency": "العملة الانجليزية",
+    "arCurrency": "العملة العربية",
     "Timezone": "التوقيت",
     "Points": "النقاط",
     "Save": "حفظ",
