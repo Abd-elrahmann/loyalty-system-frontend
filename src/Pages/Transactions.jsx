@@ -333,7 +333,7 @@ const Transactions = () => {
                       color: '#1976d2',
                       fontWeight: 'bold'
                     }}>
-                      {transaction.currency || 'USD'}
+                      {i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency}
                     </span>
                   </StyledTableCell>
                   <StyledTableCell align="center">
