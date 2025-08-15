@@ -59,6 +59,7 @@ const Transactions = () => {
       if (filters.fromDate) queryParams.append("fromDate", dayjs(filters.fromDate).format('YYYY-MM-DD'));
       if (filters.toDate) queryParams.append("toDate", dayjs(filters.toDate).format('YYYY-MM-DD'));
       if (customerId) queryParams.append("userId", customerId);
+      
 
       const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
       if (response?.data?.transactions) {
@@ -101,6 +102,8 @@ const Transactions = () => {
     setFilters(searchFilters);
     setPage(1);
   };
+
+  
 
   const handleDelete = async () => {
     if (!transactionToDelete?.id) return;
@@ -236,20 +239,21 @@ const Transactions = () => {
         >
           <Stack direction={"row"} spacing={1}>
             {!customerId && (
-              <Button
-                variant="contained"
-                onClick={() => setOpenSearchModal(true)}
-                sx={{
-                  color: "white",
-                  backgroundColor: "primary.main",
-                  textAlign: "center",
-                  fontSize: "14px",
-                  width: "120px",
-
-                }}>
-                  <Search sx={{ fontSize: "25px", mr: 1 }} />
-                  {t("Transactions.Search")}
-                </Button>
+              <>
+                <Button
+                  variant="contained"
+                  onClick={() => setOpenSearchModal(true)}
+                  sx={{
+                    color: "white",
+                    backgroundColor: "primary.main",
+                    textAlign: "center",
+                    fontSize: "14px",
+                    width: "120px",
+                  }}>
+                    <Search sx={{ fontSize: "25px", mr: 1 }} />
+                    {t("Transactions.Search")}
+                  </Button>
+              </>
             )}
           </Stack>
 
@@ -396,6 +400,8 @@ const Transactions = () => {
         onConfirm={handleDelete}
         isLoading={isLoading}
       />
+
+   
     </Box>
   );
 };

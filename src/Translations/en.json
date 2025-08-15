@@ -156,6 +156,7 @@
         "uploadQRCodeNotFound": "QR code not found",
         "uploadQRCodeNotDeleted": "QR code not deleted",
         "ScanQRCode": "Scan QR code",
+        "qrScanSuccess": "QR code scanned successfully",
         "or": "or",
         "SearchEmail": "Search Email",
         "ScanQR": "Scan QR",
@@ -169,7 +170,8 @@
         "ManualPointsEntry": "Enter points manually",
         "pointsToAdd": "Points to Add",
         "pointsAdded": "points added successfully",
-        "CustomerPoints": "Current Points"
+        "CustomerPoints": "Current Points",
+        "ClearFilter": "Clear Filter"
     },
     "Products": {
         "Cafe": "Cafe",
@@ -245,9 +247,8 @@
         "Currency": "Currency",
         "TransactionUpdated": "Transaction updated successfully",
         "TransactionNotAdded": "Transaction not added",
-        "TransactionAdded": "Transaction added successfully",
-        "Sort": "Sort",
-        "SortBy": "Sort By"
+        "TransactionAdded": "Transaction added successfully"
+
     },
     "Settings": {
         "CurrencySettings": "Currency Settings",

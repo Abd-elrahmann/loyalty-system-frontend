@@ -60,13 +60,14 @@ const Customers = () => {
   const [openAddPointsModal, setOpenAddPointsModal] = useState(false);
   const [customerToAddPoints, setCustomerToAddPoints] = useState(null);
   const [openScanQR, setOpenScanQR] = useState(false);
-
+  const [scannedEmail, setScannedEmail] = useState("");
   const fetchCustomers = async () => {
     try {
       const queryParams = new URLSearchParams();
       Object.entries(searchFilters).forEach(([key, value]) => {
         if (value) queryParams.append(key, value);
       });
+      if (scannedEmail) queryParams.append("email", scannedEmail);
       queryParams.append('limit', rowsPerPage);
 
       const response = await Api.get(`/api/users/${page}?${queryParams}`);
@@ -89,7 +90,7 @@ const Customers = () => {
   useEffect(() => {
     fetchCustomers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchFilters, rowsPerPage]);
+  }, [page, searchFilters, rowsPerPage, scannedEmail]);
 
   const handleSearch = () => {
     setPage(1);
@@ -112,6 +113,11 @@ const Customers = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(1);
+  };
+  const handleScanSuccess = (email) => {
+    setScannedEmail(email);
+    setPage(1);
+    notifySuccess(t("Customers.QRScanSuccess") + `: ${email}`);
   };
 
   const exportToPDF = () => {
@@ -204,12 +210,13 @@ const Customers = () => {
         >
           <Stack direction={"row"} spacing={1}>
                 <InputBase
-                  value={searchFilters.email}
+                  value={searchFilters.email || scannedEmail}
                   onChange={(e) => {
                     setSearchFilters((prev) => ({
                       ...prev,
                       email: e.target.value,
                     }));
+                    setScannedEmail("");
                     setPage(1);
                   }}
                   placeholder={t("Customers.SearchEmail")}
@@ -225,13 +232,33 @@ const Customers = () => {
             >
               <Search />
             </IconButton>
+              <Stack direction="row" spacing={1}>
             <IconButton
               sx={{ color: "primary.main", padding: 0 }}
-              onClick={() => setOpenScanQR(true)}
+              onClick={() => {
+                setScannedEmail("");
+                setPage(1);
+                setOpenScanQR(true);
+              }}
               title={t("Customers.ScanQR")}
             >
               <FaQrcode />
             </IconButton>
+            {scannedEmail && (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setScannedEmail("");
+                setPage(1);
+              }}
+              sx={{
+                fontSize: "12px",
+              }}
+            >
+                {t("Customers.ClearFilter")}
+              </Button>
+            )}
+            </Stack>
           </Stack>
           <Stack direction="row" spacing={2}>
               <Button
@@ -433,12 +460,7 @@ const Customers = () => {
       <ScanQRModal
         open={openScanQR}
         onClose={() => setOpenScanQR(false)}
-        onScanSuccess={(email) => {
-          setSearchFilters(prev => ({
-            ...prev,
-            email: email
-          }));
-        }}
+        onScanSuccess={handleScanSuccess}
       />
     </Box>
   );

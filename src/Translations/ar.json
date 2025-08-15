@@ -156,6 +156,7 @@
     "uploadQRCodeFailed": "هذا الحساب غير مسجل في النظام",
     "uploadQRCodeNotFound": "كود الاستجابة السريعة غير موجود",
     "uploadQRCodeNotDeleted": "فشل حذف كود الاستجابة السريعة",
+    "qrScanSuccess": "تم مسح الكود بنجاح",
     "or": "أو",
     "SearchEmail": "بحث عن البريد الإلكتروني",
     "ScanQR": "قراءة كود الاستجابة السريعة",
@@ -169,7 +170,10 @@
     "ManualPointsEntry": "أدخل النقاط يدوياً",
     "pointsToAdd": "النقاط المراد إضافتها",
     "pointsAdded": "تم إضافة النقاط بنجاح",
-    "CustomerPoints": "النقاط الحالية"
+    "CustomerPoints": "النقاط الحالية",
+    "ClearFilter": "مسح الفلتر",
+    "ClearFilterEmail": "مسح الفلتر البريد الإلكتروني",
+    "ClearFilterEmailHint": "مسح الفلتر البريد الإلكتروني"
   },
   "Products": {
     "Cafe": "المقهى",
@@ -245,9 +249,8 @@
     "Currency": "العملة",
     "TransactionUpdated": "تم تحديث التحويل بنجاح",
     "TransactionNotAdded": "فشل إضافة التحويل",
-    "TransactionAdded": "تم إضافة التحويل بنجاح",
-    "Sort": "ترتيب",
-    "SortBy": "ترتيب حسب"
+    "TransactionAdded": "تم إضافة التحويل بنجاح"
+
   },
   "Settings": {
     "CurrencySettings": "إعدادات العملة",

@@ -16,14 +16,16 @@ import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
 
 const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [points, setPoints] = useState("");
   const [price, setPrice] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [settings, setSettings] = useState({
-    currency: null,
-    pointsPerDollar: 1,
-    pointsPerIQD: 1
+    enCurrency: "",
+    arCurrency: "",
+    pointsPerDollar: 0,
+    pointsPerIQD: 0,
+    timezone: ""
   });
 
   // Fetch settings when modal opens
@@ -46,11 +48,10 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
 
   // Calculate points based on price and settings
   const calculatePoints = (priceValue) => {
-    if (!priceValue || !settings.currency) return "";
+    if (!priceValue) return "";
     
-    const pointsPerUnit = settings.currency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD;
-    const calculatedPoints = Math.floor(parseFloat(priceValue) * pointsPerUnit);
-    
+    // Always use pointsPerDollar since we're using USD
+    const calculatedPoints = Math.floor(parseFloat(priceValue) * settings.pointsPerDollar);
     return calculatedPoints.toString();
   };
 
@@ -74,7 +75,8 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
     setIsLoading(true);
     try {
       await Api.post(`/api/users/add-points/${customer?.id}`, {
-        currency: settings.currency || 'USD',
+        points: Number(points),
+        currency: settings.enCurrency,
         price: price ? Number(price) : null
       });
       
@@ -112,16 +114,14 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
             {/* Price Input Field */}
             <TextField
               fullWidth
-              label={`${t("Customers.Price")} (${settings.currency || 'USD'})`}
+              label={`${t("Customers.Price")} (${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency})`}
               type="number"
               value={price}
               onChange={handlePriceChange}
               disabled={isLoading}
               inputProps={{ min: 0, step: 0.01 }}
               sx={{ mb: 2 }}
-              helperText={settings.currency ? 
-                `${t("Customers.PointsPerUnit")}: ${settings.currency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD} ${t("Customers.Points")}` 
-                : t("Customers.LoadingSettings")}
+              helperText={`${t("Customers.PointsPerUnit")}: ${settings.pointsPerDollar} ${t("Customers.Points")}`}
             />
             
             <Divider sx={{ my: 2 }} />
