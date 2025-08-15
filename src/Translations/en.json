@@ -145,9 +145,6 @@
         "Admin": "Admin",
         "Customer": "Customer",
         "AddPoints": "Add Points",
-        "CustomerPoints": "Points",
-        "pointsToAdd": "Points to Add",
-        "pointsAdded": "Points added successfully",
         "invalidQRCode": "Invalid QR code",
         "qrScanError": "QR code scan error",
         "UploadQRCodeHint": "Upload QR code from image",
@@ -163,7 +160,16 @@
         "SearchEmail": "Search Email",
         "ScanQR": "Scan QR",
         "ExportCSV": "Export CSV",
-        "ExportPDF": "Export PDF"
+        "ExportPDF": "Export PDF",
+        "ViewTransactions": "Transactions",
+        "Price": "Price",
+        "PointsPerUnit": "Points per unit",
+        "LoadingSettings": "Loading settings...",
+        "CalculatedFromPrice": "Calculated automatically from price",
+        "ManualPointsEntry": "Enter points manually",
+        "pointsToAdd": "Points to Add",
+        "pointsAdded": "points added successfully",
+        "CustomerPoints": "Current Points"
     },
     "Products": {
         "Cafe": "Cafe",
@@ -234,6 +240,9 @@
         "TransactionNotDeleted": "Transaction not deleted",
         "TransactionNotFound": "Transaction not found",
         "TransactionNotUpdated": "Transaction not updated",
+        "BackToCustomers": "Back to Customers",
+        "CustomerTransactions": "Customer Transactions",
+        "Currency": "Currency",
         "TransactionUpdated": "Transaction updated successfully",
         "TransactionNotAdded": "Transaction not added",
         "TransactionAdded": "Transaction added successfully"
@@ -246,9 +255,11 @@
         "Timezone": "Timezone",
         "Points": "Points",
         "Save": "Save",
-        "pointsPerUnit": "Points per Unit",
-        "pointsPerUnitValue": "Points per Unit Value",
-        "pointsPerUnitValueHint": "Points per Unit Value Hint",
-        "NoCurrencies": "No Currencies"
+        "pointsPerUSD": "Points per USD",
+        "pointsPerIQD": "Points per IQD",
+        "NoCurrencies": "No Currencies",
+        "EnterPointsPer": "Enter how many points for each 1",
+        "SettingsSavedSuccessfully": "Settings saved successfully",
+        "Saving":"Settings are being saved..."
     }
 }

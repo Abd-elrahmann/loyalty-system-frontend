@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import dayjs from 'dayjs';
 import {
@@ -25,13 +26,15 @@ import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import Spinner from '../utilities/Spinner';
 import TransactionSearchModal from "../Components/Modals/TransactionSearchModal";
-import { Search } from "@mui/icons-material";
+import { Search, ArrowBack } from "@mui/icons-material";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
 
 const Transactions = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { customerId } = useParams();
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -46,19 +49,31 @@ const Transactions = () => {
   });
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
-
+  const [customerInfo, setCustomerInfo] = useState(null);
+  const [totalPoints, setTotalPoints] = useState(0);
+  
   const fetchTransactions = async () => {
     try {
       const queryParams = new URLSearchParams();
       if (filters.type) queryParams.append("type", filters.type);
       if (filters.fromDate) queryParams.append("fromDate", dayjs(filters.fromDate).format('YYYY-MM-DD'));
       if (filters.toDate) queryParams.append("toDate", dayjs(filters.toDate).format('YYYY-MM-DD'));
+      if (customerId) queryParams.append("userId", customerId);
 
       const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
       if (response?.data?.transactions) {
         setTransactions(response.data.transactions);
         setTotalPages(response.data.totalPages);
         setTotalItems(response.data.total);
+        
+        // Calculate total points for customer
+        if (customerId && response.data.transactions.length > 0) {
+          const points = response.data.transactions.reduce((sum, transaction) => {
+            return sum + (transaction.type === 'earn' ? transaction.points : -transaction.points);
+          }, 0);
+          setTotalPoints(points);
+          setCustomerInfo(response.data.transactions[0].user);
+        }
       } else {
         setTransactions([]);
         setTotalPages(0);
@@ -71,10 +86,13 @@ const Transactions = () => {
     }
   };
 
+  
+
   useEffect(() => {
     fetchTransactions();
+    
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filters]);
+  }, [page, filters, customerId]);
 
   const handleSearch = (searchFilters) => {
     setFilters(searchFilters);
@@ -97,7 +115,7 @@ const Transactions = () => {
 
   const exportToCSV = () => {
     try {
-      const fields = ['id', 'enName', 'arName', 'points', 'type', 'date'];
+      const fields = ['id', 'enName', 'arName', 'points', 'currency', 'type', 'date'];
       const csv = xlsx.utils.json_to_sheet(transactions, { header: fields });
       const workbook = xlsx.utils.book_new();
       xlsx.utils.book_append_sheet(workbook, csv, 'Transactions');
@@ -123,6 +141,7 @@ const Transactions = () => {
         'English Name', 
         'Arabic Name',
         'Points',
+        'Currency',
         'Type',
         'Date'
       ];
@@ -131,9 +150,10 @@ const Transactions = () => {
         transaction.id,
         transaction.user.enName,
         transaction.user.arName,
-        transaction.type,
         transaction.points,
-        new Date(transaction.date).toISOString().split('T')[0]
+        transaction.currency || 'USD',
+        transaction.type,
+        transaction.formattedDate
       ]);
 
       autoTable(doc, {
@@ -168,19 +188,39 @@ const Transactions = () => {
       notifyError(t("Errors.generalError")); 
     }
   };
-  const formatDate = (dateString) => {
-    const options = { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Back button and customer info for customer-specific view */}
+      {customerId && (
+        <Box sx={{ mb: 3 , display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBack />}
+            onClick={() => navigate('/customers')}
+            sx={{ mb: 2 }}
+          >
+            {t("Transactions.BackToCustomers")}
+          </Button>
+          {customerInfo && (
+            <Box sx={{ 
+              p: 2, 
+              bgcolor: 'background.paper', 
+              borderRadius: 1, 
+              border: '1px solid',
+              borderColor: 'divider'
+            }}>
+              <h3 style={{ margin: '0 0 10px 0' }}>
+                {t("Transactions.CustomerTransactions")}: {i18n.language === 'ar' ? customerInfo.arName : customerInfo.enName} 
+              </h3>
+              <p style={{ margin: 0, color: '#666' }}>
+                {t("Customers.Email")}: {customerInfo.email} | {t("Customers.Points")}: {totalPoints}
+              </p>
+            </Box>
+          )}
+        </Box>
+      )}
+      
       <Box sx={{ p: 2, mb: 2 }}>
         <Box
           sx={{
@@ -192,21 +232,22 @@ const Transactions = () => {
           }}
         >
           <Stack direction={"row"} spacing={1}>
+            {!customerId && (
+              <Button
+                variant="contained"
+                onClick={() => setOpenSearchModal(true)}
+                sx={{
+                  color: "white",
+                  backgroundColor: "primary.main",
+                  textAlign: "center",
+                  fontSize: "14px",
+                  width: "120px",
 
-            <Button
-              variant="contained"
-              onClick={() => setOpenSearchModal(true)}
-              sx={{
-                color: "white",
-                backgroundColor: "primary.main",
-                textAlign: "center",
-                fontSize: "14px",
-                width: "120px",
-
-              }}>
-                <Search sx={{ fontSize: "25px", mr: 1 }} />
-                {t("Transactions.Search")}
-              </Button>
+                }}>
+                  <Search sx={{ fontSize: "25px", mr: 1 }} />
+                  {t("Transactions.Search")}
+                </Button>
+            )}
           </Stack>
 
           <Stack direction="row" spacing={2}>
@@ -243,6 +284,9 @@ const Transactions = () => {
                 {t("Transactions.Points")}
               </StyledTableCell>
               <StyledTableCell align="center">
+                {t("Transactions.Currency")}
+              </StyledTableCell>
+              <StyledTableCell align="center">
                 {t("Transactions.Type")}
               </StyledTableCell>
               <StyledTableCell align="center">
@@ -256,13 +300,13 @@ const Transactions = () => {
           <TableBody>
             {isLoading ? (
               <StyledTableRow>
-                <StyledTableCell colSpan={7} align="center">
+                <StyledTableCell colSpan={8} align="center">
                   <Spinner />
                 </StyledTableCell>
               </StyledTableRow>
             ) : !transactions || transactions.length === 0 ? (
               <StyledTableRow>
-                <StyledTableCell colSpan={7} align="center">
+                <StyledTableCell colSpan={8} align="center">
                   {t("Transactions.NoTransactions")}
                 </StyledTableCell>
               </StyledTableRow>
@@ -283,6 +327,14 @@ const Transactions = () => {
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <span style={{ 
+                      color: '#1976d2',
+                      fontWeight: 'bold'
+                    }}>
+                      {transaction.currency || 'USD'}
+                    </span>
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <span style={{ 
                       color: transaction.type === 'earn' ? 'green' : 
                              transaction.type === 'redeem' ? '#FFB800' : 'inherit'
                     }}>
@@ -290,7 +342,7 @@ const Transactions = () => {
                     </span>
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {formatDate(transaction.date)}
+                    {transaction.formattedDate}
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <IconButton 
@@ -320,11 +372,13 @@ const Transactions = () => {
         />
       </TableContainer>
 
-      <TransactionSearchModal
-        open={openSearchModal}
-        onClose={() => setOpenSearchModal(false)}
-        onSearch={handleSearch}
-      />
+      {!customerId && (
+        <TransactionSearchModal
+          open={openSearchModal}
+          onClose={() => setOpenSearchModal(false)}
+          onSearch={handleSearch}
+        />
+      )}
 
       <DeleteModal
         open={openDeleteModal}

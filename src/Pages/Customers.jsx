@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import {
   Box,
@@ -24,7 +25,7 @@ import AddIcon from "@mui/icons-material/Add";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import { useTranslation } from "react-i18next";
 import { Search } from "@mui/icons-material";
-import { FaTrash, FaEdit, FaPlus, FaQrcode } from "react-icons/fa";
+import { FaTrash, FaEdit, FaPlus, FaQrcode, FaEye } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
@@ -36,6 +37,7 @@ import * as xlsx from 'xlsx';
 
 const Customers = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -290,6 +292,9 @@ const Customers = () => {
                 {t("Customers.AddPoints")}
               </StyledTableCell>
               <StyledTableCell align="center">
+                {t("Customers.ViewTransactions")}
+              </StyledTableCell>
+              <StyledTableCell align="center">
                 {t("Customers.Update")}
               </StyledTableCell>
               <StyledTableCell align="center">
@@ -300,13 +305,13 @@ const Customers = () => {
           <TableBody>
             {isLoading ? (
               <StyledTableRow>
-                <StyledTableCell colSpan={9} align="center">
+                <StyledTableCell colSpan={10} align="center">
                   <Spinner />
                 </StyledTableCell>
               </StyledTableRow>
             ) : !customers || customers.length === 0 ? (
               <StyledTableRow>
-                <StyledTableCell colSpan={9} align="center">
+                <StyledTableCell colSpan={10} align="center">
                   {t("Customers.NoCustomers")}
                 </StyledTableCell>
               </StyledTableRow>
@@ -349,6 +354,18 @@ const Customers = () => {
                       }}>
                         <FaPlus />
                       </IconButton>
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        navigate(`/transactions/${customer.id}`);
+                      }}
+                      title={t("Customers.ViewTransactions")}
+                    >
+                      <FaEye />
+                    </IconButton>
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     <IconButton

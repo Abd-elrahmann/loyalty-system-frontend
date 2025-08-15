@@ -145,9 +145,7 @@
     "Admin": "مدير",
     "Customer": "عميل",
     "AddPoints": "إضافة نقاط",
-    "CustomerPoints": "النقاط",
-    "pointsToAdd": "النقاط المضافة",
-    "pointsAdded": "تم إضافة النقاط بنجاح",
+
     "invalidQRCode": "كود الاستجابة السريعة غير صالح",
     "qrScanError": "خطأ في قراءة كود الاستجابة السريعة",
     "UploadQRCodeHint": "رفع كود الاستجابة السريعة من الصورة",
@@ -162,7 +160,16 @@
     "SearchEmail": "بحث عن البريد الإلكتروني",
     "ScanQR": "قراءة كود الاستجابة السريعة",
     "ExportCSV": "تصدير CSV",
-    "ExportPDF": "تصدير PDF"
+    "ExportPDF": "تصدير PDF",
+    "ViewTransactions": "المعاملات",
+    "Price": "السعر",
+    "PointsPerUnit": "النقاط لكل وحدة",
+    "LoadingSettings": "جاري تحميل الإعدادات...",
+    "CalculatedFromPrice": "محسوبة تلقائياً من السعر",
+    "ManualPointsEntry": "أدخل النقاط يدوياً",
+    "pointsToAdd": "النقاط المراد إضافتها",
+    "pointsAdded": "تم إضافة النقاط بنجاح",
+    "CustomerPoints": "النقاط الحالية"
   },
   "Products": {
     "Cafe": "المقهى",
@@ -233,6 +240,9 @@
     "TransactionNotDeleted": "فشل حذف التحويل",
     "TransactionNotFound": "التحويل غير موجود",
     "TransactionNotUpdated": "فشل تحديث التحويل",
+    "BackToCustomers": "العودة إلى العملاء",
+    "CustomerTransactions": "معاملات العميل",
+    "Currency": "العملة",
     "TransactionUpdated": "تم تحديث التحويل بنجاح",
     "TransactionNotAdded": "فشل إضافة التحويل",
     "TransactionAdded": "تم إضافة التحويل بنجاح"
@@ -245,10 +255,11 @@
     "Timezone": "التوقيت",
     "Points": "النقاط",
     "Save": "حفظ",
-    "pointsPerUnit": "النقاط لكل وحدة",
-    "pointsPerUnitValue": "قيمة النقاط لكل وحدة",
-    "pointsPerUnitValueHint": "قيمة النقاط لكل وحدة",
-    "NoCurrencies": "لا يوجد عملات"
-
+    "pointsPerUSD": "النقاط لكل دولار",
+    "pointsPerIQD": "النقاط لكل دينار",
+    "NoCurrencies": "لا يوجد عملات",
+    "EnterPointsPer": "أدخل كم نقطة لكل 1",
+    "SettingsSavedSuccessfully": "تم حفظ الإعدادات بنجاح",
+    "Saving": "جاري حفظ الإعدادات..."
   }
 }

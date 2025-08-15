@@ -5,7 +5,6 @@ import {
   CardGiftcard as RewardsIcon,
   Settings as SettingsIcon,
   ReceiptLong as ReceiptLongIcon,
-  Receipt as InvoiceIcon
 } from '@mui/icons-material';
 
 const routes = [
@@ -39,12 +38,7 @@ const routes = [
     path: '/rewards',
     icon: RewardsIcon
   },
-  {
-    name: 'Invoice',
-    arName: 'الفواتير',
-    path: '/invoice',
-    icon: InvoiceIcon
-  },
+  
   {
     name: 'Settings',
     arName: 'الإعدادات',

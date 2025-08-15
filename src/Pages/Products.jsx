@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, useMediaQuery } from '@mui/material';
+import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, useMediaQuery, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
@@ -10,7 +10,7 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
-import Spinner from '../utilities/Spinner'
+
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
@@ -24,7 +24,11 @@ const Products = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
   const isMobile = useMediaQuery('(max-width: 400px)');
+
   useEffect(() => {
+    setProducts([]);
+    setFilteredProducts([]);
+    setLoading(true);
     fetchProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
@@ -38,7 +42,6 @@ const Products = () => {
   }, [searchTerm, products]);
 
   const fetchProducts = async () => {
-    setLoading(true);
     try {
       const endpoint = activeTab === 'cafe' 
         ? '/api/cafe-products/1' 
@@ -195,8 +198,12 @@ const Products = () => {
           {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}
         </Button>
       </Box>
-      {loading && <Spinner />}
-      
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
         <Grid container spacing={3} sx={{
           justifyContent: isMobile ? 'center' : 'flex-start',
         }}>
@@ -267,7 +274,7 @@ const Products = () => {
             </Grid>
           ))}
         </Grid>
-
+      )}
 
       <AddProductModal
         open={openModal}

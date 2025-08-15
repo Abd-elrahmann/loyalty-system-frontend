@@ -24,9 +24,11 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
-    currency: '',
+    currency: null,
+    currencyValue: null,
     timezone: 'Asia/Baghdad',
-    pointsConversion: 1
+    pointsPerDollar: 0,
+    pointsPerIQD: 0
   });
 
   // Get all timezones using moment-timezone
@@ -42,7 +44,11 @@ const Settings = () => {
       try {
         const response = await Api.get('/api/settings');
         if (response.data) {
-          setSettings(response.data);
+          const currencyObj = currencies.find(c => c.enValue === response.data.currency);
+          setSettings({
+            ...response.data,
+            currencyValue: currencyObj?.arValue || null
+          });
         }
       } catch (error) {
         notifyError(error.response?.data?.message || t('Errors.generalError'));
@@ -52,6 +58,7 @@ const Settings = () => {
     };
 
     fetchSettings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t]);
 
   const handleChange = (e) => {
@@ -65,8 +72,17 @@ const Settings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await Api.put('/api/settings', settings);
-      notifySuccess(t('Settings.SavedSuccessfully'));
+      await Api.post('/api/settings', settings);
+      notifySuccess(t('Settings.SettingsSavedSuccessfully'));
+      // Refresh settings after save
+      const response = await Api.get('/api/settings');
+      if (response.data) {
+        const currencyObj = currencies.find(c => c.enValue === response.data.currency);
+        setSettings({
+          ...response.data,
+          currencyValue: currencyObj?.arValue || null
+        });
+      }
     } catch (error) {
       notifyError(error.response?.data?.message || t('Errors.generalError'));
     } finally {
@@ -95,11 +111,13 @@ const Settings = () => {
           fullWidth
           labelId="currency-label"
           name="currency"
-          value={settings.currency}
+          value={currencies.find(c => c.enValue === settings.currency) || null}
           onChange={(event, newValue) => {
             setSettings(prev => ({
               ...prev,
-              currency: newValue
+              currency: newValue ? newValue.enValue : null,
+              currencyValue: newValue ? newValue.arValue : null
+              // Keep existing pointsPerDollar and pointsPerIQD values
             }));
           }}
           options={currencies}
@@ -112,15 +130,15 @@ const Settings = () => {
           renderInput={(params) => <TextField {...params} label={t('Settings.Currency')} />}
           noOptionsText={t('Settings.NoCurrencies')}
         />
-
+         
         {settings.currency && (
           <TextField
             fullWidth
             size="small"
             type="number"
-            name="pointsConversion"
-            label={`Enter how many points for each 1 ${i18n.language === 'ar' ? settings.currency.arValue : settings.currency.enValue}`}
-            value={settings.pointsConversion}
+            name={settings.currency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
+            label={t(`Settings.EnterPointsPer`) + " " + settings.currencyValue}
+            value={settings.currency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
             onChange={handleChange}
             inputProps={{ min: 1 }}
             sx={{ mt: 2 }}
@@ -139,7 +157,12 @@ const Settings = () => {
           labelId="timezone-label"
           name="timezone"
           value={settings.timezone}
-          onChange={handleChange}
+          onChange={(event, newValue) => {
+            setSettings(prev => ({
+              ...prev,
+              timezone: newValue || 'Asia/Baghdad'
+            }));
+          }}
           label={t('Settings.Timezone')}
           options={timezones}
           getOptionLabel={(option) => option.replace(/_/g, ' ')}

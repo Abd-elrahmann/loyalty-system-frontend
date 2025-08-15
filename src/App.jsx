@@ -136,6 +136,13 @@ function App() {
                 </MainLayout>
               </ProtectedRoute>
             } />
+            <Route path="/transactions/:customerId" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Transactions />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
             <Route path="/settings" element={
               <ProtectedRoute>
                 <MainLayout>
