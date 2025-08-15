@@ -237,5 +237,18 @@
         "TransactionUpdated": "Transaction updated successfully",
         "TransactionNotAdded": "Transaction not added",
         "TransactionAdded": "Transaction added successfully"
+    },
+    "Settings": {
+        "CurrencySettings": "Currency Settings",
+        "TimezoneSettings": "Timezone Settings",
+        "PointsSettings": "Points Settings",
+        "Currency": "Currency",
+        "Timezone": "Timezone",
+        "Points": "Points",
+        "Save": "Save",
+        "pointsPerUnit": "Points per Unit",
+        "pointsPerUnitValue": "Points per Unit Value",
+        "pointsPerUnitValueHint": "Points per Unit Value Hint",
+        "NoCurrencies": "No Currencies"
     }
 }

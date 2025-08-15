@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './Config/translationConfig.js'
@@ -13,11 +12,9 @@ import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <App />
       </LocalizationProvider>
     </ThemeProvider>
-  </StrictMode>
 )

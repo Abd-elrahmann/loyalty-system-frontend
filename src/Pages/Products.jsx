@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton } from '@mui/material';
+import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
@@ -23,6 +23,7 @@ const Products = () => {
   const [productId, setProductId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
+  const isMobile = useMediaQuery('(max-width: 400px)');
   useEffect(() => {
     fetchProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,9 +128,14 @@ const Products = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+      <Box sx={{ p: isMobile ? 1 : 3,mt:isMobile ? 6 : 0 }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={activeTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
+        <Tabs value={activeTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary" sx={{
+          '& .MuiTabs-flexContainer': {
+            flexWrap: 'wrap',
+            justifyContent: isMobile ? 'center' : 'flex-start',
+          },
+        }}>
           <Tab label={t('Products.Cafe')} value="cafe" />
           <Tab label={t('Products.Restaurant')} value="restaurant" />
         </Tabs>
@@ -139,7 +145,7 @@ const Products = () => {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        mb: 3,
+        mb: isMobile ? 1 : 3,
         gap: 2
       }}>
         <TextField
@@ -150,7 +156,7 @@ const Products = () => {
           onChange={handleSearchChange}
           sx={{
             flexGrow: 1,
-            maxWidth: '250px',
+            maxWidth: isMobile ? '60%' : '250px',
             backgroundColor: 'transparent',
             '& .MuiOutlinedInput-root': {
               backgroundColor: 'transparent',
@@ -178,13 +184,22 @@ const Products = () => {
           variant="contained" 
           color="primary" 
           onClick={handleOpenModal}
+          sx={{
+            flexShrink: 0,
+            width: isMobile ? '50%' : '220px',
+            height:  '40px',
+            fontSize: isMobile ? '14px' : '16px',
+            borderRadius: isMobile ? '5px' : '10px',
+          }}
         >
           {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}
         </Button>
       </Box>
       {loading && <Spinner />}
       
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{
+          justifyContent: isMobile ? 'center' : 'flex-start',
+        }}>
           {filteredProducts.map((product) => (
             <Grid item key={product.id}>
               <Card sx={{ 

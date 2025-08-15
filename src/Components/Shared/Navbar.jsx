@@ -57,7 +57,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'white', width: '100%', boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)', zIndex: theme.zIndex.drawer + 1 }}>
+    <AppBar position="fixed" sx={{ backgroundColor: 'white', width: '100%', boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)', zIndex: theme.zIndex.drawer + 1 }}>
       <Toolbar sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', px: isMobile ? 1 : 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: isMobile ? 1 : 2 }}>
           {user && (

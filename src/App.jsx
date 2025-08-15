@@ -23,7 +23,8 @@ const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 const Products = React.lazy(() => import('./Pages/Products'));
 const Transactions = React.lazy(() => import('./Pages/Transactions'));
-
+const Settings = React.lazy(() => import('./Pages/Settings'));
+const Invoice = React.lazy(() => import('./Pages/Invoice'));
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
   
@@ -132,6 +133,20 @@ function App() {
               <ProtectedRoute>
                 <MainLayout>
                   <Transactions />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Settings />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/invoice" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Invoice />
                 </MainLayout>
               </ProtectedRoute>
             } />

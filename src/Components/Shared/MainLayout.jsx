@@ -28,38 +28,48 @@ const MainLayout = ({ children }) => {
   ].includes(window.location.pathname);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Navbar 
         onMenuClick={handleSidebarToggle} 
         sidebarVisible={sidebarVisible}
         setSidebarVisible={setSidebarVisible}
+        sx={{
+          position: 'fixed',
+          width: '100%',
+          top: 0,
+          zIndex: (theme) => theme.zIndex.drawer + 1
+        }}
       />
       
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', mt: -5 }}>
-        {shouldShowSidebar && (
-          <Sidebar 
-            key={i18n.language} // إعادة بناء عند تغيير اللغة
-            open={sidebarOpen} 
-            onToggle={handleSidebarToggle}
-            sidebarVisible={sidebarVisible}
-            isRTL={isRTL} // تمرير الاتجاه لو حبيت تستخدمه جوه السايد بار
-          />
-        )}
-        
-        <Box
-          component="main"
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'auto',
-            backgroundColor: 'background.default',
-            width: shouldShowSidebar && !isMobile && sidebarVisible ? 'calc(100% - 200px)' : '100%',
-            mt: 4
-          }}
-        >
-          {children}
-        </Box>
+      {shouldShowSidebar && (
+        <Sidebar 
+          key={i18n.language}
+          open={sidebarOpen} 
+          onToggle={handleSidebarToggle}
+          sidebarVisible={sidebarVisible}
+          isRTL={isRTL}
+        />
+      )}
+      
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 1,
+          width: '100%',
+          marginTop: '64px', // Height of navbar
+          marginLeft: shouldShowSidebar && !isMobile && sidebarVisible ? '260px' : 0,
+          transition: theme => theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+          ...(isRTL && {
+            marginRight: shouldShowSidebar && !isMobile && sidebarVisible ? '260px' : 0,
+            marginLeft: 0,
+          })
+        }}
+      >
+        {children}
       </Box>
     </Box>
   );

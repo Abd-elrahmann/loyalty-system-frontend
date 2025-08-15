@@ -11,19 +11,12 @@ import {
   useMediaQuery,
   Button
 } from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  People as PeopleIcon, 
-  Inventory as ProductsIcon,
-  CardGiftcard as RewardsIcon,
-  Settings as SettingsIcon,
-  Support as SupportIcon,
-  ReceiptLong as ReceiptLongIcon
-} from '@mui/icons-material';
+import { Support as SupportIcon } from '@mui/icons-material';
+import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-const drawerWidth = 280;
+const drawerWidth = 260;
 
 const Sidebar = ({  onToggle, sidebarVisible }) => {
   const { t, i18n } = useTranslation();
@@ -38,44 +31,10 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
   }, [isRTL]);
   
 
-  const navigationItems = [
-    {
-      name: 'Dashboard',
-      arName: 'لوحة التحكم',
-      path: '/dashboard',
-      icon: <DashboardIcon />
-    },
-    {
-      name: 'Customers',
-      arName: 'العملاء', 
-      path: '/customers',
-      icon: <PeopleIcon />
-    },
-    {
-      name: 'Transactions',
-      arName: 'المعاملات', 
-      path: '/transactions',
-      icon: <ReceiptLongIcon />
-    },
-    {
-      name: 'Products',
-      arName: 'المنتجات',
-      path: '/products', 
-      icon: <ProductsIcon />
-    },
-    {
-      name: 'Rewards',
-      arName: 'المكافآت',
-      path: '/rewards',
-      icon: <RewardsIcon />
-    },
-    {
-      name: 'Settings',
-      arName: 'الإعدادات',
-      path: '/settings',
-      icon: <SettingsIcon />
-    }
-  ];
+  const navigationItems = routes.map(route => ({
+    ...route,
+    icon: <route.icon />
+  }));
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -85,8 +44,13 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
   };
 
   const drawerContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', mt: 5 }}>
-      <List sx={{ flex: 1 }}>
+    <Box sx={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        pt: '64px' // Match navbar height
+      }}>
+      <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
           const isActive = location.pathname === item.path;
           
@@ -97,7 +61,7 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
               sx={{
                 mx: 1,
                 mb: 1,
-                mt: 1,
+                mt: 2,
                 borderRadius: 2,
                 cursor: 'pointer',
                 backgroundColor: isActive ? 'primary.main' : 'transparent',
@@ -200,7 +164,7 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
       sx={{
         display: { xs: 'block', sm: sidebarVisible ? 'block' : 'none' },
         '& .MuiDrawer-paper': {
-          position: isMobile ? 'fixed' : 'relative',
+          position:  'fixed',
           width: drawerWidth,
           boxSizing: 'border-box',
           border: 'none',

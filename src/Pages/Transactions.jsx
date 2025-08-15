@@ -120,14 +120,14 @@ const Transactions = () => {
       
       const columns = [
         'ID',
-        'English Name',
+        'English Name', 
         'Arabic Name',
         'Points',
         'Type',
         'Date'
       ];
       
-        const rows = transactions.map(transaction => [
+      const rows = transactions.map(transaction => [
         transaction.id,
         transaction.user.enName,
         transaction.user.arName,
@@ -142,20 +142,20 @@ const Transactions = () => {
         body: rows,
         theme: 'grid',
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [66, 139, 202] },
+        headStyles: { fillColor: [128, 0, 128] }, // Changed to #800080 (RGB: 128,0,128)
         columnStyles: {
           2: { 
             font: "Amiri",
             fontStyle: "bold",
-            halign: 'right', 
-            cellWidth: 40, 
-            direction: 'rtl' 
+            halign: 'right',
+            cellWidth: 40,
+            direction: 'rtl'
           }
         },
         didDrawCell: function(data) {
           if (data.column.index === 2 && data.cell.section === 'body') {
             const text = data.cell.text[0];
-            if (text && /[\u0600-\u06FF]/.test(text)) { 
+            if (text && /[\u0600-\u06FF]/.test(text)) {
               data.cell.text = [text];
             }
           }
@@ -165,7 +165,7 @@ const Transactions = () => {
       doc.save('transactions_report.pdf');
     } catch (error) {
       console.log(error);
-      notifyError(t("Errors.generalError"));
+      notifyError(t("Errors.generalError")); 
     }
   };
   const formatDate = (dateString) => {

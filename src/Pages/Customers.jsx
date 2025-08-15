@@ -116,15 +116,12 @@ const Customers = () => {
     try {
       const doc = new jsPDF();
       
-      // Add Amiri font for Arabic text
       doc.addFont("./src/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
       doc.addFont("./src/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
       
-      // Add title
       doc.setFontSize(16);
       doc.text('Customers Report', 14, 15);
       
-      // Define table columns
       const columns = [
         'ID',
         'English Name',
@@ -135,7 +132,6 @@ const Customers = () => {
         'Points'
       ];
       
-      // Prepare data rows
       const rows = customers.map(customer => [
         customer.id,
         customer.enName,
@@ -146,30 +142,26 @@ const Customers = () => {
         customer.points
       ]);
 
-      // Add table using the imported autoTable plugin
       autoTable(doc, {
         startY: 25,
         head: [columns],
         body: rows,
         theme: 'grid',
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [66, 139, 202] },
+        headStyles: { fillColor: [128, 0, 128] },
         columnStyles: {
-          2: { // Arabic Name column (0-based index)
+          2: {
             font: "Amiri",
             fontStyle: "bold",
-            halign: 'right', // Right align Arabic text
-            cellWidth: 40, // Make Arabic column wider
-            direction: 'rtl' // Add RTL direction for Arabic text
+            halign: 'right',
+            cellWidth: 40,
+            direction: 'rtl'
           }
         },
         didDrawCell: function(data) {
-          // For Arabic text cells only
           if (data.column.index === 2 && data.cell.section === 'body') {
-            // Get the text and ensure proper Arabic display
             const text = data.cell.text[0];
-            if (text && /[\u0600-\u06FF]/.test(text)) { // Test if contains Arabic
-              // Don't reverse the text since we're using RTL direction
+            if (text && /[\u0600-\u06FF]/.test(text)) {
               data.cell.text = [text];
             }
           }
@@ -197,7 +189,7 @@ const Customers = () => {
   };
 
   return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3,mt: 1 }}>
       <Box sx={{ p: 2, mb: 2 }}>
         <Box
           sx={{
@@ -239,6 +231,20 @@ const Customers = () => {
               <FaQrcode />
             </IconButton>
           </Stack>
+          <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                onClick={exportToCSV}
+              >
+                {t("Customers.ExportCSV")}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={exportToPDF}
+              >
+                {t("Customers.ExportPDF")}
+              </Button>
+            </Stack>
 
           <Button
             variant="contained"
@@ -253,20 +259,7 @@ const Customers = () => {
           </Button>
         </Box>
       </Box>
-      <Stack direction="row" spacing={4} sx={{ mb: 2 }}>
-              <Button
-                variant="contained"
-                onClick={exportToCSV}
-              >
-                {t("Customers.ExportCSV")}
-              </Button>
-              <Button
-                variant="contained"
-                onClick={exportToPDF}
-              >
-                {t("Customers.ExportPDF")}
-              </Button>
-            </Stack>
+    
 
       <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
         <Table stickyHeader>
@@ -391,6 +384,8 @@ const Customers = () => {
           rowsPerPageOptions={[5, 10, 20]}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={t("Customers.RowsPerPage")}
+          sortLabel={t("Customers.Sort")}
+          
         />
       </TableContainer>
       <AddCustomer

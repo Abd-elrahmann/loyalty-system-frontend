@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 const notifySuccess = (message) => {
   toast.success(message, {
     position: "top-right",
-    autoClose: 2000,
+    autoClose: 1500,
     pauseOnHover: true,
     draggable: true,
   });
@@ -13,7 +13,7 @@ const notifySuccess = (message) => {
 const notifyError = (message) => {
   toast.error(message, {
     position: "top-right",
-    autoClose: 2000,
+    autoClose: 1500,
     pauseOnHover: true,
     draggable: true,
   });
@@ -22,7 +22,7 @@ const notifyError = (message) => {
 const notifyInfo = (message) => {
   toast.info(message, {
     position: "top-right",
-    autoClose: 2000,
+    autoClose: 1500,
     pauseOnHover: true,
     draggable: true,
   });

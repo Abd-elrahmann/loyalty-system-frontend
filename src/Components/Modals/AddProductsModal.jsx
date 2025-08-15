@@ -8,6 +8,7 @@ import {
   Grid,
   IconButton,
   CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
@@ -32,6 +33,7 @@ const style = {
 const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 400px)');
   const fileInputRef = useRef(null);
   const formik = useFormik({
     initialValues: {
@@ -136,7 +138,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={style}>
+        <Box sx={{...style, width: isMobile ? '90%' : 600,p:isMobile ? 1 : 4}}>
         <Box
           sx={{
             width: "100%",
@@ -157,7 +159,10 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
         </Box>
 
         <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-          <Grid container spacing={2}>
+          <Grid container spacing={isMobile ? 1 : 2} sx={{
+            justifyContent: isMobile ? "center" : "flex-start",
+            mt:isMobile ? 3 : 0,
+          }}>
             <Grid item xs={12}>
               <TextField
                 fullWidth

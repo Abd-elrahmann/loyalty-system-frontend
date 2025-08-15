@@ -236,5 +236,19 @@
     "TransactionUpdated": "تم تحديث التحويل بنجاح",
     "TransactionNotAdded": "فشل إضافة التحويل",
     "TransactionAdded": "تم إضافة التحويل بنجاح"
+  },
+  "Settings": {
+    "CurrencySettings": "إعدادات العملة",
+    "TimezoneSettings": "إعدادات التوقيت",
+    "PointsSettings": "إعدادات النقاط",
+    "Currency": "العملة",
+    "Timezone": "التوقيت",
+    "Points": "النقاط",
+    "Save": "حفظ",
+    "pointsPerUnit": "النقاط لكل وحدة",
+    "pointsPerUnitValue": "قيمة النقاط لكل وحدة",
+    "pointsPerUnitValueHint": "قيمة النقاط لكل وحدة",
+    "NoCurrencies": "لا يوجد عملات"
+
   }
 }

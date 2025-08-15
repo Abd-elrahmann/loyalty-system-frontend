@@ -120,23 +120,80 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
 
           <Divider>{t("Customers.or")}</Divider>
 
-          <Box sx={{ position: 'relative', width: '100%', height: 300 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          <Box sx={{ 
+            position: 'relative', 
+            width: '100%', 
+            height: 300, 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            overflow: 'hidden',
+            backgroundColor: 'black'
+          }}>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                position: 'absolute', 
+                top: 8, 
+                backgroundColor: 'rgba(0,0,0,0.5)', 
+                color: 'white', 
+                padding: '4px 8px', 
+                borderRadius: '4px',
+                zIndex: 2
+              }}
+            >
               {t("Customers.ScanQRCodeHint")}
             </Typography>
+
             <QrReader
               constraints={{ facingMode: 'environment' }}
               onResult={handleScan}
               onError={handleError}
-              style={{ width: '100%' }}
+              containerStyle={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute'
+              }}
+              videoStyle={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
             />
+
+            <Box sx={{
+              position: 'absolute',
+              width: 200,
+              height: 200,
+              border: '3px solid #4AB814',
+              borderRadius: '8px',
+              zIndex: 2,
+              backgroundColor: 'transparent'
+            }} />
+
+            {/* Overlay to darken areas outside scanning frame */}
+            <Box sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.6)',
+              mask: 'linear-gradient(#000 0 0) center/200px 200px no-repeat',
+              WebkitMask: 'linear-gradient(#000 0 0) center/200px 200px no-repeat',
+              maskComposite: 'exclude',
+              WebkitMaskComposite: 'xor',
+              zIndex: 1
+            }} />
           </Box>
 
           {error && (
-            <Box sx={{ color: 'error.main', textAlign: 'center' }}>
+            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
               {error}
-            </Box>
+            </Typography>
           )}
+          
         </Stack>
       </DialogContent>
     </Dialog>
