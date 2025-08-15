@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import './App.css'
 import './Config/translationConfig.js'
 import './utilities/Theme.jsx'
 import { ThemeProvider } from '@mui/material/styles'

@@ -1,14 +1,15 @@
 import { useFormik } from 'formik';
-import { 
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Paper,
-  Link,
-  IconButton
-} from '@mui/material';
+import React from 'react';
+const Box = React.lazy(() => import('@mui/material/Box'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Container = React.lazy(() => import('@mui/material/Container'));
+const Paper = React.lazy(() => import('@mui/material/Paper'));
+const Link = React.lazy(() => import('@mui/material/Link'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
+import { useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Spinner from '../utilities/Spinner';
@@ -18,8 +19,11 @@ import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import EmailIcon from '@mui/icons-material/Email';
+import LockIcon from '@mui/icons-material/Lock';
 
 const Login = () => {
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const {t} =useTranslation()
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -73,7 +77,7 @@ const Login = () => {
 
   return (
     <MainLayout>
-      <Container component="main" maxWidth="sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Container component="main" maxWidth="sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', width: isMobile ? '90vw' : '100%' }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 8}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
@@ -96,6 +100,13 @@ const Login = () => {
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
             disabled={loading}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+              )
+            }}
           />
 
           <TextField
@@ -104,6 +115,11 @@ const Login = () => {
             label={t('Login.password')}
             type={showPassword ? 'text' : 'password'}
             InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+              ),
               endAdornment: (
                 <IconButton onClick={togglePasswordVisibility} disabled={loading}>
                   {showPassword ? <VisibilityOff /> : <Visibility />}

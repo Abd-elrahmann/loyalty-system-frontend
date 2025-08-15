@@ -1,14 +1,14 @@
 import { useFormik } from 'formik';
+import React from 'react';
+const Box = React.lazy(() => import('@mui/material/Box'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Container = React.lazy(() => import('@mui/material/Container'));
+const Paper = React.lazy(() => import('@mui/material/Paper'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
 import { useState } from 'react';
-import { 
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Paper,
-  IconButton
-} from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Spinner from '../utilities/Spinner';
 import { useNavigate } from 'react-router-dom';
@@ -17,8 +17,14 @@ import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import EmailIcon from '@mui/icons-material/Email';
+import LockIcon from '@mui/icons-material/Lock';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PersonIcon from '@mui/icons-material/Person';
+const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
 
 const Register = () => {
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const {t} = useTranslation()
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -104,7 +110,7 @@ const Register = () => {
 
   return (
     <MainLayout>
-      <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: isMobile ? '90vw' : '100%' }}>
       <Paper 
         elevation={3} 
         sx={{ 
@@ -129,6 +135,13 @@ const Register = () => {
               onChange={formik.handleChange}
               error={formik.touched.enName && Boolean(formik.errors.enName)}
               helperText={formik.touched.enName && formik.errors.enName}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon sx={{ color: 'primary.main' }} />
+                  </InputAdornment>
+                )
+              }}
             />
             <TextField
               fullWidth
@@ -138,6 +151,13 @@ const Register = () => {
               onChange={formik.handleChange}
               error={formik.touched.arName && Boolean(formik.errors.arName)}
               helperText={formik.touched.arName && formik.errors.arName}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon sx={{ color: 'primary.main' }} />
+                  </InputAdornment>
+                )
+              }}
             />    
           </Box>
 
@@ -151,6 +171,13 @@ const Register = () => {
             onChange={formik.handleChange}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+              )
+            }}
           />
 
           <TextField
@@ -162,6 +189,13 @@ const Register = () => {
             onChange={formik.handleChange}
             error={formik.touched.phone && Boolean(formik.errors.phone)}
             helperText={formik.touched.phone && formik.errors.phone}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneIcon sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+              )
+            }}
           />
 
           <TextField
@@ -170,6 +204,11 @@ const Register = () => {
             label={t('Register.password')}
             type={showPassword ? 'text' : 'password'}
             InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+              ),
               endAdornment: (
                 <IconButton onClick={togglePasswordVisibility}>
                   {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -181,6 +220,7 @@ const Register = () => {
             onChange={formik.handleChange}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
+         
           />
 
           <TextField
@@ -189,6 +229,11 @@ const Register = () => {
             label={t('Register.confirmPassword')}
             type={showConfirmPassword ? 'text' : 'password'}
             InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+              ),
               endAdornment: (
                 <IconButton onClick={toggleConfirmPasswordVisibility}>
                   {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
@@ -200,6 +245,7 @@ const Register = () => {
             onChange={formik.handleChange}
             error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
             helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+           
           />
 
           <Button

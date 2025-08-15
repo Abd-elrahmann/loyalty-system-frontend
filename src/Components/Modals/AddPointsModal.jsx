@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Box,
-  Typography,
-  CircularProgress,
-  Divider,
-} from "@mui/material";
+const Dialog = React.lazy(() => import('@mui/material/Dialog'));
+const DialogTitle = React.lazy(() => import('@mui/material/DialogTitle'));
+const DialogContent = React.lazy(() => import('@mui/material/DialogContent'));
+const DialogActions = React.lazy(() => import('@mui/material/DialogActions'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Divider = React.lazy(() => import('@mui/material/Divider'));
+const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Link = React.lazy(() => import('@mui/material/Link'));
 import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
@@ -28,7 +27,6 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
     timezone: ""
   });
 
-  // Fetch settings when modal opens
   useEffect(() => {
     if (open) {
       fetchSettings();
@@ -46,16 +44,13 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
     }
   };
 
-  // Calculate points based on price and settings
   const calculatePoints = (priceValue) => {
     if (!priceValue) return "";
     
-    // Always use pointsPerDollar since we're using USD
     const calculatedPoints = Math.floor(parseFloat(priceValue) * settings.pointsPerDollar);
     return calculatedPoints.toString();
   };
 
-  // Handle price change and auto-calculate points
   const handlePriceChange = (e) => {
     const newPrice = e.target.value;
     setPrice(newPrice);
@@ -105,13 +100,15 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
         <DialogContent>
           <Box sx={{ mb: 2 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              {t("Customers.Customer")}: {customer?.enName}
+              {t("Customers.Customer")}: {i18n.language === 'ar' ? customer?.arName : customer?.enName}
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>
-              {t("Customers.CustomerPoints")}: {customer?.points}
+              {t("Customers.CustomerPoints")}: {customer?.points} {t("Customers.Point")}
             </Typography>
-            
-            {/* Price Input Field */}
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {t("Customers.NeedToChangeCurrency")} <Link href="/settings">{t("Customers.GoToSettings")}</Link>
+            </Typography>
+            <Divider sx={{ my: 2 }} />
             <TextField
               fullWidth
               label={`${t("Customers.Price")} (${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency})`}
@@ -126,7 +123,6 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
             
             <Divider sx={{ my: 2 }} />
             
-            {/* Points Display/Input Field */}
             <TextField
               fullWidth
               label={t("Customers.pointsToAdd")}

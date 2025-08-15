@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, useMediaQuery, CircularProgress, Pagination } from '@mui/material';
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Tabs = React.lazy(() => import('@mui/material/Tabs'));
+const Tab = React.lazy(() => import('@mui/material/Tab'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Card = React.lazy(() => import('@mui/material/Card'));
+const CardContent = React.lazy(() => import('@mui/material/CardContent'));
+const CardMedia = React.lazy(() => import('@mui/material/CardMedia'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Grid = React.lazy(() => import('@mui/material/Grid'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
+const Pagination = React.lazy(() => import('@mui/material/Pagination'));
 import SearchIcon from '@mui/icons-material/Search';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
@@ -10,6 +23,7 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
+import { useMediaQuery } from '@mui/material';
 
 const Products = () => {
   const { t, i18n } = useTranslation();
@@ -24,7 +38,7 @@ const Products = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const isMobile = useMediaQuery('(max-width: 400px)');
 
   useEffect(() => {
@@ -53,7 +67,7 @@ const Products = () => {
       const response = await Api.get(endpoint);
       setProducts(response.data.products || []);
       setFilteredProducts(response.data.products || []);
-      setTotalPages(response.data.totalPages || 1);
+      setTotalItems(response.data.totalItems || 0);
     } catch (error) {
       handleApiError(error);
       setProducts([]); 
@@ -242,7 +256,7 @@ const Products = () => {
                   <CardMedia
                     component="img"
                     height="200"
-                    loading="lazy"
+                    loading="eager"
                     image={product.image}
                     alt={product.enName}
                     sx={{ objectFit: 'cover' }}
@@ -292,8 +306,8 @@ const Products = () => {
 
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
             <Pagination 
-              count={totalPages}
-              page={currentPage}
+              count={totalItems}
+              page={currentPage - 1}
               onChange={handlePageChange}
               color="primary"
               size={isMobile ? "small" : "medium"}

@@ -1,4 +1,7 @@
 import React from 'react';
+const Paper = React.lazy(() => import('@mui/material/Paper'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+import { useTheme } from '@mui/material';
 import {
   AreaChart,
   Area,
@@ -8,7 +11,6 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { Paper, Typography, Box, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 const PointsChart = ({ data, title }) => {

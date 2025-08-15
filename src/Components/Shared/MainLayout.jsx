@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box, useTheme, useMediaQuery } from '@mui/material';
+const Box = React.lazy(() => import('@mui/material/Box'));
+import { useTheme, useMediaQuery } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,7 @@ const MainLayout = ({ children }) => {
           flexGrow: 1,
           p: 1,
           width: '100%',
-          marginTop: '64px', // Height of navbar
+          marginTop: '64px', 
           marginLeft: shouldShowSidebar && !isMobile && sidebarVisible ? '260px' : 0,
           transition: theme => theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,

@@ -171,7 +171,10 @@
         "pointsToAdd": "Points to Add",
         "pointsAdded": "points added successfully",
         "CustomerPoints": "Current Points",
-        "ClearFilter": "Clear Filter"
+        "ClearFilter": "Clear Filter",
+        "Point": "Point",
+        "NeedToChangeCurrency": " Need to change the currency?",
+        "GoToSettings": "Go to settings"
     },
     "Products": {
         "Cafe": "Cafe",

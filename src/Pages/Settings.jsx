@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  Typography,
-  Paper,
-  Divider,
-  Button,
-  TextField,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  CircularProgress,
-  Container,
-  Autocomplete
-} from '@mui/material';
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Paper = React.lazy(() => import('@mui/material/Paper'));
+const Divider = React.lazy(() => import('@mui/material/Divider'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
+const Container = React.lazy(() => import('@mui/material/Container'));
+const Autocomplete = React.lazy(() => import('@mui/material/Autocomplete'));
+
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
@@ -31,7 +26,6 @@ const Settings = () => {
     pointsPerIQD: 0
   });
 
-  // Get all timezones using moment-timezone
   const timezones = moment.tz.names();
 
   const currencies = [
@@ -82,7 +76,6 @@ const Settings = () => {
       };
       await Api.post('/api/settings', settingsToSave);
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
-      // Refresh settings after save
       const response = await Api.get('/api/settings');
       if (response.data) {
         const currencyObj = currencies.find(c => c.enValue === response.data.enCurrency);
@@ -120,7 +113,6 @@ const Settings = () => {
 
         <Autocomplete
           fullWidth
-          labelId="currency-label"
           name="currency"
           value={currencies.find(c => c.enValue === settings.enCurrency) || null}
           onChange={(event, newValue) => {
@@ -147,7 +139,7 @@ const Settings = () => {
             size="small"
             type="number"
             name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
-            label={t(`Settings.EnterPointsPer`) + " " + settings.arCurrency}
+            label={t(`Settings.EnterPointsPer`) + " " + (i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency)}
             value={settings.enCurrency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
             onChange={handleChange}
             inputProps={{ min: 1 }}
@@ -164,7 +156,6 @@ const Settings = () => {
 
         <Autocomplete
           fullWidth
-          labelId="timezone-label"
           name="timezone"
           value={settings.timezone}
           onChange={(event, newValue) => {

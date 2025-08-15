@@ -3,19 +3,18 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import dayjs from 'dayjs';
-import {
-  Box,
-  Button,
-  Stack,
-  IconButton,
-  Table,
-  TableBody,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-} from "@mui/material";
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Stack = React.lazy(() => import('@mui/material/Stack'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const Table = React.lazy(() => import('@mui/material/Table'));
+const TableBody = React.lazy(() => import('@mui/material/TableBody'));
+const TableContainer = React.lazy(() => import('@mui/material/TableContainer'));
+const TableHead = React.lazy(() => import('@mui/material/TableHead'));
+const TableRow = React.lazy(() => import('@mui/material/TableRow'));
+const TablePagination = React.lazy(() => import('@mui/material/TablePagination'));
+const Paper = React.lazy(() => import('@mui/material/Paper'));
+
 import {
   StyledTableCell,
   StyledTableRow,
@@ -38,8 +37,6 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  // eslint-disable-next-line no-unused-vars
-  const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const [filters, setFilters] = useState({
@@ -64,7 +61,6 @@ const Transactions = () => {
       const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
       if (response?.data?.transactions) {
         setTransactions(response.data.transactions);
-        setTotalPages(response.data.totalPages);
         setTotalItems(response.data.total);
         
         // Calculate total points for customer
@@ -77,7 +73,6 @@ const Transactions = () => {
         }
       } else {
         setTransactions([]);
-        setTotalPages(0);
         setTotalItems(0);
       }
     } catch (error) {
@@ -377,7 +372,6 @@ const Transactions = () => {
            rowsPerPageOptions={[5, 10, 20]}
            onRowsPerPageChange={handleChangeRowsPerPage}
            labelRowsPerPage={t("Transactions.RowsPerPage")}
-           sortLabel={t("Transactions.Sort")}
         />
       </TableContainer>
 
@@ -385,7 +379,7 @@ const Transactions = () => {
         <TransactionSearchModal
           open={openSearchModal}
           onClose={() => setOpenSearchModal(false)}
-          onSearch={handleSearch}
+          onSearch={handleSearch} 
         />
       )}
 

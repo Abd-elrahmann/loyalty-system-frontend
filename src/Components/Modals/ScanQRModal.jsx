@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  Box, 
-  IconButton,
-  Stack,
-  Typography
-} from '@mui/material';
+const Dialog = React.lazy(() => import('@mui/material/Dialog'));
+const DialogTitle = React.lazy(() => import('@mui/material/DialogTitle'));
+const DialogContent = React.lazy(() => import('@mui/material/DialogContent'));
+const Box = React.lazy(() => import('@mui/material/Box'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const Stack = React.lazy(() => import('@mui/material/Stack'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
 import { Close } from '@mui/icons-material';
 import { QrReader } from 'react-qr-reader';
 import { useTranslation } from "react-i18next";
@@ -17,16 +15,18 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
   const { t } = useTranslation();
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
+  const [hasScanned, setHasScanned] = useState(false);
 
   const handleScan = async (result) => {
-    if (result) {
+    if (result && !hasScanned) {
+      setHasScanned(true); 
       try {
-        // Parse the QR data directly from camera scan
         let qrData;
         try {
           qrData = JSON.parse(result.text);
         } catch {
           notifyError(t("Customers.invalidQRCode"));
+          onClose();
           return;
         }
 
@@ -36,24 +36,36 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
           onClose();
         } else {
           notifyError(t("Customers.invalidQRCode"));
+          onClose();
         }
       } catch (error) {
         console.log(error);
         notifyError(t("Customers.invalidQRCode"));
+        onClose();
       }
     }
   };
 
   const handleError = (error) => {
-    console.log(error);
-    notifyError(t("Customers.qrScanError"));
+    if (!hasScanned) {
+      console.log(error);
+      notifyError(t("Customers.qrScanError"));
+      setHasScanned(true);
+      onClose();
+    }
   };
+
+  React.useEffect(() => {
+    if (open) {
+      setHasScanned(false);
+    }
+  }, [open]);
 
   return (
     <Dialog 
       open={open} 
       onClose={onClose}
-      maxWidth="sm"
+      maxWidth="xs"
       fullWidth
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -62,31 +74,20 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
           <Close />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
         <Stack spacing={2}>
           <Box sx={{ 
-            width: '100%',
-            height: 400,
+            width: 150,
+            height: 150,
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            margin: '0 auto'
           }}>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                position: 'absolute', 
-                top: 8,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: 'rgba(0,0,0,0.5)', 
-                color: 'white', 
-                padding: '4px 8px', 
-                borderRadius: '4px',
-                zIndex: 2
-              }}
-            >
-              {t("Customers.ScanQRCodeHint")}
-            </Typography>
-
+          
             <QrReader
               constraints={{
                 facingMode: 'environment'

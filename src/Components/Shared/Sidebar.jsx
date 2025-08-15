@@ -1,16 +1,13 @@
 import React, { useLayoutEffect } from 'react';
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Box,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Button
-} from '@mui/material';
+const Drawer = React.lazy(() => import('@mui/material/Drawer'));
+const List = React.lazy(() => import('@mui/material/List'));
+const ListItem = React.lazy(() => import('@mui/material/ListItem'));
+const ListItemIcon = React.lazy(() => import('@mui/material/ListItemIcon'));
+const ListItemText = React.lazy(() => import('@mui/material/ListItemText'));
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+import { useTheme } from '@mui/material';
+import { useMediaQuery, Button } from '@mui/material';
 import { Support as SupportIcon } from '@mui/icons-material';
 import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -48,7 +45,7 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
-        pt: '64px' // Match navbar height
+        pt: '64px' 
       }}>
       <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
@@ -134,7 +131,7 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
       <Box sx={{ p: 2 }}>
         <Button 
           variant="contained" 
-          color="primary" 
+          color="error" 
           fullWidth
           onClick={() => {
             localStorage.removeItem('token');

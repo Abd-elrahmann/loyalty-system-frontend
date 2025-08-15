@@ -173,7 +173,10 @@
     "CustomerPoints": "النقاط الحالية",
     "ClearFilter": "مسح الفلتر",
     "ClearFilterEmail": "مسح الفلتر البريد الإلكتروني",
-    "ClearFilterEmailHint": "مسح الفلتر البريد الإلكتروني"
+    "ClearFilterEmailHint": "مسح الفلتر البريد الإلكتروني",
+    "Point": "نقطة",
+    "NeedToChangeCurrency": "هل تحتاج إلى تغيير العملة؟",
+    "GoToSettings": "الذهاب إلى الإعدادات"
   },
   "Products": {
     "Cafe": "المقهى",
@@ -218,7 +221,7 @@
     "ExportCSV": "تصدير CSV",
     "ExportPDF": "تصدير PDF",
     "ExportedSuccessfully": "تم التصدير بنجاح",
-    "NoTransactions": "لا يوجد تحويلات",
+    "NoTransactions": "لا يوجد معاملات",
     "RowsPerPage": "عدد الصفوف في الصفحة",
     "ID": "المسلسل",
     "CustomerEnName": "الاسم الانجليزي ",

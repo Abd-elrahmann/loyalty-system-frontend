@@ -1,12 +1,10 @@
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './utilities/Theme';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import React from 'react';
 import Register from './Auth/Register';
 import Login from './Auth/Login';
+import Profile from './Components/Shared/Profile';
 import { useTranslation } from 'react-i18next';
 import './App.css';
 import { useEffect, useMemo } from 'react';
@@ -16,20 +14,34 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
-const Customers = React.lazy(() => import('./Pages/Customers'));
-const Profile = React.lazy(() => import('./Components/Shared/Profile'));
-const Home = React.lazy(() => import('./Components/Shared/Home'));
-const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
+
+const ToastContainer = React.lazy(() =>
+  import('react-toastify').then(m => ({ default: m.ToastContainer }))
+); 
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
-const Products = React.lazy(() => import('./Pages/Products'));
+const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
+const Customers = React.lazy(() => import('./Pages/Customers'));
 const Transactions = React.lazy(() => import('./Pages/Transactions'));
+const Products = React.lazy(() => import('./Pages/Products'));
 const Settings = React.lazy(() => import('./Pages/Settings'));
-const Invoice = React.lazy(() => import('./Pages/Invoice'));
+const Rewards = React.lazy(() => import('./Pages/Rewards'));
+const Layout = React.lazy(() => import('./Layout'));
+import MainRoutes from './Config/routes';
+
+const routeComponents = {
+  '/dashboard': Dashboard,
+  '/customers': Customers,
+  '/transactions': Transactions,
+  '/products': Products,
+  '/settings': Settings,
+  '/rewards': Rewards,
+};
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
+
   
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -69,15 +81,10 @@ function App() {
   }, [i18n.dir()]);
 
   return (
-    <ThemeProvider theme={theme}>
+        <Layout >
       <CacheProvider value={cacheRtl}>
       <BrowserRouter> 
           <Routes>
-            <Route path="/" element={
-              <PublicRoute>
-                <Home />
-              </PublicRoute>
-            } />
             <Route path="/signup" element={
               <PublicRoute>
                 <Register />
@@ -98,41 +105,22 @@ function App() {
                 <ResetPassword />
               </PublicRoute>
             } />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <Dashboard />
-                  </MainLayout>
-                </ProtectedRoute>
-              } 
-            />
+            {MainRoutes.map((route, index) => {
+              const RouteComponent = routeComponents[route.path];
+              return (
+                <Route key={index} path={route.path} element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <RouteComponent />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+              );
+            })}
             <Route path="/profile" element={
               <ProtectedRoute>
                 <MainLayout>
                   <Profile />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/customers" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Customers />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/products" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Products />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/transactions" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Transactions />
                 </MainLayout>
               </ProtectedRoute>
             } />
@@ -143,25 +131,11 @@ function App() {
                 </MainLayout>
               </ProtectedRoute>
             } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Settings />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/invoice" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Invoice />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
           </Routes>
           <ToastContainer />
         </BrowserRouter>
       </CacheProvider>
-    </ThemeProvider>
+      </Layout>
   );
 }
 

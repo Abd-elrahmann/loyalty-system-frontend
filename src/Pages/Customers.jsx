@@ -2,21 +2,18 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
-import {
-  Box,
-  Button,
-  Stack,
-  InputBase,
-  IconButton,
-  Table,
-  TableBody,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-  CircularProgress,
-} from "@mui/material";
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Stack = React.lazy(() => import('@mui/material/Stack'));
+const InputBase = React.lazy(() => import('@mui/material/InputBase'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const Table = React.lazy(() => import('@mui/material/Table'));
+const TableBody = React.lazy(() => import('@mui/material/TableBody'));
+const TableContainer = React.lazy(() => import('@mui/material/TableContainer'));
+const TableHead = React.lazy(() => import('@mui/material/TableHead'));
+const TableRow = React.lazy(() => import('@mui/material/TableRow'));
+const TablePagination = React.lazy(() => import('@mui/material/TablePagination'));
+const Paper = React.lazy(() => import('@mui/material/Paper'));
+const Button = React.lazy(() => import('@mui/material/Button'));
 import {
   StyledTableCell,
   StyledTableRow,
@@ -41,10 +38,8 @@ const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  // eslint-disable-next-line no-unused-vars
-  const [totalItems, setTotalItems] = useState(0); // Added total items count
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Default to 5 rows
+  const [totalPages, setTotalPages] = useState(0); 
+  const [rowsPerPage, setRowsPerPage] = useState(5); 
   const [searchFilters, setSearchFilters] = useState({
     id: "",
     enName: "",
@@ -73,12 +68,10 @@ const Customers = () => {
       const response = await Api.get(`/api/users/${page}?${queryParams}`);
       if (response?.data?.users) {
         setCustomers(response.data.users);
-        setTotalPages(response.data.totalPages);
-        setTotalItems(response.data.total); // Store total items count
+        setTotalPages(response.data.totalPages); 
       } else {
         setCustomers([]);
         setTotalPages(0);
-        setTotalItems(0);
       }
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
@@ -421,14 +414,13 @@ const Customers = () => {
         </Table>
         <TablePagination
           component="div"
-          count={totalPages * 20}
+          count={totalPages * rowsPerPage}
           page={page - 1}
           onPageChange={(e, newPage) => setPage(newPage + 1)}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[5, 10, 20]}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage={t("Customers.RowsPerPage")}
-          sortLabel={t("Customers.Sort")}
           
         />
       </TableContainer>
@@ -459,7 +451,10 @@ const Customers = () => {
       />
       <ScanQRModal
         open={openScanQR}
-        onClose={() => setOpenScanQR(false)}
+        onClose={() => {
+          setOpenScanQR(false);
+          setScannedEmail("");
+        }}
         onScanSuccess={handleScanSuccess}
       />
     </Box>

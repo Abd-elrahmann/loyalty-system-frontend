@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box } from '@mui/material';
+const Dialog = React.lazy(() => import('@mui/material/Dialog'));
+const DialogTitle = React.lazy(() => import('@mui/material/DialogTitle'));
+const DialogContent = React.lazy(() => import('@mui/material/DialogContent'));
+const DialogActions = React.lazy(() => import('@mui/material/DialogActions'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Box = React.lazy(() => import('@mui/material/Box'));
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';

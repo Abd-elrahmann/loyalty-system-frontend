@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Container,
-  Avatar,
-  CircularProgress,
-  Grid,
-  TextField,
-  Button,
-  Alert,
-  IconButton,
-  useMediaQuery
-} from '@mui/material';
+import React from 'react';
+  const Box = React.lazy(() => import('@mui/material/Box'));
+  const Typography = React.lazy(() => import('@mui/material/Typography'));
+  const Paper = React.lazy(() => import('@mui/material/Paper'));
+  const Container = React.lazy(() => import('@mui/material/Container'));
+  const Avatar = React.lazy(() => import('@mui/material/Avatar'));
+  const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
+  const Grid = React.lazy(() => import('@mui/material/Grid'));
+  const TextField = React.lazy(() => import('@mui/material/TextField'));
+  const Button = React.lazy(() => import('@mui/material/Button'));
+  const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+  import { useMediaQuery } from '@mui/material';
+
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
@@ -264,7 +263,7 @@ const Profile = () => {
               {t('Profile.UpdateName')}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
+              <Grid  xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   label={t('Profile.enName')}
@@ -272,7 +271,7 @@ const Profile = () => {
                   onChange={(e) => setNameForm({ ...nameForm, enName: e.target.value })}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
+              <Grid  xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   label={t('Profile.arName')}
@@ -291,7 +290,7 @@ const Profile = () => {
               {t('Profile.UpdatePassword')}
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sx={{ mx: isMobile ? 'auto' : 0 }}>
+              <Grid  xs={12} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   type="password"
@@ -302,7 +301,7 @@ const Profile = () => {
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
+              <Grid  xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }}>
                 <TextField
                   fullWidth
                   type="password"
@@ -313,7 +312,7 @@ const Profile = () => {
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }} >
+              <Grid  xs={12} sm={6} sx={{ mx: isMobile ? 'auto' : 0 }} >
                 <TextField
                   fullWidth
                   type="password"

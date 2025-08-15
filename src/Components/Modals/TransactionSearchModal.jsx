@@ -1,13 +1,11 @@
 import React from "react";
-import {
-  Modal,
-  Box,
-  Button,
-  Stack,
-  TextField,
-  Typography,
-  MenuItem,
-} from "@mui/material";
+const Modal = React.lazy(() => import('@mui/material/Modal'));
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Stack = React.lazy(() => import('@mui/material/Stack'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
 import { DatePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
 const TransactionSearchModal = ({ open, onClose, onSearch }) => {
@@ -35,7 +33,6 @@ const TransactionSearchModal = ({ open, onClose, onSearch }) => {
       fromDate: null,
       toDate: null,
     });
-    onClose();
   };
 
   return (
@@ -87,10 +84,10 @@ const TransactionSearchModal = ({ open, onClose, onSearch }) => {
             />
 
             <Stack direction="row"  justifyContent="space-between">
-              <Button variant="outlined" onClick={handleReset}>
+              <Button variant="outlined" onClick={handleReset} disabled={!filters.type && !filters.fromDate && !filters.toDate}>
                 {t("Transactions.Reset")}
               </Button>
-              <Button type="submit" variant="contained">
+              <Button type="submit" variant="contained" disabled={!filters.type && !filters.fromDate && !filters.toDate}>
                 {t("Transactions.Search")}
               </Button>
             </Stack>

@@ -1,15 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  IconButton,
-  CircularProgress,
-  useMediaQuery,
-} from "@mui/material";
+const Modal = React.lazy(() => import('@mui/material/Modal'));
+const Box = React.lazy(() => import('@mui/material/Box'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Grid = React.lazy(() => import('@mui/material/Grid'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
+import { useMediaQuery } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";

@@ -1,12 +1,11 @@
 import { useFormik } from 'formik';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Paper,
-} from '@mui/material';
+import React from 'react';
+const Box = React.lazy(() => import('@mui/material/Box'));
+const TextField = React.lazy(() => import('@mui/material/TextField'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Container = React.lazy(() => import('@mui/material/Container'));
+const Paper = React.lazy(() => import('@mui/material/Paper'));
 import Api from '../Config/Api';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Spinner from '../utilities/Spinner';

@@ -1,7 +1,17 @@
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, useMediaQuery, useTheme, Avatar } from '@mui/material';
+import React from 'react';
+const AppBar = React.lazy(() => import('@mui/material/AppBar'));
+const Toolbar = React.lazy(() => import('@mui/material/Toolbar'));
+const Typography = React.lazy(() => import('@mui/material/Typography'));
+const Button = React.lazy(() => import('@mui/material/Button'));
+const Box = React.lazy(() => import('@mui/material/Box'));
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+const Menu = React.lazy(() => import('@mui/material/Menu'));
+const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
+const Avatar = React.lazy(() => import('@mui/material/Avatar'));
+import { useMediaQuery, useTheme } from '@mui/material';
+
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../assets/images/logo.webp';
 import PersonIcon from '@mui/icons-material/Person';
 import { useState, useEffect } from 'react';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
@@ -72,19 +82,6 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
             </IconButton>
           )}
           
-          <img src={Logo} alt="Logo" style={{ width: isMobile ? '32px' : '40px', height: isMobile ? '32px' : '40px' }} />
-          <Typography 
-            variant={isMobile ? "subtitle1" : "h6"}
-            sx={{ 
-              color: 'primary.main',
-              fontWeight: 500,
-              cursor: 'pointer',
-              display: isMobile ? 'none' : 'block'
-            }}
-            onClick={() => navigate('/')}
-          >
-            {t('Navbar.Logo')}
-          </Typography>
         </Box>
 
         <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, alignItems: 'center' }}>
