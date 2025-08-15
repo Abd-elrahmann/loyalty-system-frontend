@@ -24,8 +24,8 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
-    currency: null,
-    currencyValue: null,
+    enCurrency: null,
+    arCurrency: null,
     timezone: 'Asia/Baghdad',
     pointsPerDollar: 0,
     pointsPerIQD: 0
@@ -35,8 +35,8 @@ const Settings = () => {
   const timezones = moment.tz.names();
 
   const currencies = [
-    { enValue: 'IQD', arValue: 'IQD (الدينار العراقي)' },
-    { enValue: 'USD', arValue: 'USD (الدولار الأمريكي)' }
+    { enValue: 'IQD', arValue: 'الدينار العراقي' },
+    { enValue: 'USD', arValue: 'الدولار الأمريكي' }
   ];
 
   useEffect(() => {
@@ -44,12 +44,13 @@ const Settings = () => {
       try {
         const response = await Api.get('/api/settings');
         if (response.data) {
-          const currencyObj = currencies.find(c => c.enValue === response.data.currency);
+          const currencyObj = currencies.find(c => c.enValue === response.data.enCurrency);
           setSettings({
             ...response.data,
             pointsPerDollar: parseInt(response.data.pointsPerDollar) || 0,
             pointsPerIQD: parseInt(response.data.pointsPerIQD) || 0,
-            currencyValue: currencyObj?.arValue || null
+            enCurrency: currencyObj?.enValue || null,
+            arCurrency: currencyObj?.arValue || null
           });
         }
       } catch (error) {
@@ -67,7 +68,7 @@ const Settings = () => {
     const { name, value } = e.target;
     setSettings(prev => ({
       ...prev,
-      [name]: parseInt(value) || 0
+      [name]: parseInt(value) || null
     }));
   };
 
@@ -84,12 +85,13 @@ const Settings = () => {
       // Refresh settings after save
       const response = await Api.get('/api/settings');
       if (response.data) {
-        const currencyObj = currencies.find(c => c.enValue === response.data.currency);
+        const currencyObj = currencies.find(c => c.enValue === response.data.enCurrency);
         setSettings({
           ...response.data,
-          pointsPerDollar: parseInt(response.data.pointsPerDollar) || 0,
-          pointsPerIQD: parseInt(response.data.pointsPerIQD) || 0,
-          currencyValue: currencyObj?.arValue || null
+          pointsPerDollar: parseInt(response.data.pointsPerDollar) || null,
+          pointsPerIQD: parseInt(response.data.pointsPerIQD) || null,
+          enCurrency: currencyObj?.enValue || null,
+          arCurrency: currencyObj?.arValue || null
         });
       }
     } catch (error) {
@@ -120,13 +122,12 @@ const Settings = () => {
           fullWidth
           labelId="currency-label"
           name="currency"
-          value={currencies.find(c => c.enValue === settings.currency) || null}
+          value={currencies.find(c => c.enValue === settings.enCurrency) || null}
           onChange={(event, newValue) => {
             setSettings(prev => ({
               ...prev,
-              currency: newValue ? newValue.enValue : null,
-              currencyValue: newValue ? newValue.arValue : null
-              // Keep existing pointsPerDollar and pointsPerIQD values
+              enCurrency: newValue ? newValue.enValue : null,
+              arCurrency: newValue ? newValue.arValue : null
             }));
           }}
           options={currencies}
@@ -140,14 +141,14 @@ const Settings = () => {
           noOptionsText={t('Settings.NoCurrencies')}
         />
          
-        {settings.currency && (
+        {settings.enCurrency && (
           <TextField
             fullWidth
             size="small"
             type="number"
-            name={settings.currency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
-            label={t(`Settings.EnterPointsPer`) + " " + settings.currencyValue}
-            value={settings.currency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
+            name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
+            label={t(`Settings.EnterPointsPer`) + " " + settings.arCurrency}
+            value={settings.enCurrency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
             onChange={handleChange}
             inputProps={{ min: 1 }}
             sx={{ mt: 2 }}
