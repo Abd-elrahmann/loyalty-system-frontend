@@ -47,6 +47,8 @@ const Settings = () => {
           const currencyObj = currencies.find(c => c.enValue === response.data.currency);
           setSettings({
             ...response.data,
+            pointsPerDollar: parseInt(response.data.pointsPerDollar) || 0,
+            pointsPerIQD: parseInt(response.data.pointsPerIQD) || 0,
             currencyValue: currencyObj?.arValue || null
           });
         }
@@ -65,14 +67,19 @@ const Settings = () => {
     const { name, value } = e.target;
     setSettings(prev => ({
       ...prev,
-      [name]: value
+      [name]: parseInt(value) || 0
     }));
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await Api.post('/api/settings', settings);
+      const settingsToSave = {
+        ...settings,
+        pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
+        pointsPerIQD: parseInt(settings.pointsPerIQD) || 0
+      };
+      await Api.post('/api/settings', settingsToSave);
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
       // Refresh settings after save
       const response = await Api.get('/api/settings');
@@ -80,6 +87,8 @@ const Settings = () => {
         const currencyObj = currencies.find(c => c.enValue === response.data.currency);
         setSettings({
           ...response.data,
+          pointsPerDollar: parseInt(response.data.pointsPerDollar) || 0,
+          pointsPerIQD: parseInt(response.data.pointsPerIQD) || 0,
           currencyValue: currencyObj?.arValue || null
         });
       }
