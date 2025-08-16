@@ -108,10 +108,14 @@ const Customers = () => {
     setPage(1);
   };
   const handleScanSuccess = (email) => {
-    setScannedEmail(email);
-    setPage(1);
-    notifySuccess(t("Customers.QRScanSuccess") + `: ${email}`);
-  };
+  setSearchFilters((prev) => ({
+    ...prev,
+    email: email,
+  }));
+  setScannedEmail(email); // Optional: keep if you want to show clear filter button
+  setPage(1);
+  notifySuccess(t("Customers.QRScanSuccess") + `: ${email}`);
+};
 
   const exportToPDF = () => {
     try {
@@ -203,7 +207,7 @@ const Customers = () => {
         >
           <Stack direction={"row"} spacing={1}>
                 <InputBase
-                  value={searchFilters.email || scannedEmail}
+                  value={searchFilters.email}
                   onChange={(e) => {
                     setSearchFilters((prev) => ({
                       ...prev,
