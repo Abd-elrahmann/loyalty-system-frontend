@@ -85,6 +85,9 @@ function App() {
       <CacheProvider value={cacheRtl}>
       <BrowserRouter> 
           <Routes>
+            <Route path="/" element={
+              <Navigate to={localStorage.getItem('token') ? "/dashboard" : "/login"} replace />
+            } />
             <Route path="/signup" element={
               <PublicRoute>
                 <Register />

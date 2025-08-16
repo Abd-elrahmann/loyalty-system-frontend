@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 const Drawer = React.lazy(() => import('@mui/material/Drawer'));
 const List = React.lazy(() => import('@mui/material/List'));
 const ListItem = React.lazy(() => import('@mui/material/ListItem'));
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 
 const drawerWidth = 260;
 
-const Sidebar = ({  onToggle, sidebarVisible }) => {
+const Sidebar = ({ onToggle, sidebarVisible }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,21 +26,22 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
   useLayoutEffect(() => {
     document.dir = isRTL ? 'rtl' : 'ltr';
   }, [isRTL]);
-  
 
-  const navigationItems = routes.map(route => ({
+  const navigationItems = useMemo(() => routes.map(route => ({
     ...route,
     icon: <route.icon />
-  }));
+  })), []);
 
-  const handleNavigation = (path) => {
-    navigate(path);
-    if (isMobile) {
-      onToggle();
-    }
-  };
+  const handleNavigation = React.useCallback((path) => {
+    requestAnimationFrame(() => {
+      navigate(path);
+      if (isMobile) {
+        onToggle();
+      }
+    });
+  }, [navigate, isMobile, onToggle]);
 
-  const drawerContent = (
+  const drawerContent = useMemo(() => (
     <Box sx={{ 
         height: '100%', 
         display: 'flex', 
@@ -149,19 +150,19 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
         </Box>
       </Box>
     </Box>
-  );
+  ), [navigationItems, location.pathname, isRTL, handleNavigation, t, navigate]);
 
   return (
     <Drawer
       key={isRTL}
-      variant={isMobile ? "temporary" : "permanent"}
+      variant={isMobile ? "temporary" : "permanent"} 
       anchor={isRTL ? 'right' : 'left'}
       open={sidebarVisible}
       onClose={onToggle}
       sx={{
         display: { xs: 'block', sm: sidebarVisible ? 'block' : 'none' },
         '& .MuiDrawer-paper': {
-          position:  'fixed',
+          position: 'fixed',
           width: drawerWidth,
           boxSizing: 'border-box',
           border: 'none',
@@ -179,7 +180,6 @@ const Sidebar = ({  onToggle, sidebarVisible }) => {
       {drawerContent}
     </Drawer>
   );
-  
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);
