@@ -212,7 +212,9 @@
         "DeleteProduct": "Delete Product",
         "DeleteProductMessage": "Are you sure you want to delete the product?",
         "EditProduct": "Edit Product",
-        "UpdateProduct": "Update Product"
+        "UpdateProduct": "Update Product",
+        "ProductRedeemed": "Product redeemed successfully",
+        "ProductNotRedeemed": "Product not redeemed"
     },
     "Transactions": {
         "Search": "Search",
@@ -268,5 +270,44 @@
         "EnterPointsPer": "Enter how many points for each 1",
         "SettingsSavedSuccessfully": "Settings saved successfully",
         "Saving":"Settings are being saved..."
-    }
+    },
+    "Rewards": {
+  "Pending": "Pending",
+  "Approved": "Approved",
+  "Rejected": "Rejected",
+  "ID": "ID",
+  "Customer": "Customer",
+  "Product": "Product",
+  "Points": "Points",
+  "Type": "Type",
+  "Date": "Date",
+  "Actions": "Actions",
+  "RejectionNote": "Rejection Note",
+  "NoRewards": "No rewards found",
+  "RowsPerPage": "Rows per page",
+  "Search": "Search",
+  "SearchRewards": "Search Rewards",
+  "FromDate": "From Date",
+  "ToDate": "To Date",
+  "AllTypes": "All Types",
+  "Cafe": "Cafe",
+  "Restaurant": "Restaurant",
+  "MinPoints": "Minimum Points",
+  "Reset": "Reset",
+  "RewardApproved": "Reward approved successfully",
+  "RewardRejected": "Reward rejected successfully",
+  "RejectConfirmation": "Are you sure you want to reject this reward?",
+  "RejectionReasonOptional": "Rejection reason (optional)",
+  "RejectReward": "Reject Reward",
+  "Approve": "Approve",
+  "Reject": "Reject",
+  "Status": "Status",
+  "ResetFilters": "Reset Filters",
+  "ExportExcel": "Export Excel",
+  "ExportPdf": "Export PDF",
+  "Print": "Print",
+  "Image": "Image",
+  "RewardsReport": "Rewards Report",
+  "PrintTitle": "Rewards Report"
+}
 }

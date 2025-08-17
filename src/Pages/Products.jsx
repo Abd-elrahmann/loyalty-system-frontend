@@ -158,6 +158,20 @@ const Products = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleRedeemProduct = async (productId) => {
+    try {
+      await Api.post('/api/redeem', {
+        productId,
+        type: activeTab
+      });
+  
+      notifySuccess(t('Products.ProductRedeemed'));
+    } catch (error) {
+      handleApiError(error);
+      notifyError(t('Products.ProductNotRedeemed'));
+    }
+  };
+
   return (
       <Box sx={{ p: isMobile ? 1 : 3,mt:isMobile ? 6 : 0 }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
@@ -279,6 +293,7 @@ const Products = () => {
                       color="primary"
                       size="small"
                       startIcon={<RedeemIcon />}
+                      onClick={() => handleRedeemProduct(product.id)}
                     >
                       {t('Products.Redeem')}
                     </Button>

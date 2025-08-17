@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import Spinner from '../../utilities/Spinner';
 
-const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) => {
+const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, ButtonText }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
@@ -53,7 +53,7 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) =>
           disabled={isLoading}
           variant="outlined"
         >
-          {t('Customers.Cancel')}
+          { t('Customers.Cancel')}
         </Button>
         <Button 
           onClick={onConfirm}
@@ -61,7 +61,7 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading }) =>
           color="error"
           disabled={isLoading}
         >
-          {isLoading? <Spinner /> : t('Customers.Delete')}
+          {isLoading? <Spinner /> : ButtonText || t('Customers.Delete')}
         </Button>
       </DialogActions>
     </Dialog>
