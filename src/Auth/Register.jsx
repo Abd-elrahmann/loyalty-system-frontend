@@ -126,7 +126,7 @@ const Register = () => {
         </Typography>
 
         <Box component="form" onSubmit={formik.handleSubmit} sx={{ width: '100%' }}>
-          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2,flexDirection:isMobile ? 'column' : 'row' }}>
             <TextField
               fullWidth
               name="enName"

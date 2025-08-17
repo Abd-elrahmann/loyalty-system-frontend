@@ -46,7 +46,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
-        pt: '64px' 
+        pt: '64px',
       }}>
       <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
@@ -93,7 +93,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
                 primary={isRTL ? item.arName : item.name}
                 sx={{
                   '& .MuiListItemText-primary': {
-                    fontSize: '0.95rem',
+                    fontSize: isMobile ? '0.75rem' : '0.95rem',
                     fontWeight: isActive ? 600 : 500
                   }
                 }}
@@ -150,7 +150,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
         </Box>
       </Box>
     </Box>
-  ), [navigationItems, location.pathname, isRTL, handleNavigation, t, navigate]);
+  ), [navigationItems, isRTL, t, location.pathname, isMobile, handleNavigation, navigate]);
 
   return (
     <Drawer

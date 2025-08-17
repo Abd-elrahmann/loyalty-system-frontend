@@ -6,10 +6,12 @@ const Stack = React.lazy(() => import('@mui/material/Stack'));
 const TextField = React.lazy(() => import('@mui/material/TextField'));
 const Typography = React.lazy(() => import('@mui/material/Typography'));
 const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
+const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
 import { DatePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
 const TransactionSearchModal = ({ open, onClose, onSearch }) => {
   const { t } = useTranslation();
+  const [loading, setLoading] = React.useState(false);
   const [filters, setFilters] = React.useState({
     type: "",
     fromDate: null,
@@ -17,9 +19,16 @@ const TransactionSearchModal = ({ open, onClose, onSearch }) => {
   });
 
   const handleSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     onSearch(filters);
     onClose();
+    setFilters({
+      type: "",
+      fromDate: null,
+      toDate: null,
+    });
+    setLoading(false);
   };
 
   const handleReset = () => {
@@ -87,8 +96,8 @@ const TransactionSearchModal = ({ open, onClose, onSearch }) => {
               <Button variant="outlined" onClick={handleReset} disabled={!filters.type && !filters.fromDate && !filters.toDate}>
                 {t("Transactions.Reset")}
               </Button>
-              <Button type="submit" variant="contained" disabled={!filters.type && !filters.fromDate && !filters.toDate}>
-                {t("Transactions.Search")}
+              <Button type="submit" variant="contained" disabled={!filters.type && !filters.fromDate && !filters.toDate} >
+                {loading ? <CircularProgress size={20} /> : t("Transactions.Search")}
               </Button>
             </Stack>
           </Stack>

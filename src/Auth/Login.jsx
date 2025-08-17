@@ -9,7 +9,6 @@ const Paper = React.lazy(() => import('@mui/material/Paper'));
 const Link = React.lazy(() => import('@mui/material/Link'));
 const IconButton = React.lazy(() => import('@mui/material/IconButton'));
 const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
-import { useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import Spinner from '../utilities/Spinner';
@@ -23,7 +22,6 @@ import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 
 const Login = () => {
-  const isMobile = useMediaQuery('(max-width: 600px)');
   const {t} =useTranslation()
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -77,7 +75,7 @@ const Login = () => {
 
   return (
     <MainLayout>
-      <Container component="main" maxWidth="sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', width: isMobile ? '90vw' : '100%' }}>
+      <Container component="main" maxWidth= "sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 8}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 

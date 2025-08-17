@@ -50,6 +50,7 @@ const Transactions = () => {
   const [totalPoints, setTotalPoints] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const fetchTransactions = async () => {
+    setIsLoading(true);
     try {
       const queryParams = new URLSearchParams();
       if (filters.type) queryParams.append("type", filters.type);
@@ -63,7 +64,6 @@ const Transactions = () => {
         setTransactions(response.data.transactions);
         setTotalItems(response.data.total);
         
-        // Calculate total points for customer
         if (customerId && response.data.transactions.length > 0) {
           const points = response.data.transactions.reduce((sum, transaction) => {
             return sum + (transaction.type === 'earn' ? transaction.points : -transaction.points);
@@ -116,10 +116,19 @@ const Transactions = () => {
 
   const exportToCSV = () => {
     try {
-      const fields = ['id', 'enName', 'arName', 'points', 'currency', 'type', 'date'];
-      const csv = xlsx.utils.json_to_sheet(transactions, { header: fields });
+      const exportData = transactions.map(transaction => ({
+        ID: transaction.id,
+        'English Name': transaction.user.enName,
+        'Arabic Name': transaction.user.arName,
+        Points: transaction.points,
+        Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+        Type: transaction.type,
+        Date: transaction.formattedDate
+      }));
+
       const workbook = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(workbook, csv, 'Transactions');
+      const worksheet = xlsx.utils.json_to_sheet(exportData);
+      xlsx.utils.book_append_sheet(workbook, worksheet, 'Transactions');
       xlsx.writeFile(workbook, 'transactions_report.xlsx');
     } catch (error) {
       console.log(error);
@@ -135,7 +144,7 @@ const Transactions = () => {
       doc.addFont("./src/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
       
       doc.setFontSize(16);
-      doc.text('Transactions Report', 14, 15);
+      doc.text('Transactions Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
       
       const columns = [
         'ID',
@@ -152,7 +161,7 @@ const Transactions = () => {
         transaction.user.enName,
         transaction.user.arName,
         transaction.points,
-        transaction.currency || 'USD',
+        i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
         transaction.type,
         transaction.formattedDate
       ]);
@@ -247,7 +256,25 @@ const Transactions = () => {
                   }}>
                     <Search sx={{ fontSize: "25px", mr: 1 }} />
                     {t("Transactions.Search")}
+                </Button>
+                {(filters.type || filters.fromDate || filters.toDate) && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setFilters({
+                        type: "",
+                        fromDate: null,
+                        toDate: null,
+                      });
+                      setPage(1);
+                    }}
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "14px",
+                    }}>
+                    {t("Transactions.Reset")}
                   </Button>
+                )}
               </>
             )}
           </Stack>

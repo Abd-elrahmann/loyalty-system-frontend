@@ -3,7 +3,8 @@ import { notifyError } from '../utilities/Toastify'
 import i18n from 'i18next'
 
 const Api = axios.create({
-  baseURL: "http://localhost:3000",
+  // baseURL: "http://localhost:3000",
+  baseURL: "http://192.168.1.6:3000",
   headers: {
     'Content-Type': 'application/json',
   },

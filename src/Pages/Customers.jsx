@@ -112,9 +112,9 @@ const Customers = () => {
     ...prev,
     email: email,
   }));
-  setScannedEmail(email); // Optional: keep if you want to show clear filter button
+  setScannedEmail(email);
   setPage(1);
-  notifySuccess(t("Customers.QRScanSuccess") + `: ${email}`);
+  notifySuccess(t("Customers.qrScanSuccess") + `: ${email}`);
 };
 
   const exportToPDF = () => {
@@ -125,7 +125,7 @@ const Customers = () => {
       doc.addFont("./src/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
       
       doc.setFontSize(16);
-      doc.text('Customers Report', 14, 15);
+      doc.text('Customers Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
       
       const columns = [
         'ID',

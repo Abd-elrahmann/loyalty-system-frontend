@@ -67,8 +67,27 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   };
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: 'white', width: '100%', boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)', zIndex: theme.zIndex.drawer + 1 }}>
-      <Toolbar sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', px: isMobile ? 1 : 2 }}>
+    <AppBar position="fixed" sx={{ 
+      backgroundColor: 'white', 
+      width: '100%',
+      boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)', 
+      zIndex: theme.zIndex.drawer + 1,
+      ...(isMobile && {
+        width: '90%',
+        right: i18n.language === 'ar' ? '50%' : 'auto',
+        left: i18n.language === 'ar' ? 'auto' : '50%',
+        transform: i18n.language === 'ar' ? 'translateX(35%)' : 'translateX(-50%)',
+        borderRadius: '8px',
+        mt: 1
+      })
+    }}>
+      <Toolbar sx={{ 
+        justifyContent: 'space-between', 
+        display: 'flex', 
+        alignItems: 'center', 
+        px: isMobile ? 1 : 2,
+        minHeight: isMobile ? 48 : 64
+      }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: isMobile ? 1 : 2 }}>
           {user && (
             <IconButton

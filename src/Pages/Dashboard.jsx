@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Box } from '@mui/material';
+import { Grid, Box, useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import StatCard from '../Components/Dashboard/StatCard';
 import PointsChart from '../Components/Dashboard/PointsChart';
@@ -70,12 +70,12 @@ const mockStats = {
 };
 
 const Dashboard = () => {
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
-
+  const { t } = useTranslation();
+  // const isRTL = i18n.language === 'ar';
+  const isMobile = useMediaQuery('(max-width: 600px)');
   return (
     <Box sx={{ p: 3 }}>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{width:'100%',flexDirection:isMobile ? 'column' : 'row',display:'flex', alignItems:'center',justifyContent:'center',margin:'0 auto' }}>
         {/* Stats Cards */}
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
