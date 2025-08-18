@@ -53,7 +53,6 @@ const Rewards = () => {
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [rewardToReject, setRewardToReject] = useState(null);
   const [openScanModal, setOpenScanModal] = useState(false);
-  const [scannedReward, setScannedReward] = useState(null);
 
   const statusMap = {
     PENDING: { label: "PENDING", color: "warning" },
@@ -67,6 +66,7 @@ const Rewards = () => {
       const queryParams = new URLSearchParams();
       const statusLabels = ["PENDING", "APPROVED", "REJECTED"];
       queryParams.append("status", statusLabels[tabValue]);
+      if (filters.customerId) queryParams.append("customerId", filters.customerId);
       if (filters.fromDate) queryParams.append("fromDate", filters.fromDate);
       if (filters.toDate) queryParams.append("toDate", filters.toDate);
       if (filters.type) queryParams.append("type", filters.type);
@@ -327,9 +327,12 @@ const Rewards = () => {
       notifyError(t("Errors.PrintError"));
     }
   };
-  const handleScanSuccess = (rewardId) => {
-    setScannedReward(rewardId);
-    setOpenScanModal(false);
+  const handleScanSuccess = (userId) => {
+    setFilters(prev => ({
+      ...prev,
+      userId: userId
+    }));
+    setPage(1);
     notifySuccess(t("Rewards.ScanQRSuccess"));
   };
   return (
@@ -397,6 +400,7 @@ const Rewards = () => {
                   toDate: null,
                   type: "",
                   minPoints: "",
+                  customerId: "",
                 });
                 setPage(1);
               }}
@@ -405,7 +409,8 @@ const Rewards = () => {
                   filters.fromDate ||
                   filters.toDate ||
                   filters.type ||
-                  filters.minPoints
+                  filters.minPoints ||
+                  filters.userId
                     ? "visible"
                     : "hidden",
               }}

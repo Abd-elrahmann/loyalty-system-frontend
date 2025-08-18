@@ -21,7 +21,7 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
 
   const handleScan = async (result) => {
     if (result && !hasScanned) {
-      setHasScanned(true); 
+      setHasScanned(true);
       try {
         let qrData;
         try {
@@ -31,9 +31,9 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
           onClose();
           return;
         }
-
-        if (qrData.rewardId) {
-          onScanSuccess(qrData.rewardId);
+  
+        if (qrData.id) {
+          onScanSuccess(qrData.id);
           notifySuccess(t("Rewards.qrScanSuccess"));
           onClose();
         } else {
@@ -47,7 +47,6 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
       }
     }
   };
-
   const handleError = (error) => {
     if (!hasScanned) {
       console.log(error);
