@@ -66,7 +66,7 @@ const Rewards = () => {
       const queryParams = new URLSearchParams();
       const statusLabels = ["PENDING", "APPROVED", "REJECTED"];
       queryParams.append("status", statusLabels[tabValue]);
-      if (filters.customerId) queryParams.append("customerId", filters.customerId);
+      if (filters.userId) queryParams.append("userId", filters.userId);
       if (filters.fromDate) queryParams.append("fromDate", filters.fromDate);
       if (filters.toDate) queryParams.append("toDate", filters.toDate);
       if (filters.type) queryParams.append("type", filters.type);
@@ -363,13 +363,12 @@ const Rewards = () => {
             >
               {t("Rewards.Search")}
             </Button>
-            <Button
-              variant="outlined"
-              startIcon={<FaQrcode size={16} />}
+            <IconButton
+              sx={{ color: "primary.main", padding: 0 }}
               onClick={() => setOpenScanModal(true)}
             >
-              {t("Rewards.ScanQR")}
-            </Button>
+              <FaQrcode />
+            </IconButton>
           </Stack>
           <Stack
             direction={isMobile ? "column" : "row"}
@@ -400,7 +399,7 @@ const Rewards = () => {
                   toDate: null,
                   type: "",
                   minPoints: "",
-                  customerId: "",
+                  userId: "",
                 });
                 setPage(1);
               }}
