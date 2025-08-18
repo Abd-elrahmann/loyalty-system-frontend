@@ -308,6 +308,9 @@
   "Print": "Print",
   "Image": "Image",
   "RewardsReport": "Rewards Report",
-  "PrintTitle": "Rewards Report"
+  "PrintTitle": "Rewards Report",
+  "ScanQR": "Scan QR",
+  "ScanQRTitle": "Scan QR for rewards",
+  "ScanQRSuccess": "Reward scanned successfully"
 }
 }

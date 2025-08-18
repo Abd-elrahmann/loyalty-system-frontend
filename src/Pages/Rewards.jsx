@@ -30,6 +30,9 @@ import DeleteModal from "../Components/Modals/DeleteModal";
 import * as xlsx from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import RewardsScanModal from "../Components/Modals/RewardsScanModal";
+import { FaQrcode } from "react-icons/fa";
+
 
 const Rewards = () => {
   const { t, i18n } = useTranslation();
@@ -49,6 +52,8 @@ const Rewards = () => {
   const [rejectNote, setRejectNote] = useState("");
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [rewardToReject, setRewardToReject] = useState(null);
+  const [openScanModal, setOpenScanModal] = useState(false);
+  const [scannedReward, setScannedReward] = useState(null);
 
   const statusMap = {
     PENDING: { label: "PENDING", color: "warning" },
@@ -322,6 +327,11 @@ const Rewards = () => {
       notifyError(t("Errors.PrintError"));
     }
   };
+  const handleScanSuccess = (rewardId) => {
+    setScannedReward(rewardId);
+    setOpenScanModal(false);
+    notifySuccess(t("Rewards.ScanQRSuccess"));
+  };
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
@@ -349,6 +359,13 @@ const Rewards = () => {
               onClick={() => setOpenSearchModal(true)}
             >
               {t("Rewards.Search")}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<FaQrcode size={16} />}
+              onClick={() => setOpenScanModal(true)}
+            >
+              {t("Rewards.ScanQR")}
             </Button>
           </Stack>
           <Stack
@@ -598,6 +615,12 @@ const Rewards = () => {
         ButtonText={t("Rewards.Reject")}
         onConfirm={handleReject}
         isLoading={isLoading}
+      />
+
+      <RewardsScanModal
+        open={openScanModal}
+        onClose={() => setOpenScanModal(false)}
+        onScanSuccess={handleScanSuccess}
       />
     </Box>
   );
