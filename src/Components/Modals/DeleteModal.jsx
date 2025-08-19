@@ -7,10 +7,10 @@ const Button = React.lazy(() => import('@mui/material/Button'));
 const Typography = React.lazy(() => import('@mui/material/Typography'));
 const Box = React.lazy(() => import('@mui/material/Box'));
 import { useTranslation } from 'react-i18next';
-import { FaExclamationTriangle } from 'react-icons/fa';
+import { FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
 import Spinner from '../../utilities/Spinner';
 
-const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, ButtonText }) => {
+const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, ButtonText}) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
@@ -58,7 +58,7 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, Butt
         <Button 
           onClick={onConfirm}
           variant="contained" 
-          color="error"
+          color={"error"}
           disabled={isLoading}
         >
           {isLoading? <Spinner /> : ButtonText || t('Customers.Delete')}

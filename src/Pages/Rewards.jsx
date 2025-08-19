@@ -17,6 +17,7 @@ import {
   Stack,
   Chip,
   useMediaQuery,
+  Checkbox,
 } from "@mui/material";
 import {
   StyledTableCell,
@@ -32,7 +33,6 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import { FaQrcode } from "react-icons/fa";
-
 
 const Rewards = () => {
   const { t, i18n } = useTranslation();
@@ -53,6 +53,8 @@ const Rewards = () => {
   const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [rewardToReject, setRewardToReject] = useState(null);
   const [openScanModal, setOpenScanModal] = useState(false);
+  const [isAllChecked, setIsAllChecked] = useState(false);
+  const [selectedRewards, setSelectedRewards] = useState([]);
 
   const statusMap = {
     PENDING: { label: "PENDING", color: "warning" },
@@ -89,6 +91,8 @@ const Rewards = () => {
 
   useEffect(() => {
     fetchRewards();
+    // Reset selection when data changes
+    setSelectedRewards([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, tabValue, filters]);
 
@@ -107,6 +111,26 @@ const Rewards = () => {
     }
   };
 
+  const handleApproveMany = async () => {
+    if (selectedRewards.length === 0) {
+      notifyError(t("Rewards.NoRewardsSelected"));
+      return;
+    }
+    
+    try {
+      await Api.patch(`/api/rewards/approve-many`, {
+        rewardIds: selectedRewards,
+      });
+      notifySuccess(t("Rewards.RewardsApproved", { count: selectedRewards.length }));
+      setSelectedRewards([]);
+      setIsAllChecked(false);
+      fetchRewards();
+    } catch (error) {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  };
+  
+
   const handleReject = async () => {
     if (!rewardToReject) return;
     try {
@@ -120,6 +144,44 @@ const Rewards = () => {
       fetchRewards();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  };
+
+  const handleRejectMany = async () => {
+    if (selectedRewards.length === 0) {
+      notifyError(t("Rewards.NoRewardsSelected"));
+      return;
+    }
+    
+    try {
+      await Api.patch(`/api/rewards/reject-many`, {
+        rewardIds: selectedRewards,
+        note: rejectNote,
+      });
+      notifySuccess(t("Rewards.RewardsRejected", { count: selectedRewards.length }));
+      setSelectedRewards([]);
+      setIsAllChecked(false);
+      setOpenRejectDialog(false);
+      setRejectNote("");
+      fetchRewards();
+    } catch (error) {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  };
+
+  const handleSelectReward = (rewardId) => {
+    setSelectedRewards(prev =>
+      prev.includes(rewardId)
+        ? prev.filter(id => id !== rewardId)
+        : [...prev, rewardId]
+    );
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedRewards(filteredRewards.map(reward => reward.id));
+    } else {
+      setSelectedRewards([]);
     }
   };
 
@@ -349,12 +411,12 @@ const Rewards = () => {
         <Stack
           direction={isMobile ? "column" : "row"}
           justifyContent={isMobile ? "center" : "space-between"}
-          spacing={2}
+          spacing={1}
         >
           <Stack
             direction={isMobile ? "column" : "row"}
             justifyContent={isMobile ? "center" : "flex-start"}
-            spacing={2}
+            spacing={1}
           >
             <Button
               variant="contained"
@@ -373,8 +435,62 @@ const Rewards = () => {
           <Stack
             direction={isMobile ? "column" : "row"}
             justifyContent={isMobile ? "center" : "flex-end"}
-            spacing={2}
+            spacing={1}
           >
+              <Button
+                variant={isAllChecked ? "contained" : "outlined"}
+                color={isAllChecked ? "success" : "primary"}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "130px",
+                  fontSize: "12px",
+                }}
+                onClick={() => {
+                  setIsAllChecked(!isAllChecked);
+                  if (!isAllChecked) setSelectedRewards([]);
+                }}
+              >
+                {isAllChecked ? t("Rewards.CancelSelect") : t("Rewards.SelectMultiple")}
+              </Button>
+
+              {isAllChecked && tabValue === 0 && (
+              <>
+                <Button 
+                   sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    width: "130px",
+                    fontSize: "12px",
+                  }}
+                  variant="contained" 
+                  color="success"
+                  onClick={handleApproveMany}
+                  disabled={selectedRewards.length === 0}
+                >
+                  {t("Rewards.ApproveSelected", { count: selectedRewards.length })}
+                </Button>
+                <Button 
+                   sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    width: "130px",
+                    fontSize: "12px",
+                  }}
+                  variant="contained" 
+                  color="error"
+                  onClick={() => setOpenRejectDialog(true)}
+                  disabled={selectedRewards.length === 0}
+                >
+                  {t("Rewards.RejectSelected", { count: selectedRewards.length })}
+                </Button>
+              </>
+            )}
+            <Stack
+              direction={isMobile ? "column" : "row"}
+              justifyContent={isMobile ? "center" : "flex-end"}
+              spacing={1}
+            >
             <Button variant="contained" onClick={exportToCSV}>
               {t("Rewards.ExportExcel")}
             </Button>
@@ -384,6 +500,7 @@ const Rewards = () => {
             <Button variant="contained" onClick={PrintRewards}>
               {t("Rewards.Print")}
             </Button>
+            </Stack>
           </Stack>
           <Stack
             direction={isMobile ? "column" : "row"}
@@ -424,6 +541,21 @@ const Rewards = () => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
+            {isAllChecked && (
+                <StyledTableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={
+                      selectedRewards.length > 0 &&
+                      selectedRewards.length < filteredRewards.length
+                    }
+                    checked={
+                      filteredRewards.length > 0 &&
+                      selectedRewards.length === filteredRewards.length
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </StyledTableCell>
+              )}
               <StyledTableCell align="center">
                 {t("Rewards.ID")}
               </StyledTableCell>
@@ -448,7 +580,7 @@ const Rewards = () => {
               <StyledTableCell align="center">
                 {t("Rewards.Date")}
               </StyledTableCell>
-              {tabValue === 0 && (
+              {tabValue === 0 && !isAllChecked && (
                 <StyledTableCell align="center">
                   {t("Rewards.Actions")}
                 </StyledTableCell>
@@ -482,7 +614,15 @@ const Rewards = () => {
               </StyledTableRow>
             ) : (
               filteredRewards.map((reward) => (
-                <StyledTableRow key={reward.id}>
+                <StyledTableRow key={reward.id} hover>
+                  {isAllChecked && (
+                    <StyledTableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedRewards.includes(reward.id)}
+                        onChange={() => handleSelectReward(reward.id)}
+                      />
+                    </StyledTableCell>
+                  )}
                   <StyledTableCell align="center">{reward.id}</StyledTableCell>
                   <StyledTableCell align="center">
                     {i18n.language === "ar"
@@ -536,7 +676,7 @@ const Rewards = () => {
                   <StyledTableCell align="center">
                     {reward.formattedDate}
                   </StyledTableCell>
-                  {tabValue === 0 && (
+                  {tabValue === 0 && !isAllChecked && (
                     <StyledTableCell align="center">
                       <Stack
                         direction="row"
@@ -597,11 +737,14 @@ const Rewards = () => {
           setOpenRejectDialog(false);
           setRewardToReject(null);
           setRejectNote("");
-          fetchRewards();
         }}
         message={
           <div>
-            <p>{t("Rewards.RejectConfirmation")}</p>
+            <p>
+              {rewardToReject 
+                ? t("Rewards.RejectConfirmation")
+                : t("Rewards.RejectManyConfirmation", { count: selectedRewards.length })}
+            </p>
             <textarea
               placeholder={t("Rewards.RejectionReasonOptional")}
               value={rejectNote}
@@ -615,11 +758,16 @@ const Rewards = () => {
             />
           </div>
         }
-        title={t("Rewards.RejectReward")}
+        title={
+          rewardToReject 
+            ? t("Rewards.RejectReward")
+            : t("Rewards.RejectManyRewards")
+        }
         ButtonText={t("Rewards.Reject")}
-        onConfirm={handleReject}
+        onConfirm={rewardToReject ? handleReject : handleRejectMany}
         isLoading={isLoading}
       />
+
 
       <RewardsScanModal
         open={openScanModal}

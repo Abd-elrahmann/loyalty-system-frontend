@@ -24,6 +24,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
 import { useMediaQuery } from '@mui/material';
+import Swal from 'sweetalert2';
 
 const Products = () => {
   const { t, i18n } = useTranslation();
@@ -293,7 +294,25 @@ const Products = () => {
                       color="primary"
                       size="small"
                       startIcon={<RedeemIcon />}
-                      onClick={() => handleRedeemProduct(product.id)}
+                      onClick={() => {
+                        Swal.fire({
+                          title: t('Products.RedeemProduct'),
+                          text: t('Products.RedeemProductText'),
+                          icon: 'warning',
+                          confirmButtonText: t('Products.Redeem'),
+                          cancelButtonText: t('Products.RedeemProductTextCancel'),
+                          showCancelButton: true,
+                          confirmButtonColor: '#800080',
+                          cancelButtonColor: '#D91656',
+                          reverseButtons: i18n.language === 'ar' ? false : true,
+                          allowOutsideClick: false,
+                          allowEscapeKey: false,
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleRedeemProduct(product.id);
+                          }
+                        });
+                      }}
                     >
                       {t('Products.Redeem')}
                     </Button>

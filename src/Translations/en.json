@@ -91,7 +91,26 @@
         "RecentUsers": "Recent Users",
         "JoinDate": "Join Date",
         "User": "User",
-        "Points": "Points"
+        "Points": "Points",
+        "TotalCustomers": "Total Customers",
+        "ItemTransactions": "Item Transactions",
+        "Revenue&Expenses": "Revenue & Expenses",
+        "PointsDistribution": "Points Distribution",
+        "TotalIn": "Total In",
+        "TotalOut": "Total Out",
+        "Stores": "Stores",
+        "Items": "Items",
+        "day": "day",
+        "week": "week",
+        "month": "month",
+        "year": "year",
+        "fromLastPeriod": "from last period",
+        "StoreTransactions": "Store Transactions",
+        "Transactions": "Transactions",
+        "Incoming": "Incoming",
+        "Outgoing": "Outgoing",
+        "Revenue": "Revenue",
+        "Expenses": "Expenses"
     },
     "Profile": {
         "Title": "Profile",
@@ -214,7 +233,9 @@
         "EditProduct": "Edit Product",
         "UpdateProduct": "Update Product",
         "ProductRedeemed": "Product redeemed successfully",
-        "ProductNotRedeemed": "Product not redeemed"
+        "ProductNotRedeemed": "Product not redeemed",
+        "RedeemProductText": "Are you sure you want to redeem the product?",
+        "RedeemProductTextCancel": "Cancel"
     },
     "Transactions": {
         "Search": "Search",
@@ -311,6 +332,15 @@
   "PrintTitle": "Rewards Report",
   "ScanQR": "Scan QR",
   "ScanQRTitle": "Scan QR for rewards",
-  "ScanQRSuccess": "Reward scanned successfully"
+  "ScanQRSuccess": "Reward scanned successfully",
+  "MultipleSelect": "Multiple Select",
+  "CancelSelect": "Cancel",
+  "SelectMultiple": "Select Multiple",
+  "ApproveSelected": "Approve",
+  "RejectSelected": "Reject",
+  "RejectManyConfirmation": "Are you sure you want to reject selected rewards?",
+  "RejectManyRewards": "Reject Selected Rewards",
+  "RewardsApproved": "Rewards approved successfully",
+  "RewardsRejected": "Rewards rejected successfully"
 }
 }

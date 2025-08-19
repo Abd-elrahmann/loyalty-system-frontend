@@ -91,7 +91,26 @@
     "RecentUsers": "أحدث المستخدمين",
     "JoinDate": "تاريخ الانضمام",
     "User": "المستخدم",
-    "Points": "النقاط"
+    "Points": "النقاط",
+    "TotalCustomers": "إجمالي العملاء",
+    "ItemTransactions": "المعاملات",
+    "Revenue&Expenses": "الإيرادات والمصاريف",
+    "PointsDistribution": "توزيع النقاط",
+    "TotalIn": "الإيرادات",
+    "TotalOut": "المصاريف",
+    "Stores": "المتاجر",
+    "Items": "المنتجات",
+    "day": "يوم",
+    "week": "أسبوع",
+    "month": "شهر",
+    "year": "سنة",
+    "fromLastPeriod": "من الفترة السابقة",
+    "StoreTransactions": "المعاملات في المتجر",
+    "Transactions": "المعاملات",
+    "Incoming": "الوارد",
+    "Outgoing": "الصادر",
+    "Revenue": "الإيرادات",
+    "Expenses": "المصاريف"
   },
   "Profile": {
     "Title": "الملف الشخصي",
@@ -216,7 +235,9 @@
     "EditProduct": "تعديل المنتج",
     "UpdateProduct": "تحديث المنتج",
     "ProductRedeemed": "تم الحصول على المنتج بنجاح",
-    "ProductNotRedeemed": "فشل الحصول على المنتج"
+    "ProductNotRedeemed": "فشل الحصول على المنتج",
+    "RedeemProductText": "هل أنت متأكد من الحصول على المنتج ؟",
+    "RedeemProductTextCancel": "إلغاء"
   },
   "Transactions": {
     "Search": "بحث",
@@ -313,6 +334,15 @@
     "PrintTitle": "تقرير المكافئات",
     "ScanQR": "قراءة كود الاستجابة السريعة",
     "ScanQRTitle": "قراءة كود الاستجابة السريعة للمكافآت",
-    "ScanQRSuccess": "تم قراءة كود الاستجابة السريعة بنجاح"
+    "ScanQRSuccess": "تم قراءة كود الاستجابة السريعة بنجاح",
+    "MultipleSelect": "اختيار متعدد",
+    "CancelSelect": "إلغاء الاختيار",
+    "SelectMultiple": "اختيار متعدد",
+    "ApproveSelected": "موافقة",
+    "RejectSelected": "رفض",
+    "RejectManyConfirmation": "هل أنت متأكد من رفض المكافآت المختارة ؟",
+    "RejectManyRewards": "رفض المكافآت المختارة",
+    "RewardsApproved": "تم الموافقة على المكافآت المختارة بنجاح",
+    "RewardsRejected": "تم رفض المكافآت المختارة بنجاح"
   }
 }
