@@ -33,7 +33,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import { FaQrcode } from "react-icons/fa";
-
+import { user } from "../utilities/user.jsx";
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -426,7 +426,7 @@ const Rewards = () => {
               {t("Rewards.Search")}
             </Button>
             <IconButton
-              sx={{ color: "primary.main", padding: 0 }}
+              sx={{ color: "primary.main", padding: 0 ,display: user.role === "ADMIN" ? "flex" : "none"}}
               onClick={() => setOpenScanModal(true)}
             >
               <FaQrcode />
@@ -441,7 +441,7 @@ const Rewards = () => {
                 variant={isAllChecked ? "contained" : "outlined"}
                 color={isAllChecked ? "success" : "primary"}
                 sx={{
-                  display: "flex",
+                  display: user.role === "ADMIN" ? "flex" : "none",
                   alignItems: "center",
                   width: "130px",
                   fontSize: "12px",
@@ -458,7 +458,7 @@ const Rewards = () => {
               <>
                 <Button 
                    sx={{
-                    display: "flex",
+                    display: user.role === "ADMIN" ? "flex" : "none",
                     alignItems: "center",
                     width: "130px",
                     fontSize: "12px",
@@ -472,7 +472,7 @@ const Rewards = () => {
                 </Button>
                 <Button 
                    sx={{
-                    display: "flex",
+                    display: user.role === "ADMIN" ? "flex" : "none",
                     alignItems: "center",
                     width: "130px",
                     fontSize: "12px",
@@ -521,7 +521,8 @@ const Rewards = () => {
                 setPage(1);
               }}
               sx={{
-                visibility:
+                display: user.role === "ADMIN" ? "block" : "none",
+                  visibility:
                   filters.fromDate ||
                   filters.toDate ||
                   filters.type ||
@@ -580,7 +581,7 @@ const Rewards = () => {
               <StyledTableCell align="center">
                 {t("Rewards.Date")}
               </StyledTableCell>
-              {tabValue === 0 && !isAllChecked && (
+              {tabValue === 0 && !isAllChecked && user.role === "ADMIN" && (
                 <StyledTableCell align="center">
                   {t("Rewards.Actions")}
                 </StyledTableCell>

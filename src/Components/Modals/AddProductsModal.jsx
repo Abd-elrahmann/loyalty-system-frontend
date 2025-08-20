@@ -31,12 +31,14 @@ const style = {
 const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit   }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
+  const [imageUploadType, setImageUploadType] = useState('file'); // 'file' or 'link'
   const isMobile = useMediaQuery('(max-width: 400px)');
   const fileInputRef = useRef(null);
   const formik = useFormik({
     initialValues: {
       image: null,
       imagePreview: "",
+      imageUrl: "",
       enName: "",
       arName: "",
       price: "",
@@ -46,7 +48,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       try {
         const submitData = {
           ...values,
-          image: values.imagePreview,
+          image: values.imagePreview || values.imageUrl,
         };
         if (handleUpdateProduct) {
           await handleUpdateProduct(submitData);
@@ -61,7 +63,6 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
     },
   });
 
-
   useEffect(() => {
     if (open) {
       if (productToEdit) {
@@ -69,6 +70,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
           ...productToEdit,
           image: productToEdit.image,
           imagePreview: productToEdit.image,
+          imageUrl: productToEdit.image,
         });
       } else {
         formik.resetForm();
@@ -97,9 +99,39 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
           ...prev,
           image: file,
           imagePreview: reader.result,
+          imageUrl: "",
         }));
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const [imageError, setImageError] = useState(false);
+  
+  const preloadImage = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve(url);
+      img.onerror = () => reject(new Error('Failed to load image'));
+    });
+  };
+
+  const handleImageUrlChange = async (url) => {
+    if (!url) {
+      setImageError(false);
+      return;
+    }
+
+    // Add a small delay to prevent too many requests while typing
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    try {
+      await preloadImage(url);
+      setImageError(false);
+    } catch (error) {
+      console.error('Error loading image:', error);
+      setImageError(true);
     }
   };
 
@@ -109,7 +141,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
     try {
       const submitData = {
         ...formik.values,
-        image: formik.values.imagePreview, 
+        image: formik.values.imagePreview || formik.values.imageUrl,
       };
       if (handleUpdateProduct && productToEdit) {
         await handleUpdateProduct(submitData);
@@ -119,6 +151,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       formik.setValues({
         image: null,
         imagePreview: "",
+        imageUrl: "",
         enName: "",
         arName: "",
         price: "",
@@ -199,33 +232,133 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               />
             </Grid>
             <Grid item xs={12}>
-              <Box
-                sx={{
-                  border: "2px dashed",
-                  borderColor: "primary.main",
-                  borderRadius: 2,
-                  p: 2,
-                  textAlign: "center",
-                  cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
-                  },
-                }}
-                onClick={triggerFileInput}
-              >
-                
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                  id="product-image-upload"
-                  ref={fileInputRef}
+              <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  variant={imageUploadType === 'file' ? 'contained' : 'outlined'}
+                  onClick={() => setImageUploadType('file')}
+                  sx={{ mr: 1 }}
+                >
+                  {t("Products.ImageUploadTypeFile")}
+                </Button>
+                <Button
+                  variant={imageUploadType === 'link' ? 'contained' : 'outlined'}
+                  onClick={() => setImageUploadType('link')}
+                >
+                  {t("Products.ImageUploadTypeLink")}
+                </Button>
+              </Box>
+
+              {imageUploadType === 'link' ? (
+                <TextField
+                  fullWidth
+                  label={t("Products.ImageUploadType")}
+                  name="imageUrl"
+                  value={formik.values.imageUrl}
+                  onChange={(e) => {
+                    const url = e.target.value;
+                    formik.setFieldValue('imageUrl', url);
+                    if (url) {
+                      handleImageUrlChange(url);
+                    }
+                  }}
+                  placeholder="https://example.com/image.jpg"
+                  sx={{ mb: 2 }}
+                  error={imageError}
+                  helperText={imageError ? t("Products.InvalidImageUrl") : ""}
                 />
-                {formik.values.imagePreview ? (
-                  <Box sx={{ position: "relative" }}>
+              ) : (
+                <Box
+                  sx={{
+                    border: "2px dashed",
+                    borderColor: "primary.main",
+                    borderRadius: 2,
+                    p: 2,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    },
+                  }}
+                  onClick={triggerFileInput}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                    id="product-image-upload"
+                    ref={fileInputRef}
+                  />
+                  {formik.values.imagePreview ? (
+                    <Box sx={{ position: "relative" }}>
+                      <img
+                        src={formik.values.imagePreview}
+                        alt="Product Preview"
+                        style={{
+                          width: "100%",
+                          height: "200px",
+                          objectFit: "contain",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 8,
+                          right: 8,
+                          backgroundColor: "rgba(0,0,0,0.5)",
+                          borderRadius: "50%",
+                          padding: "4px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          "&:hover": {
+                            backgroundColor: "rgba(0,0,0,0.7)",
+                          },
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          formik.setValues((prev) => ({
+                            ...prev,
+                            image: null,
+                            imagePreview: "",
+                          }));
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                      >
+                        <CloseIcon sx={{ color: "white", fontSize: "16px" }} />
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        sx={{ mt: 1, display: "block", color: "text.secondary" }}
+                      >
+                        {t("Products.ClickToChange")}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Box sx={{ py: 3 }}>
+                      <CloudUploadIcon
+                        sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
+                      />
+                      <Typography variant="body1" sx={{ mb: 1 }}>
+                        {t("Products.DragAndDrop")}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t("Products.SupportedFormats")}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              )}
+
+              {imageUploadType === 'link' && formik.values.imageUrl && (
+                <Box sx={{ mt: 2, textAlign: 'center', position: 'relative' }}>
+                  {!imageError ? (
                     <img
-                      src={formik.values.imagePreview}
+                      src={formik.values.imageUrl}
                       alt="Product Preview"
                       style={{
                         width: "100%",
@@ -233,7 +366,30 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                         objectFit: "contain",
                         borderRadius: "8px",
                       }}
+                      loading="lazy"
+                      crossOrigin="anonymous"
+                      onError={() => setImageError(true)}
                     />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: "100%",
+                        height: "200px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px dashed",
+                        borderColor: "error.main",
+                        borderRadius: "8px",
+                        bgcolor: "error.light",
+                      }}
+                    >
+                      <Typography color="error">
+                        {t("Products.ImageLoadError")}
+                      </Typography>
+                    </Box>
+                  )}
+                  {formik.values.imageUrl && !imageError && (
                     <Box
                       sx={{
                         position: "absolute",
@@ -250,41 +406,19 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                           backgroundColor: "rgba(0,0,0,0.7)",
                         },
                       }}
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         formik.setValues((prev) => ({
                           ...prev,
-                          image: null,
-                          imagePreview: "",
+                          imageUrl: "",
                         }));
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = "";
-                        }
+                        setImageError(false);
                       }}
                     >
                       <CloseIcon sx={{ color: "white", fontSize: "16px" }} />
                     </Box>
-                    <Typography
-                      variant="caption"
-                      sx={{ mt: 1, display: "block", color: "text.secondary" }}
-                    >
-                      {t("Products.ClickToChange")}
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box sx={{ py: 3 }}>
-                    <CloudUploadIcon
-                      sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
-                    />
-                    <Typography variant="body1" sx={{ mb: 1 }}>
-                      {t("Products.DragAndDrop")}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {t("Products.SupportedFormats")}
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
+                  )}
+                </Box>
+              )}
             </Grid>
           </Grid>
 
@@ -303,7 +437,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.points}
+              disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.points || (!formik.values.imagePreview && !formik.values.imageUrl)}
             >
               {loading ? (
                 <CircularProgress size={24} />

@@ -1,4 +1,4 @@
-// MainLayout.jsx
+
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './utilities/Theme';
 

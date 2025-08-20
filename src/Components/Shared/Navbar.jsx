@@ -13,46 +13,22 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import Api from '../../Config/Api';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useUser, updateUserProfile } from '../../utilities/user.jsx';
 
 const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery('(max-width: 400px)');
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const user = useUser(); 
   const [anchorEl, setAnchorEl] = useState(null);
 
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-      fetchProfile();
-    }
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const response = await Api.get('/api/auth/profile');
-        setProfile(response.data);
-        localStorage.setItem('profile', JSON.stringify(response.data)); 
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      const profileData = localStorage.getItem('profile');
-      if (profileData) {
-        setProfile(JSON.parse(profileData));
-      }
-    }
-  };
+  const profile = user;
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
@@ -63,6 +39,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('profile');
+    updateUserProfile(); 
     navigate('/login');
   };
 

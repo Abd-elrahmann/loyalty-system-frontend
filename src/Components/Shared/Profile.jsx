@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useNavigate } from 'react-router-dom';
+import { updateUserProfile } from '../../utilities/user.jsx';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 const Profile = () => {
@@ -43,6 +44,7 @@ const Profile = () => {
           arName: response.data.arName
         });
         localStorage.setItem('profile', JSON.stringify(response.data));
+        updateUserProfile(); 
         setLoading(false);
       } catch (err) {
         console.error('Profile fetch error:', err);
@@ -65,6 +67,7 @@ const Profile = () => {
       const updatedProfile = { ...profile, ...nameForm };
       setProfile(updatedProfile);
       localStorage.setItem('profile', JSON.stringify(updatedProfile));
+      updateUserProfile(); 
       notifySuccess(t('Profile.NameUpdated'));
     } catch (err) {
       setError(err.response?.data?.message || 'Error updating name');

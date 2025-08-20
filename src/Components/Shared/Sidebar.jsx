@@ -12,7 +12,7 @@ import { Support as SupportIcon } from '@mui/icons-material';
 import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { user } from '../../utilities/user';
+import { useUser, updateUserProfile } from '../../utilities/user.jsx';
 
 const drawerWidth = 260;
 
@@ -23,6 +23,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isRTL = i18n.language === 'ar';
+  const user = useUser(); 
 
   useLayoutEffect(() => {
     document.dir = isRTL ? 'rtl' : 'ltr';
@@ -52,7 +53,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
       <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
           const isActive = location.pathname === item.path;
-          if (item.role && !item.role.includes(user.role)) {
+          if (item.role && (!user || !item.role.includes(user.role))) {
             return null;
           }
           return (
@@ -140,6 +141,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
           onClick={() => {
             localStorage.removeItem('token');
             localStorage.removeItem('profile');
+            updateUserProfile(); 
             navigate('/login');
           }}
         >
@@ -153,6 +155,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
         </Box>
       </Box>
     </Box>
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   ), [navigationItems, isRTL, t, location.pathname, isMobile, handleNavigation, navigate]);
 
   return (

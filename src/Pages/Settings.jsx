@@ -13,9 +13,10 @@ const Autocomplete = React.lazy(() => import('@mui/material/Autocomplete'));
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
+import { useUser } from '../utilities/user';
 
 const Settings = () => {
-  const { t,i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -25,7 +26,7 @@ const Settings = () => {
     pointsPerDollar: 0,
     pointsPerIQD: 0
   });
-
+  const user = useUser();
   const timezones = moment.tz.names();
 
   const currencies = [
@@ -69,13 +70,25 @@ const Settings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const settingsToSave = {
-        ...settings,
-        pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
-        pointsPerIQD: parseInt(settings.pointsPerIQD) || 0
-      };
+      let settingsToSave;
+      if (user.role === 'ADMIN') {
+        settingsToSave = {
+          ...settings,
+          pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
+          pointsPerIQD: parseInt(settings.pointsPerIQD) || 0,
+          enCurrency: settings.enCurrency,
+          arCurrency: settings.arCurrency,
+          timezone: settings.timezone
+        };
+      } else {
+        settingsToSave = {
+          timezone: settings.timezone
+        };
+      }
+
       await Api.post('/api/settings', settingsToSave);
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
+      
       const response = await Api.get('/api/settings');
       if (response.data) {
         const currencyObj = currencies.find(c => c.enValue === response.data.enCurrency);
@@ -103,52 +116,53 @@ const Settings = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4,mt:6 }}>
-    
-      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle1" gutterBottom>
-          {t('Settings.CurrencySettings')}
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
+    <Container maxWidth="sm" sx={{ py: 4, mt: 6 }}>
+      {user.role === 'ADMIN' && (
+        <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
+          <Typography variant="subtitle1" gutterBottom>
+            {t('Settings.CurrencySettings')}
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
 
-        <Autocomplete
-          fullWidth
-          name="currency"
-          value={currencies.find(c => c.enValue === settings.enCurrency) || null}
-          onChange={(event, newValue) => {
-            setSettings(prev => ({
-              ...prev,
-              enCurrency: newValue ? newValue.enValue : null,
-              arCurrency: newValue ? newValue.arValue : null
-            }));
-          }}
-          options={currencies}
-          getOptionLabel={(option) => {
-            if (typeof option === 'string') {
-              return option;
-            }
-            return i18n.language === 'ar' ? option.arValue : option.enValue;
-          }}
-          renderInput={(params) => <TextField {...params} label={t('Settings.enCurrency')} />}
-          noOptionsText={t('Settings.NoCurrencies')}
-        />
-         
-        {settings.enCurrency && (
-          <TextField
+          <Autocomplete
             fullWidth
-            size="small"
-            type="number"
-            name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
-            label={t(`Settings.EnterPointsPer`) + " " + (i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency)}
-            value={settings.enCurrency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
-            onChange={handleChange}
-            inputProps={{ min: 1 }}
-            sx={{ mt: 2 }}
+            name="currency"
+            value={currencies.find(c => c.enValue === settings.enCurrency) || null}
+            onChange={(event, newValue) => {
+              setSettings(prev => ({
+                ...prev,
+                enCurrency: newValue ? newValue.enValue : null,
+                arCurrency: newValue ? newValue.arValue : null
+              }));
+            }}
+            options={currencies}
+            getOptionLabel={(option) => {
+              if (typeof option === 'string') {
+                return option;
+              }
+              return i18n.language === 'ar' ? option.arValue : option.enValue;
+            }}
+            renderInput={(params) => <TextField {...params} label={t('Settings.ChooseCurrency')} />}
+            noOptionsText={t('Settings.NoCurrencies')}
           />
-        )}
-      </Paper>
+          
+          {settings.enCurrency && (
+            <TextField
+              fullWidth
+              size="small"
+              type="number"
+              name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
+              label={t(`Settings.EnterPointsPer`) + " " + (i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency)}
+              value={settings.enCurrency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
+              onChange={handleChange}
+              inputProps={{ min: 1 }}
+              sx={{ mt: 2 }}
+            />
+          )}
+        </Paper>
+      )}
 
-      <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
+      <Paper elevation={1} sx={{ p: 2, mb: 2, mt: user.role === 'ADMIN' ? 0 : 12 }}>
         <Typography variant="subtitle1" gutterBottom>
           {t('Settings.TimezoneSettings')}
         </Typography>
@@ -164,7 +178,6 @@ const Settings = () => {
               timezone: newValue || 'Asia/Baghdad'
             }));
           }}
-          label={t('Settings.Timezone')}
           options={timezones}
           getOptionLabel={(option) => option.replace(/_/g, ' ')}
           renderOption={(props, option) => (

@@ -296,7 +296,7 @@ const Transactions = () => {
         </Box>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
+      <TableContainer component={Paper} sx={{ maxHeight: 650 ,width: '100%' }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -321,7 +321,7 @@ const Transactions = () => {
               <StyledTableCell align="center">
                 {t("Transactions.Date")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{ display: user.role === 'ADMIN' ? 'block' : 'none' }}>
                 {t("Transactions.Delete")}
               </StyledTableCell>
             </TableRow>

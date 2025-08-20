@@ -237,7 +237,12 @@
     "ProductRedeemed": "تم الحصول على المنتج بنجاح",
     "ProductNotRedeemed": "فشل الحصول على المنتج",
     "RedeemProductText": "هل أنت متأكد من الحصول على المنتج ؟",
-    "RedeemProductTextCancel": "إلغاء"
+    "RedeemProductTextCancel": "إلغاء",
+    "ImageUrl": "رابط الصورة",
+    "ImageUploadType": "نوع الرفع",
+    "ImageUploadTypeFile": "من الملف",
+    "ImageUploadTypeLink": "من الرابط",
+    "UploadFile": "رفع ملف"
   },
   "Transactions": {
     "Search": "بحث",
@@ -292,7 +297,8 @@
     "NoCurrencies": "لا يوجد عملات",
     "EnterPointsPer": "أدخل كم نقطة لكل 1",
     "SettingsSavedSuccessfully": "تم حفظ الإعدادات بنجاح",
-    "Saving": "جاري حفظ الإعدادات..."
+    "Saving": "جاري حفظ الإعدادات...",
+    "ChooseCurrency": "اختر العملة"
   },
   "Rewards": {
     "Pending": "قيد الانتظار",

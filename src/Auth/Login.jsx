@@ -16,6 +16,7 @@ import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
 import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
+import { updateUserProfile } from '../utilities/user.jsx';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import EmailIcon from '@mui/icons-material/Email';
@@ -60,7 +61,8 @@ const Login = () => {
           localStorage.setItem('token', response.data.token);
         }
         if (response.data.user) {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          localStorage.setItem('profile', JSON.stringify(response.data.user));
+          updateUserProfile(); 
         }
 
         notifySuccess('Login successful');

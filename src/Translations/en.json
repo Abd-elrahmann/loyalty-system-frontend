@@ -235,7 +235,12 @@
         "ProductRedeemed": "Product redeemed successfully",
         "ProductNotRedeemed": "Product not redeemed",
         "RedeemProductText": "Are you sure you want to redeem the product?",
-        "RedeemProductTextCancel": "Cancel"
+        "RedeemProductTextCancel": "Cancel",
+        "ImageUrl": "Image URL",
+        "ImageUploadType": "Image Upload Type",
+        "ImageUploadTypeFile": "File",
+        "ImageUploadTypeLink": "Link",
+        "UploadFile": "Upload File"
     },
     "Transactions": {
         "Search": "Search",
@@ -290,7 +295,8 @@
         "NoCurrencies": "No Currencies",
         "EnterPointsPer": "Enter how many points for each 1",
         "SettingsSavedSuccessfully": "Settings saved successfully",
-        "Saving":"Settings are being saved..."
+        "Saving":"Settings are being saved...",
+        "ChooseCurrency": "Choose Currency"
     },
     "Rewards": {
   "Pending": "Pending",
