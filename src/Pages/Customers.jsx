@@ -303,7 +303,7 @@ const Customers = () => {
               <StyledTableCell align="center">
                 {t("Customers.Role")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{ maxWidth: '300px' }}>
                 {t("Customers.Email")}
               </StyledTableCell>
               <StyledTableCell align="center">
@@ -359,7 +359,7 @@ const Customers = () => {
                       {customer.role}
                     </Box>
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {customer.email}
                   </StyledTableCell>
                   <StyledTableCell align="center">

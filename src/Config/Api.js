@@ -4,10 +4,11 @@ import i18n from 'i18next'
 
 const Api = axios.create({
   baseURL: "http://localhost:3000",
-  // baseURL: "http://192.168.1.6:3000",
+  // baseURL: "https://loyalty-system-backend-production.up.railway.app",
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
 Api.interceptors.request.use(

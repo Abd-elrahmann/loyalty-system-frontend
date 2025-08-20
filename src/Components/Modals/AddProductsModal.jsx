@@ -28,7 +28,7 @@ const style = {
   alignItems: "center",
 };
 
-const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit }) => {
+const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit   }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const isMobile = useMediaQuery('(max-width: 400px)');
@@ -63,16 +63,22 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
 
 
   useEffect(() => {
-
-    if (productToEdit) {
-      formik.setValues({
-        ...productToEdit,
-        image: productToEdit.image,
-        imagePreview: productToEdit.image,
-      });
+    if (open) {
+      if (productToEdit) {
+        formik.setValues({
+          ...productToEdit,
+          image: productToEdit.image,
+          imagePreview: productToEdit.image,
+        });
+      } else {
+        formik.resetForm();
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productToEdit]);
+  }, [productToEdit, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -105,7 +111,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
         ...formik.values,
         image: formik.values.imagePreview, 
       };
-      if (handleUpdateProduct) {
+      if (handleUpdateProduct && productToEdit) {
         await handleUpdateProduct(submitData);
       } else {
         await onSubmit(submitData);
@@ -297,7 +303,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading || !formik.values.image || !formik.values.enName || !formik.values.arName || !formik.values.price || !formik.values.points}
+              disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.points}
             >
               {loading ? (
                 <CircularProgress size={24} />

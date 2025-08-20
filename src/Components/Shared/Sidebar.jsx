@@ -12,6 +12,7 @@ import { Support as SupportIcon } from '@mui/icons-material';
 import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { user } from '../../utilities/user';
 
 const drawerWidth = 260;
 
@@ -51,7 +52,9 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
       <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
           const isActive = location.pathname === item.path;
-          
+          if (item.role && !item.role.includes(user.role)) {
+            return null;
+          }
           return (
             <ListItem
               key={item.path}

@@ -25,7 +25,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
 import { useMediaQuery } from '@mui/material';
 import Swal from 'sweetalert2';
-
+import { user } from '../utilities/user';
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
@@ -147,6 +147,8 @@ const Products = () => {
       await Api.delete(endpoint);
       fetchProducts();
       notifySuccess(t('Products.ProductDeleted'));
+      setOpenDeleteModal(false);
+      setProductId(null);
     } catch (error) {
       handleApiError(error);
       notifyError(t('Products.ProductNotDeleted'));
@@ -229,13 +231,14 @@ const Products = () => {
         <Button 
           variant="contained" 
           color="primary" 
-          onClick={handleOpenModal}
+          onClick={() => handleOpenModal()}
           sx={{
             flexShrink: 0,
             width: isMobile ? '50%' : '220px',
             height:  '40px',
             fontSize: isMobile ? '14px' : '16px',
             borderRadius: isMobile ? '5px' : '10px',
+            display: user.role === 'ADMIN' ? 'block' : 'none',
           }}
         >
           {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}
@@ -248,8 +251,8 @@ const Products = () => {
         </Box>
       ) : (
         <>
-          <Grid container spacing={3} sx={{
-            justifyContent: isMobile ? 'center' : 'flex-start',
+          <Grid container spacing={4} sx={{
+            justifyContent: 'center',
           }}>
             {filteredProducts.map((product) => (
               <Grid item key={product.id}>
@@ -261,7 +264,7 @@ const Products = () => {
                   borderRadius: '10px',
                   border: '1px solid #e0e0e0',
                   boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.2)',
-                  width: 300,
+                  width: 250,
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-5px)',
@@ -277,18 +280,18 @@ const Products = () => {
                     sx={{ objectFit: 'cover' }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h6" component="div">
+                    <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'center' }}>
                       {i18n.language === 'ar' ? product.arName : product.enName}
                     </Typography>
     
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
                       <MonetizationOnIcon sx={{ color: 'gold' }} />
                       <Typography variant="body1">
                         {t('Products.Points')}: {product.points}
                       </Typography>
                     </Box>
                   </CardContent>
-                  <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                  <Box sx={{ p: 2, display: 'flex', justifyContent: user.role === 'ADMIN' ? 'space-between' : 'center' }}>
                     <Button 
                       variant="contained" 
                       color="primary"
@@ -316,7 +319,12 @@ const Products = () => {
                     >
                       {t('Products.Redeem')}
                     </Button>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{
+                       display: user.role === 'ADMIN' ? 'flex' : 'none',
+                     alignItems: 'center',
+                     gap: 1,
+                     justifyContent: 'center'
+                     }}>
                     <IconButton
                       color="primary"
                       onClick={() => handleOpenModal(product)}
@@ -326,7 +334,10 @@ const Products = () => {
                     </IconButton>
                     <IconButton 
                       color="error"
-                      onClick={() => setOpenDeleteModal(true)}
+                      onClick={() => {
+                        setOpenDeleteModal(true);
+                        setProductId(product.id);
+                      }}
                       aria-label="delete"
                       >
                         <DeleteIcon sx={{ color: 'red' }} />
@@ -356,7 +367,8 @@ const Products = () => {
         onSubmit={handleAddProduct}
         type={activeTab}
         handleUpdateProduct={handleUpdateProduct}
-        productToEdit={productToEdit}
+        productToEdit={productToEdit} 
+        
       />
       <DeleteModal
         open={openDeleteModal}
@@ -365,6 +377,7 @@ const Products = () => {
         message={t('Products.DeleteProductMessage')}
         onConfirm={() => handleDeleteProduct(productId)}
         isLoading={isLoading}
+        
       />
     </Box>
   );

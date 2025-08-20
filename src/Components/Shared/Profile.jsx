@@ -203,11 +203,11 @@ const Profile = () => {
 
               {/* Contact Info Row */}
               <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Paper elevation={1} sx={{ p: 2, width: '250px' }}>
+                <Paper elevation={1} sx={{ p: 2, maxWidth: '400px' }}>
                   <Typography variant="subtitle1" color="text.secondary">
                     {t('Profile.Email')}
                   </Typography>
-                  <Typography variant="body1">{profile?.email}</Typography>
+                  <Typography variant="body1" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.email}</Typography>
                 </Paper>
                 <Paper elevation={2} sx={{ p: 2, width: '250px' }}>
                   <Typography variant="subtitle1" color="text.secondary">

@@ -12,38 +12,49 @@ const routes = [
     name: 'Dashboard',
     arName: 'لوحة التحكم',
     path: '/dashboard',
-    icon: DashboardIcon
+    icon: DashboardIcon,
+    role: ['ADMIN', 'USER'],
   },
   {
     name: 'Customers',
     arName: 'العملاء', 
     path: '/customers',
-    icon: PeopleIcon
+    icon: PeopleIcon,
+    role: ['ADMIN'],
+    
   },
   {
     name: 'Transactions',
     arName: 'المعاملات', 
     path: '/transactions',
-    icon: ReceiptLongIcon
+    icon: ReceiptLongIcon,
+    role: ['ADMIN', 'USER'],
+    
   },
   {
     name: 'Products',
     arName: 'المنتجات',
     path: '/products', 
-    icon: ProductsIcon
+    icon: ProductsIcon,
+    role: ['ADMIN', 'USER'],
+    
   },
   {
     name: 'Rewards',
     arName: 'المكافآت',
     path: '/rewards',
-    icon: RewardsIcon
+    icon: RewardsIcon,
+    role: ['ADMIN', 'USER'],
+    
   },
   
   {
     name: 'Settings',
     arName: 'الإعدادات',
     path: '/settings',
-    icon: SettingsIcon
+    icon: SettingsIcon,
+    role: ['ADMIN', 'USER'],
+    
   }
 ];
 

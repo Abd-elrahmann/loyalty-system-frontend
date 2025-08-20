@@ -29,7 +29,7 @@ import { Search, ArrowBack } from "@mui/icons-material";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
-
+import { user } from '../utilities/user';
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -377,9 +377,13 @@ const Transactions = () => {
                     <IconButton 
                       size="small" 
                       color="error" 
+                      sx={{
+                        display: user.role === 'ADMIN' ? 'block' : 'none',
+                      }}
                       onClick={() => {
                         setOpenDeleteModal(true);
                         setTransactionToDelete(transaction);
+                        
                       }}
                     >
                       <FaTrash />
