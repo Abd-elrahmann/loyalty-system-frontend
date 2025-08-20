@@ -18,7 +18,7 @@ import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useNavigate } from 'react-router-dom';
 import { updateUserProfile } from '../../utilities/user.jsx';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
-
+import DownloadIcon from '@mui/icons-material/Download';
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -103,6 +103,36 @@ const Profile = () => {
       notifySuccess(t('Profile.ImageUploaded'));
     } catch (err) {
       notifyError(err.response?.data?.message || 'Error uploading image');
+    }
+  };
+
+  const handleDownloadQRCode = async () => {
+    try {
+      const qrCode = profile.qrCode;
+      if (!qrCode) {
+        notifyError(t('Profile.NoQRCode'));
+        return;
+      }
+
+      // Convert base64/URL to blob
+      const response = await fetch(qrCode);
+      const blob = await response.blob();
+
+      // Create object URL
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `qrcode-${profile.email}.png`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      notifyError(err.message || t('Errors.generalError')); 
     }
   };
 
@@ -237,6 +267,7 @@ const Profile = () => {
                     {t('Profile.QRCode')}
                   </Typography>
                   {profile?.qrCode ? (
+                    <>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
                       <Box
                         component="img"
@@ -251,6 +282,12 @@ const Profile = () => {
                         }}
                       />
                     </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                      <Button  color="primary" onClick={handleDownloadQRCode} sx={{ mt: 2 }}>
+                        <DownloadIcon sx={{ fontSize: '25px' }} />
+                      </Button>
+                    </Box>
+                    </>
                   ) : (
                     <Typography variant="body2" color="text.secondary" align="center">
                       {t('Profile.NoQRCode')}
