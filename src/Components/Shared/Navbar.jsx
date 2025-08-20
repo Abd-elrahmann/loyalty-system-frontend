@@ -13,12 +13,13 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useUser, updateUserProfile } from '../../utilities/user.jsx';
+import Api from '../../Config/Api';
 
 const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const { t, i18n } = useTranslation();
@@ -27,8 +28,27 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const isMobile = useMediaQuery('(max-width: 400px)');
   const user = useUser(); 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [profile, setProfile] = useState(user);
 
-  const profile = user;
+  useEffect(() => {
+    const fetchProfileIfNeeded = async () => {
+      if (user && (!user.points && user.points !== 0) && !user.profileImage) {
+        try {
+          const token = localStorage.getItem('token');
+          if (token) {
+            const response = await Api.get('/api/auth/profile');
+            localStorage.setItem('profile', JSON.stringify(response.data));
+            updateUserProfile();
+          }
+        } catch (error) {
+          console.warn('Could not fetch profile:', error);
+        }
+      }
+    };
+
+    fetchProfileIfNeeded();
+    setProfile(user);
+  }, [user]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';

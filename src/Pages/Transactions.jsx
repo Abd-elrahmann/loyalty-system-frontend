@@ -29,7 +29,7 @@ import { Search, ArrowBack } from "@mui/icons-material";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
-import { user } from '../utilities/user';
+import { useUser } from '../utilities/user';
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -49,6 +49,9 @@ const Transactions = () => {
   const [customerInfo, setCustomerInfo] = useState(null);
   const [totalPoints, setTotalPoints] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const profile = useUser();
+
+
   const fetchTransactions = async () => {
     setIsLoading(true);
     try {
@@ -57,12 +60,15 @@ const Transactions = () => {
       if (filters.fromDate) queryParams.append("fromDate", dayjs(filters.fromDate).format('YYYY-MM-DD'));
       if (filters.toDate) queryParams.append("toDate", dayjs(filters.toDate).format('YYYY-MM-DD'));
       if (customerId) queryParams.append("userId", customerId);
-      
+       
+      queryParams.append("limit", rowsPerPage);
+      queryParams.append("page", page);
 
       const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
       if (response?.data?.transactions) {
         setTransactions(response.data.transactions);
         setTotalItems(response.data.total);
+
         
         if (customerId && response.data.transactions.length > 0) {
           const points = response.data.transactions.reduce((sum, transaction) => {
@@ -91,7 +97,7 @@ const Transactions = () => {
     fetchTransactions();
     
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filters, customerId]);
+  }, [page, filters, customerId, rowsPerPage]);
 
   const handleSearch = (searchFilters) => {
     setFilters(searchFilters);
@@ -300,28 +306,28 @@ const Transactions = () => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.ID")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.CustomerEnName")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.CustomerArName")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.Points")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.Currency")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.Type")}
               </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.Date")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{ display: user.role === 'ADMIN' ? 'block' : 'none' }}>
+              <StyledTableCell align="center" sx={{ display: profile.role === 'ADMIN' ? '' : 'none' ,whiteSpace: 'nowrap'}}>
                 {t("Transactions.Delete")}
               </StyledTableCell>
             </TableRow>
@@ -342,19 +348,19 @@ const Transactions = () => {
             ) : (
               transactions.map((transaction) => (
                 <StyledTableRow key={transaction.id}>
-                  <StyledTableCell align="center">
+                    <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.id}
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.user?.enName || '-'}
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.user?.arName || '-'}
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.points}
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     <span style={{ 
                       color: '#1976d2',
                       fontWeight: 'bold'
@@ -370,15 +376,15 @@ const Transactions = () => {
                       {transaction.type}
                     </span>
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.formattedDate}
                   </StyledTableCell>
-                  <StyledTableCell align="center">
+                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     <IconButton 
                       size="small" 
                       color="error" 
                       sx={{
-                        display: user.role === 'ADMIN' ? 'block' : 'none',
+                        display: profile.role === 'ADMIN' ? '' : 'none',
                       }}
                       onClick={() => {
                         setOpenDeleteModal(true);
@@ -401,6 +407,7 @@ const Transactions = () => {
            onPageChange={(e, newPage) => setPage(newPage + 1)}
            rowsPerPage={rowsPerPage}
            rowsPerPageOptions={[5, 10, 20]}
+
            onRowsPerPageChange={handleChangeRowsPerPage}
            labelRowsPerPage={t("Transactions.RowsPerPage")}
         />

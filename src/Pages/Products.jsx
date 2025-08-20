@@ -25,7 +25,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
 import { useMediaQuery } from '@mui/material';
 import Swal from 'sweetalert2';
-import { user } from '../utilities/user';
+import { useUser } from '../utilities/user';
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
@@ -41,7 +41,7 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const isMobile = useMediaQuery('(max-width: 400px)');
-
+  const profile = useUser();
   useEffect(() => {
     setProducts([]);
     setFilteredProducts([]);
@@ -238,7 +238,7 @@ const Products = () => {
             height:  '40px',
             fontSize: isMobile ? '14px' : '16px',
             borderRadius: isMobile ? '5px' : '10px',
-            display: user.role === 'ADMIN' ? 'block' : 'none',
+            display: profile.role === 'ADMIN' ? 'block' : 'none',
           }}
         >
           {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}
@@ -291,7 +291,7 @@ const Products = () => {
                       </Typography>
                     </Box>
                   </CardContent>
-                  <Box sx={{ p: 2, display: 'flex', justifyContent: user.role === 'ADMIN' ? 'space-between' : 'center' }}>
+                  <Box sx={{ p: 2, display: 'flex', justifyContent: profile.role === 'ADMIN' ? 'space-between' : 'center' }}>
                     <Button 
                       variant="contained" 
                       color="primary"
@@ -320,7 +320,7 @@ const Products = () => {
                       {t('Products.Redeem')}
                     </Button>
                     <Box sx={{
-                       display: user.role === 'ADMIN' ? 'flex' : 'none',
+                       display: profile.role === 'ADMIN' ? 'flex' : 'none',
                      alignItems: 'center',
                      gap: 1,
                      justifyContent: 'center'

@@ -63,7 +63,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
               sx={{
                 mx: 1,
                 mb: 1,
-                mt: 2,
+                mt: user.role === "ADMIN" ? 2 : 3,
                 borderRadius: 2,
                 cursor: 'pointer',
                 backgroundColor: isActive ? 'primary.main' : 'transparent',

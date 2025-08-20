@@ -83,7 +83,7 @@ const Customers = () => {
   useEffect(() => {
     fetchCustomers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchFilters, rowsPerPage, scannedEmail]);
+  }, [page, searchFilters, rowsPerPage, scannedEmail, isLoading]);
 
   const handleSearch = () => {
     setPage(1);

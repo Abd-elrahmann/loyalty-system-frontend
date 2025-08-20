@@ -62,6 +62,14 @@ const Login = () => {
         }
         if (response.data.user) {
           localStorage.setItem('profile', JSON.stringify(response.data.user));
+          
+          try {
+            const profileResponse = await Api.get('/api/auth/profile');
+            localStorage.setItem('profile', JSON.stringify(profileResponse.data));
+          } catch (profileError) {
+            console.warn('Could not fetch full profile:', profileError);
+          }
+          
           updateUserProfile(); 
         }
 
