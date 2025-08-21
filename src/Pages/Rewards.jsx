@@ -42,7 +42,6 @@ const Rewards = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [openSearchModal, setOpenSearchModal] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 600px)");
   const [filters, setFilters] = useState({
     fromDate: null,
     toDate: null,
@@ -55,6 +54,7 @@ const Rewards = () => {
   const [openScanModal, setOpenScanModal] = useState(false);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [selectedRewards, setSelectedRewards] = useState([]);
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const profile = useUser();
   const statusMap = {
     PENDING: { label: "PENDING", color: "warning" },
@@ -399,26 +399,54 @@ const Rewards = () => {
   };
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+      <Box sx={{ 
+        borderBottom: 1, 
+        borderColor: "divider", 
+        mb: 2,
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab label={t("Rewards.Pending")} sx={{ color: "warning.main" }} />
           <Tab label={t("Rewards.Approved")} sx={{ color: "success.main" }} />
           <Tab label={t("Rewards.Rejected")} sx={{ color: "error.main" }} />
         </Tabs>
+
+        <Stack
+          direction={isMobile ? "column" : "row"}
+          spacing={2}
+          sx={{ mt: isMobile ? 2 : 0 }}
+          alignItems="center"
+        >
+          <Button variant="contained" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "130px" }}>
+            {t("Rewards.ExportExcel")}
+          </Button>
+          <Button variant="contained" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "130px" }}>
+            {t("Rewards.ExportPdf")}
+          </Button>
+          <Button variant="contained" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "130px" }}>
+            {t("Rewards.Print")}
+          </Button>
+        </Stack>
       </Box>
 
-      <Box sx={{ p: isMobile ? 1 : 2, mb: isMobile ? 0 : 2 }}>
+      <Box sx={{ p: isMobile ? 1 : 2, mb: isMobile ? 0 : 2,width:isMobile? "100%":"90%" }}>
         <Stack
           direction={isMobile ? "column" : "row"}
           justifyContent={isMobile ? "center" : "space-between"}
           spacing={1}
+          alignItems="center"
         >
           <Stack
             direction={isMobile ? "column" : "row"}
             justifyContent={isMobile ? "center" : "flex-start"}
             spacing={1}
+            alignItems="center"
           >
             <Button
+              sx={{ display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '130px' }}
               variant="contained"
               startIcon={<FaSearch size={16} />}
               onClick={() => setOpenSearchModal(true)}
@@ -426,16 +454,18 @@ const Rewards = () => {
               {t("Rewards.Search")}
             </Button>
             <IconButton
-              sx={{ color: "primary.main", padding: 0 ,display: profile.role === "ADMIN" ? "flex" : "none"}}
+              sx={{ color: "primary.main", padding: 0 ,display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '50px' }}
               onClick={() => setOpenScanModal(true)}
             >
               <FaQrcode />
             </IconButton>
           </Stack>
+
           <Stack
             direction={isMobile ? "column" : "row"}
             justifyContent={isMobile ? "center" : "flex-end"}
             spacing={1}
+            alignItems="center"
           >
               <Button
                 variant={isAllChecked ? "contained" : "outlined"}
@@ -443,7 +473,8 @@ const Rewards = () => {
                 sx={{
                   display: profile.role === "ADMIN" ? "flex" : "none",
                   alignItems: "center",
-                  width: "130px",
+                  width:isMobile? "140px":"130px",
+                  height: "40px",
                   fontSize: "12px",
                 }}
                 onClick={() => {
@@ -460,7 +491,8 @@ const Rewards = () => {
                    sx={{
                     display: profile.role === "ADMIN" ? "flex" : "none",
                     alignItems: "center",
-                    width: "130px",
+                    width:isMobile? "140px":"130px",
+                    height: "40px",
                     fontSize: "12px",
                   }}
                   variant="contained" 
@@ -474,7 +506,8 @@ const Rewards = () => {
                    sx={{
                     display: profile.role === "ADMIN" ? "flex" : "none",
                     alignItems: "center",
-                    width: "130px",
+                    width:isMobile? "140px":"130px",
+                    height: "40px",
                     fontSize: "12px",
                   }}
                   variant="contained" 
@@ -486,26 +519,13 @@ const Rewards = () => {
                 </Button>
               </>
             )}
-            <Stack
-              direction={isMobile ? "column" : "row"}
-              justifyContent={isMobile ? "center" : "flex-end"}
-              spacing={1}
-            >
-            <Button variant="contained" onClick={exportToCSV}>
-              {t("Rewards.ExportExcel")}
-            </Button>
-            <Button variant="contained" onClick={exportToPDF}>
-              {t("Rewards.ExportPdf")}
-            </Button>
-            <Button variant="contained" onClick={PrintRewards}>
-              {t("Rewards.Print")}
-            </Button>
-            </Stack>
           </Stack>
+
           <Stack
             direction={isMobile ? "column" : "row"}
             justifyContent={isMobile ? "center" : "flex-start"}
             spacing={2}
+            alignItems="center"
           >
             <Button
               variant="contained"
@@ -521,7 +541,8 @@ const Rewards = () => {
                 setPage(1);
               }}
               sx={{
-                display: profile.role === "ADMIN" ? "block" : "none",
+                display: profile.role === "ADMIN" ? "" : "none",
+                height: "40px",
                   visibility:
                   filters.fromDate ||
                   filters.toDate ||
@@ -557,10 +578,10 @@ const Rewards = () => {
                   />
                 </StyledTableCell>
               )}
-              <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "block" : "none" }}>
+              <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
                 {t("Rewards.ID")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "block" : "none" }}>
+              <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
                 {t("Rewards.Customer")}
               </StyledTableCell>
               <StyledTableCell align="center">
@@ -624,8 +645,8 @@ const Rewards = () => {
                       />
                     </StyledTableCell>
                   )}
-                  <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "block" : "none" }}>{reward.id}</StyledTableCell>
-                  <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "block" : "none" }}>
+                  <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>{reward.id}</StyledTableCell>
+                  <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
                     {i18n.language === "ar"
                       ? reward.user?.arName
                       : reward.user?.enName}
@@ -653,7 +674,7 @@ const Rewards = () => {
                         "-"
                       }
                       alt="Reward Image"
-                      style={{ width: "70px", height: "70px" }}
+                      style={{ width:isMobile? "50px" : "60px", height:isMobile? "50px" : "60px" }}
                     />
                   </StyledTableCell>
                   <StyledTableCell align="center">

@@ -44,9 +44,10 @@ const StatCard = ({ icon: Icon, title, value, trend, color = 'primary' }) => {
       boxShadow: 1,
       display: 'flex',
       flexDirection: 'column',
-      height: '100%'
+      height: '100%',
+      textAlign: { xs: 'center', sm: 'left' }
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
         <Icon sx={{ color: colorMap[color], mr: 1 }} />
         <Typography variant="subtitle2" color="text.secondary">
           {title}
@@ -118,9 +119,9 @@ const Dashboard = () => {
     ) : (
     <Box sx={{ p: 3 }}>
       <Stack spacing={3}>
-         <Stack direction="row" spacing={2} justifyContent="space-between">
+         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems="center">
         {/* Filters */}
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center', flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label={t('Dashboard.SelectDate')}
@@ -141,15 +142,15 @@ const Dashboard = () => {
             </Button>
           ))}
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>  
-          <Button variant="contained" color="primary" onClick={exportToPDF} sx={{ marginBottom: '20px',width: '200px',display: 'flex',justifyContent: 'center',alignItems: 'center',margin: 'auto' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: { xs: '20px', sm: 0 } }}>  
+          <Button variant="contained" color="primary" onClick={exportToPDF} sx={{ width: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {t('Dashboard.DashboardReport')}
           </Button>
         </Box>
         </Stack>
         {/* Stats Cards Row */}
         <Grid container spacing={7} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ width: '190px',height: '120px' }}>
             <StatCard
               icon={PeopleIcon}
               title={t('Dashboard.TotalCustomers')}
@@ -157,7 +158,7 @@ const Dashboard = () => {
               color="primary"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ width: '190px',height: '120px' }}>
             <StatCard
               icon={PointsIcon}
               title={t('Dashboard.TotalPoints')}
@@ -165,7 +166,7 @@ const Dashboard = () => {
               color="primary"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ width: '190px',height: '120px' }}>
             <StatCard
               icon={TrendingUpIcon}
               title={t('Dashboard.AvgPoints')}
@@ -173,7 +174,7 @@ const Dashboard = () => {
               color="success"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ width: '190px',height: '120px' }}>
             <StatCard
               icon={CompareIcon}
               title={t('Dashboard.TransactionsCount')}
@@ -184,7 +185,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Points Comparison Chart */}
-        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
+        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
           <Typography variant="h6" mb={3}>{t('Dashboard.PointsComparison')}</Typography>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={pointsComparisonData}>
@@ -199,12 +200,12 @@ const Dashboard = () => {
         </Box>
 
         {/* Top Earners */}
-        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
+        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
           <Typography variant="h6" mb={3}>
             <TrophyIcon sx={{ mr: 1, verticalAlign: 'middle', color: 'warning.main' }} />
             {t('Dashboard.TopEarners')}
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={2} justifyContent={{ xs: 'center', sm: 'flex-start' }}>
             {dashboardData.topEarners.map((earner, index) => (
               <Grid item xs={12} sm={6} key={earner.userId}>
                 <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
@@ -221,7 +222,7 @@ const Dashboard = () => {
         </Box>
 
         {/* Most Used Products Bar Chart */}
-        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
+        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
           <Typography variant="h6" mb={3}>{t('Dashboard.MostUsedProducts')}</Typography>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={dashboardData.mostUsedProducts}>
@@ -241,7 +242,7 @@ const Dashboard = () => {
         </Box>
 
         {/* Points Distribution Pie Chart */}
-        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
+        <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
           <Typography variant="h6" mb={3}>{t('Dashboard.PointsDistribution')}</Typography>
           <Grid container spacing={2} mb={3}>
             <Grid item xs={6} sm={3}>

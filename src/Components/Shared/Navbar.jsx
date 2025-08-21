@@ -70,12 +70,12 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
       boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)', 
       zIndex: theme.zIndex.drawer + 1,
       ...(isMobile && {
-        width: '90%',
-        right: i18n.language === 'ar' ? '50%' : 'auto',
-        left: i18n.language === 'ar' ? 'auto' : '50%',
-        transform: i18n.language === 'ar' ? 'translateX(35%)' : 'translateX(-50%)',
-        borderRadius: '8px',
-        mt: 1
+        width: '100%',
+        right: 'auto',
+        left: 'auto',
+        transform: 'none',
+        borderRadius: 0,
+        mt: 0
       })
     }}>
       <Toolbar sx={{ 
