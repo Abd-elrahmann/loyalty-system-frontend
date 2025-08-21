@@ -111,7 +111,8 @@
       "month": "Month",
       "year": "Year",
       "ExportToPDF": "Export to PDF",
-      "DashboardReport": "Dashboard Report"
+      "DashboardReport": "Dashboard Report",
+      "Unauthorized": "You are not authorized to access this page"
     },
     "Profile": {
         "Title": "Profile",
@@ -242,7 +243,11 @@
         "ImageUploadType": "Image Upload Type",
         "ImageUploadTypeFile": "File",
         "ImageUploadTypeLink": "Link",
-        "UploadFile": "Upload File"
+        "UploadFile": "Upload File",
+        "InvalidImageUrl": "Invalid image URL. Please provide a direct link to an image file.",
+        "ImageNotAccessible": "Image is not accessible. Please try a different URL.",
+        "GoogleImagesNotSupported": "Google Images thumbnails are not supported. Please use the original image URL.",
+        "ImageLoadError": "Failed to load image"
     },
     "Transactions": {
         "Search": "Search",

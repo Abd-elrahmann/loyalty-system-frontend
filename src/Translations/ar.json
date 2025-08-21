@@ -109,7 +109,8 @@
     "month": "شهر",
     "year": "سنة",
     "ExportToPDF": "تصدير إلى PDF",
-    "DashboardReport": "تقرير النظام"
+    "DashboardReport": "تقرير النظام",
+    "Unauthorized": "ليس لديك صلاحية للدخول إلى هذه الصفحة"
   },
   "Profile": {
     "Title": "الملف الشخصي",
@@ -242,7 +243,11 @@
     "ImageUploadType": "نوع الرفع",
     "ImageUploadTypeFile": "من الملف",
     "ImageUploadTypeLink": "من الرابط",
-    "UploadFile": "رفع ملف"
+    "UploadFile": "رفع ملف",
+    "InvalidImageUrl": "رابط الصورة غير صالح. يرجى توفير رابط مباشر لملف الصورة.",
+    "ImageNotAccessible": "لا يمكن الوصول إلى الصورة. يرجى تجربة رابط آخر.",
+    "GoogleImagesNotSupported": "صور Google المصغرة غير مدعومة. يرجى استخدام رابط الصورة الأصلي.",
+    "ImageLoadError": "فشل تحميل الصورة"
   },
   "Transactions": {
     "Search": "بحث",

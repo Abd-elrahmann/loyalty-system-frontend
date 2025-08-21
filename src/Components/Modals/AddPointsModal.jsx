@@ -106,7 +106,7 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
               {t("Customers.CustomerPoints")}: {customer?.points} {t("Customers.Point")}
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>
-              {t("Customers.NeedToChangeCurrency")} <Link href="/settings">{t("Customers.GoToSettings")}</Link>
+              {t("Customers.NeedToChangeCurrency")} <Link href="/settings" sx={{textDecoration: "none"}}>{t("Customers.GoToSettings")}</Link>
             </Typography>
             <Divider sx={{ my: 2 }} />
             <TextField

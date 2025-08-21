@@ -60,6 +60,9 @@ const Login = () => {
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
         }
+       
+        notifySuccess('Login successful');
+        navigate('/dashboard');
         if (response.data.user) {
           localStorage.setItem('profile', JSON.stringify(response.data.user));
           
@@ -73,8 +76,6 @@ const Login = () => {
           updateUserProfile(); 
         }
 
-        notifySuccess('Login successful');
-        navigate('/dashboard');
       } catch (error) {
         notifyError(error.response?.data?.message || 'Login failed');
       } finally {

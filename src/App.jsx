@@ -14,12 +14,13 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
+import Dashboard from './Pages/Dashboard';
 
 const ToastContainer = React.lazy(() =>
   import('react-toastify').then(m => ({ default: m.ToastContainer }))
 ); 
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
-const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
+
 const Customers = React.lazy(() => import('./Pages/Customers'));
 const Transactions = React.lazy(() => import('./Pages/Transactions'));
 const Products = React.lazy(() => import('./Pages/Products'));

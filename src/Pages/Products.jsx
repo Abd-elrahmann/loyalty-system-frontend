@@ -368,7 +368,7 @@ const Products = () => {
         type={activeTab}
         handleUpdateProduct={handleUpdateProduct}
         productToEdit={productToEdit} 
-        
+        fetchProducts={fetchProducts}
       />
       <DeleteModal
         open={openDeleteModal}

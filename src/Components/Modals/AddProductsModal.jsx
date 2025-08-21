@@ -28,7 +28,7 @@ const style = {
   alignItems: "center",
 };
 
-const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit   }) => {
+const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit, fetchProducts }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [imageUploadType, setImageUploadType] = useState('file'); // 'file' or 'link'
@@ -54,6 +54,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
           await handleUpdateProduct(submitData);
         } else {
           await onSubmit(submitData);
+          fetchProducts();
         }
       } catch (error) {
         console.error("Error submitting form:", error);

@@ -59,7 +59,11 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
           return (
             <ListItem
               key={item.path}
-              onClick={() => handleNavigation(item.path)}
+              onClick={() => {
+                // Directly navigate without animation frame
+                navigate(item.path);
+                if (isMobile) onToggle();
+              }}
               sx={{
                 mx: 1,
                 mb: 1,
@@ -77,7 +81,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
                 '& .MuiListItemText-primary': {
                   color: isActive ? 'white' : 'inherit'
                 },
-                transition: 'all 0.2s ease',
+                transition: 'background-color 0.1s ease', // Faster transition
                 justifyContent: 'flex-start',
                 px: 2
               }}
@@ -147,12 +151,6 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
         >
           {t('Navbar.Logout')}
         </Button>
-
-        <Box sx={{ mt: 1, borderTop: '1px solid', borderColor: 'divider', pt: 1 }}>
-          <Typography variant="caption" color="text.secondary" align="center" display="block">
-            © 2024 Loyalty System
-          </Typography>
-        </Box>
       </Box>
     </Box>
   // eslint-disable-next-line react-hooks/exhaustive-deps

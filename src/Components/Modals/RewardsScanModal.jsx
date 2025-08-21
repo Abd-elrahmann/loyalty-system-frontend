@@ -6,7 +6,8 @@ import {
   Box, 
   IconButton, 
   Stack,
-  Typography 
+  Typography,
+  useMediaQuery
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { QrReader } from 'react-qr-reader';
@@ -18,6 +19,7 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const [hasScanned, setHasScanned] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 600px)');
 
   const handleScan = async (result) => {
     if (result && !hasScanned) {
@@ -82,8 +84,8 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
     }}>
       <Stack spacing={2}>
         <Box sx={{ 
-          width: 150,
-          height: 150,
+          width: isMobile ? 250 : 200,
+          height: isMobile ? 250 : 200,
           position: 'relative',
           overflow: 'hidden',
           margin: '0 auto'
@@ -104,8 +106,8 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 200,
-                height: 200,
+                width: isMobile ? 3000 : 200,
+                height: isMobile ? 300 : 200,
                 border: '2px solid #4AB814',
                 borderRadius: 2,
                 zIndex: 2
