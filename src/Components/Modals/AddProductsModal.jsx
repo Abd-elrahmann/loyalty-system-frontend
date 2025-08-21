@@ -31,7 +31,7 @@ const style = {
 const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit, fetchProducts }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [imageUploadType, setImageUploadType] = useState('file'); // 'file' or 'link'
+  const [imageUploadType, setImageUploadType] = useState('file');
   const isMobile = useMediaQuery('(max-width: 400px)');
   const fileInputRef = useRef(null);
   const formik = useFormik({
@@ -124,7 +124,6 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       return;
     }
 
-    // Add a small delay to prevent too many requests while typing
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {

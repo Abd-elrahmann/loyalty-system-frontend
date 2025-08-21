@@ -118,7 +118,7 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
               disabled={isLoading}
               inputProps={{ min: 0, step: 0.01 }}
               sx={{ mb: 2 }}
-              helperText={`${t("Customers.PointsPerUnit")}: ${settings.pointsPerDollar} ${t("Customers.Points")}`}
+              helperText={`${t("Customers.PointsPerUnit")}: ${settings.enCurrency==="IQD" ? settings.pointsPerIQD : settings.pointsPerDollar} ${t("Customers.Points")}`}
             />
             
             <Divider sx={{ my: 2 }} />
