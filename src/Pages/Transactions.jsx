@@ -223,14 +223,15 @@ const Transactions = () => {
               p: 2, 
               bgcolor: 'background.paper', 
               borderRadius: 1, 
+              mr: 3,
               border: '1px solid',
               borderColor: 'divider'
             }}>
               <h3 style={{ margin: '0 0 10px 0' }}>
-                {t("Transactions.CustomerTransactions")}: {i18n.language === 'ar' ? customerInfo.arName : customerInfo.enName} 
+                {t("Customers.Customer")}: {i18n.language === 'ar' ? customerInfo.arName : customerInfo.enName} 
               </h3>
               <p style={{ margin: 0, color: '#666' }}>
-                {t("Customers.Email")}: {customerInfo.email} | {t("Customers.Points")}: {totalPoints}
+                {t("Customers.Points")}: {totalPoints}
               </p>
             </Box>
           )}

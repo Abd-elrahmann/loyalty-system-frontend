@@ -13,7 +13,6 @@ import {
 } from "../Components/Shared/tableLayout";
 import Spinner from '../utilities/Spinner';
 
-// Lazy load components
 const Box = lazy(() => import('@mui/material/Box'));
 const Stack = lazy(() => import('@mui/material/Stack'));
 const InputBase = lazy(() => import('@mui/material/InputBase'));
@@ -31,7 +30,6 @@ const DeleteModal = lazy(() => import("../Components/Modals/DeleteModal"));
 const AddPointsModal = lazy(() => import("../Components/Modals/AddPointsModal")); 
 const ScanQRModal = lazy(() => import("../Components/Modals/ScanQRModal"));
 
-const LoadingFallback = () => <Spinner />;
 
 const Customers = () => {
   const { t } = useTranslation();
@@ -190,7 +188,6 @@ const Customers = () => {
   };
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
       <Box sx={{ p: 3, mt: 1 }}>
         <Box sx={{ p: 2, mb: 2 }}>
           <Box
@@ -394,7 +391,6 @@ const Customers = () => {
           />
         </TableContainer>
 
-        <Suspense fallback={<LoadingFallback />}>
           {openAddCustomer && (
             <AddCustomer
               open={openAddCustomer}
@@ -436,9 +432,7 @@ const Customers = () => {
               onScanSuccess={handleScanSuccess}
             />
           )}
-        </Suspense>
       </Box>
-    </Suspense>
   );
 };
 

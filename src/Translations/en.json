@@ -133,7 +133,12 @@
         "ImageUploaded": "Image uploaded successfully",
         "QRCode": "QR Code",
         "NoQRCode": "No QR code found",
-        "DownloadQRCode": "Download QR Code"
+        "DownloadQRCode": "Download QR Code",
+        "ImageRemoved": "Image removed successfully",
+        "ImageRemovedFailed": "Failed to remove image",
+        "ChangeImage": "Change Image",
+        "RemoveImage": "Remove Image",
+        "UploadImage": "Upload Image"
     },
     "Customers": {
         "AddCustomer": "Add Customer",
@@ -165,6 +170,7 @@
         "CustomerAdded": "Customer added successfully",
         "Cancel": "Cancel",
         "Admin": "Admin",
+        "User": "User",
         "Customer": "Customer",
         "AddPoints": "Add Points",
         "invalidQRCode": "Invalid QR code",
@@ -354,6 +360,14 @@
   "RejectManyConfirmation": "Are you sure you want to reject selected rewards?",
   "RejectManyRewards": "Reject Selected Rewards",
   "RewardsApproved": "Rewards approved successfully",
-  "RewardsRejected": "Rewards rejected successfully"
+  "RewardsRejected": "Rewards rejected successfully",
+  "Delete": "Delete Rejected Rewards",
+  "Deelete":"Delete",
+  "DeleteRejectedRewards": "Are you sure you want to delete the rejected rewards?",
+  "DeleteRejectedRewardsSuccess": "Rejected rewards deleted successfully",
+  "DeleteRejectedRewardsFailed": "Failed to delete rejected rewards",
+  "DeleteRejectedRewardsNotFound": "Rejected rewards not found",
+  "DeleteRejectedRewardsNotDeleted": "Failed to delete rejected rewards",
+  "DeleteRejectedRewardsNotUpdated": "Failed to update rejected rewards"
 }
 }

@@ -131,7 +131,12 @@
     "Update": "تحديث",
     "QRCode": "كود الاستجابة السريعة",
     "NoQRCode": "لا يوجد كود الاستجابة السريعة",
-    "DownloadQRCode": "تحميل كود الاستجابة السريعة"
+    "DownloadQRCode": "تحميل كود الاستجابة السريعة",
+    "ImageRemoved": "تم حذف الصورة بنجاح",
+    "ImageRemovedFailed": "فشل حذف الصورة",
+    "ChangeImage": "تغيير الصورة",
+    "RemoveImage": "حذف الصورة",
+    "UploadImage": "رفع الصورة"
   },
   "Customers": {
     "AddCustomer": "إضافة عميل",
@@ -156,13 +161,14 @@
     "Delete": "حذف",
     "SearchName": "بحث عن اسم",
     "Role": "الدور",
+    "Admin": "مدير",
+    "User": "عميل",
     "DeleteCustomer": "حذف",
     "DeleteCustomerMessage": "هل أنت متأكد من حذف العميل ؟",
     "CustomerDeleted": "تم حذف العميل بنجاح",
     "CustomerUpdated": "تم تحديث العميل بنجاح",
     "CustomerAdded": "تم إضافة العميل بنجاح",
     "Cancel": "إلغاء",
-    "Admin": "مدير",
     "Customer": "عميل",
     "AddPoints": "إضافة نقاط",
 
@@ -354,6 +360,14 @@
     "RejectManyConfirmation": "هل أنت متأكد من رفض المكافآت المختارة ؟",
     "RejectManyRewards": "رفض المكافآت المختارة",
     "RewardsApproved": "تم الموافقة على المكافآت المختارة بنجاح",
-    "RewardsRejected": "تم رفض المكافآت المختارة بنجاح"
+    "RewardsRejected": "تم رفض المكافآت المختارة بنجاح",
+    "Delete": "حذف المكافآت المرفوضة",
+    "Deelete":"Delete",
+    "DeleteRejectedRewards": "هل أنت متأكد من حذف المكافآت المرفوضة ؟",
+    "DeleteRejectedRewardsSuccess": "تم حذف المكافآت المرفوضة بنجاح",
+    "DeleteRejectedRewardsFailed": "فشل حذف المكافآت المرفوضة",
+    "DeleteRejectedRewardsNotFound": "المكافآت المرفوضة غير موجودة",
+    "DeleteRejectedRewardsNotDeleted": "فشل حذف المكافآت المرفوضة",
+    "DeleteRejectedRewardsNotUpdated": "فشل تحديث المكافآت المرفوضة"
   }
 }

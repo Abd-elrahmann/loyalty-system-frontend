@@ -6,17 +6,24 @@ const DialogActions = React.lazy(() => import('@mui/material/DialogActions'));
 const Button = React.lazy(() => import('@mui/material/Button'));
 const TextField = React.lazy(() => import('@mui/material/TextField'));
 const Box = React.lazy(() => import('@mui/material/Box'));
+const Select = React.lazy(() => import('@mui/material/Select'));
+const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
+const FormControl = React.lazy(() => import('@mui/material/FormControl'));
+const InputLabel = React.lazy(() => import('@mui/material/InputLabel'));
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useFormik } from 'formik';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+const IconButton = React.lazy(() => import('@mui/material/IconButton'));
 
 const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, customer = null }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const isEdit = Boolean(customer);
-
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -98,6 +105,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         email: customer.email || '',
         phone: customer.phone || '',
         points: customer.points || 0,
+        role: customer.role || 'USER',
         password: '',
         confirmPassword: ''
       });
@@ -108,6 +116,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         email: '',
         phone: '',
         points: 0,
+        role: 'USER',
         password: '',
         confirmPassword: ''
       });
@@ -120,7 +129,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
       open={open} 
       onClose={onClose}
       fullWidth
-      maxWidth="sm"
+      maxWidth="xs"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <DialogTitle>
@@ -172,25 +181,50 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
               fullWidth
             />
           )}
+              <FormControl fullWidth>
+                <InputLabel id="role-label">{t('Customers.Role')}</InputLabel>
+              <Select
+                labelId="role-label"
+                value={formik.values.role}
+                onChange={(e) => formik.setValues({...formik.values, role: e.target.value})}
+              >
+                <MenuItem value="ADMIN" sx={{ textAlign: isRTL ? 'right' : 'left' }}>{t('Customers.Admin')}</MenuItem>
+                <MenuItem value="USER" sx={{ textAlign: isRTL ? 'right' : 'left' }}>{t('Customers.User')}</MenuItem>
+              </Select>
+              </FormControl>
           {!isEdit && (
             <>
               <TextField
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 label={t('Customers.Password')}
                 value={formik.values.password}
                 onChange={(e) => formik.setValues({...formik.values, password: e.target.value})}
                 error={!!errors.password}
                 helperText={errors.password}
                 fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <IconButton onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <VisibilityOff sx={{ color: 'primary.main', fontSize: 20 }} /> : <Visibility sx={{ color: 'primary.main', fontSize: 20 }} />}
+                    </IconButton>
+                  )
+                }}
               />
               <TextField
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'} 
                 label={t('Customers.ConfirmPassword')}
                 value={formik.values.confirmPassword}
                 onChange={(e) => formik.setValues({...formik.values, confirmPassword: e.target.value})}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword}
                 fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                      {showConfirmPassword ? <VisibilityOff sx={{ color: 'primary.main', fontSize: 20 }} /> : <Visibility sx={{ color: 'primary.main', fontSize: 20 }} />}
+                    </IconButton>
+                  )
+                }}
               />
             </>
           )}

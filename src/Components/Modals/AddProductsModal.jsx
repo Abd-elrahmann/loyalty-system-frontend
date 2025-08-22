@@ -48,7 +48,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       try {
         const submitData = {
           ...values,
-          image: values.imagePreview || values.imageUrl,
+          image: values.imageUrl || values.imagePreview, // Changed order to prioritize imageUrl
         };
         if (handleUpdateProduct) {
           await handleUpdateProduct(submitData);
@@ -141,7 +141,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
     try {
       const submitData = {
         ...formik.values,
-        image: formik.values.imagePreview || formik.values.imageUrl,
+        image: formik.values.imageUrl || formik.values.imagePreview, // Changed order to prioritize imageUrl
       };
       if (handleUpdateProduct && productToEdit) {
         await handleUpdateProduct(submitData);
@@ -242,7 +242,9 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 </Button>
                 <Button
                   variant={imageUploadType === 'link' ? 'contained' : 'outlined'}
-                  onClick={() => setImageUploadType('link')}
+                  onClick={() => setImageUploadType('link')
+                     
+                  }
                 >
                   {t("Products.ImageUploadTypeLink")}
                 </Button>
@@ -257,6 +259,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                   onChange={(e) => {
                     const url = e.target.value;
                     formik.setFieldValue('imageUrl', url);
+                    formik.setFieldValue('imagePreview', ''); // Clear imagePreview when using URL
                     if (url) {
                       handleImageUrlChange(url);
                     }

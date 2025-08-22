@@ -23,17 +23,17 @@ import {
   StyledTableCell,
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
-import { FaCheck, FaTimes, FaSearch, FaSync } from "react-icons/fa";
+import { FaCheck, FaTimes, FaSearch, FaSync, FaTrash } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import RewardsSearchModal from "../Components/Modals/RewardsSearchModal";
 import Spinner from "../utilities/Spinner";
-import DeleteModal from "../Components/Modals/DeleteModal";
 import * as xlsx from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import { FaQrcode } from "react-icons/fa";
 import { useUser } from "../utilities/user.jsx";
+import DeleteModal from "../Components/Modals/DeleteModal";
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -54,6 +54,9 @@ const Rewards = () => {
   const [openScanModal, setOpenScanModal] = useState(false);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [selectedRewards, setSelectedRewards] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [rewardToDelete, setRewardToDelete] = useState(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const isMobile = useMediaQuery("(max-width: 600px)");
   const profile = useUser();
   const statusMap = {
@@ -163,6 +166,18 @@ const Rewards = () => {
       setIsAllChecked(false);
       setOpenRejectDialog(false);
       setRejectNote("");
+      fetchRewards();
+    } catch (error) {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  };
+
+  const handleDeleteRejectedRewards = async () => {
+    try {
+      await Api.delete(`/api/rewards/delete-rejected`);
+      setOpenDeleteDialog(false);
+      setRewardToDelete(null);
+      notifySuccess(t("Rewards.DeleteRejectedRewardsSuccess"));
       fetchRewards();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
@@ -607,9 +622,14 @@ const Rewards = () => {
                   {t("Rewards.Actions")}
                 </StyledTableCell>
               )}
-              {tabValue === 2 && (
+              {tabValue === 2 && profile.role === "ADMIN" && (
                 <StyledTableCell align="center">
                   {t("Rewards.RejectionNote")}
+                </StyledTableCell>
+              )}
+              {tabValue === 2 && profile.role === "ADMIN" && (
+                <StyledTableCell align="center">
+                  {t("Rewards.Actions")}
                 </StyledTableCell>
               )}
             </TableRow>
@@ -731,6 +751,19 @@ const Rewards = () => {
                       {reward.note || "-"}
                     </StyledTableCell>
                   )}
+                  {tabValue === 2 && profile.role === "ADMIN" && (
+                    <StyledTableCell align="center">
+                      <IconButton
+                        color="error"
+                        onClick={() => {
+                          setRewardToDelete(reward.id);
+                          setOpenDeleteDialog(true);
+                        }}
+                      >
+                        <FaTrash size={20} />
+                      </IconButton>
+                    </StyledTableCell>
+                  )}
                 </StyledTableRow>
               ))
             )}
@@ -796,6 +829,19 @@ const Rewards = () => {
         open={openScanModal}
         onClose={() => setOpenScanModal(false)}
         onScanSuccess={handleScanSuccess}
+      />
+
+      <DeleteModal
+        open={openDeleteDialog}
+        onClose={() => {
+          setOpenDeleteDialog(false);
+          setRewardToDelete(null);
+        }}
+        message={t("Rewards.DeleteRejectedRewards")}
+        title={t("Rewards.Delete")}
+        ButtonText={t("Rewards.Deelete")}
+        onConfirm={handleDeleteRejectedRewards}
+        isLoading={isLoading}
       />
     </Box>
   );

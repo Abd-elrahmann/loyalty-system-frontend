@@ -10,6 +10,8 @@ import React from 'react';
   const TextField = React.lazy(() => import('@mui/material/TextField'));
   const Button = React.lazy(() => import('@mui/material/Button'));
   const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+  const Menu = React.lazy(() => import('@mui/material/Menu'));
+  const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
   import { useMediaQuery } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
@@ -19,10 +21,13 @@ import { useNavigate } from 'react-router-dom';
 import { updateUserProfile } from '../../utilities/user.jsx';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import DownloadIcon from '@mui/icons-material/Download';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageMenuAnchorEl, setImageMenuAnchorEl] = useState(null);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 400px)');
@@ -99,10 +104,28 @@ const Profile = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setProfile(prev => ({...prev, profileImage: response.data.user.profileImage}));
+      const updatedProfile = {...profile, profileImage: response.data.user.profileImage};
+      setProfile(updatedProfile);
+      localStorage.setItem('profile', JSON.stringify(updatedProfile));
+      updateUserProfile();
       notifySuccess(t('Profile.ImageUploaded'));
+      setImageMenuAnchorEl(null);
     } catch (err) {
       notifyError(err.response?.data?.message || 'Error uploading image');
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      await Api.delete('/api/auth/profile/image');
+      const updatedProfile = {...profile, profileImage: null};
+      setProfile(updatedProfile);
+      localStorage.setItem('profile', JSON.stringify(updatedProfile));
+      updateUserProfile();
+      notifySuccess(t('Profile.ImageRemoved'));
+      setImageMenuAnchorEl(null);
+    } catch (err) {
+      notifyError(err.response?.data?.message || 'Error removing image');
     }
   };
 
@@ -114,21 +137,17 @@ const Profile = () => {
         return;
       }
 
-      // Convert base64/URL to blob
       const response = await fetch(qrCode);
       const blob = await response.blob();
 
-      // Create object URL
       const url = window.URL.createObjectURL(blob);
       
-      // Create temporary link and trigger download
       const link = document.createElement('a');
       link.href = url;
       link.download = `qrcode-${profile.email}.png`;
       document.body.appendChild(link);
       link.click();
       
-      // Cleanup
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
@@ -193,23 +212,37 @@ const Profile = () => {
               type="file"
               onChange={handleImageUpload}
             />
-            <label htmlFor="icon-button-file">
-              <IconButton 
-                component="span"
-                sx={{
-                  position: 'absolute',
-                  bottom: -10,
-                  right: -10,
-                  backgroundColor: 'primary.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'primary.dark',
-                  }
-                }}
-              >
-                <PhotoCamera />
-              </IconButton>
-            </label>
+            <IconButton 
+              onClick={(e) => setImageMenuAnchorEl(e.currentTarget)}
+              sx={{
+                position: 'absolute',
+                bottom: -10,
+                right: -10,
+                backgroundColor: 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                }
+              }}
+            >
+              <PhotoCamera />
+            </IconButton>
+            <Menu
+              anchorEl={imageMenuAnchorEl}
+              open={Boolean(imageMenuAnchorEl)}
+              onClose={() => setImageMenuAnchorEl(null)}
+            >
+              <label htmlFor="icon-button-file">
+                <MenuItem component="span">
+                  <ChangeCircleIcon color='primary' sx={{ mr: 1 }} />
+              {profile?.profileImage ? t('Profile.ChangeImage') : t('Profile.UploadImage')}
+                </MenuItem>
+              </label>
+              <MenuItem onClick={handleRemoveImage}>
+                <DeleteIcon color='error' sx={{ mr: 1 }} />
+                {t('Profile.RemoveImage')}
+              </MenuItem>
+            </Menu>
           </Box>
 
           <Typography variant="h5" component="h1" gutterBottom>

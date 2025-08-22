@@ -50,6 +50,18 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
     setProfile(user);
   }, [user]);
 
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedProfile = JSON.parse(localStorage.getItem('profile'));
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'ar' : 'en';
     i18n.changeLanguage(newLang);
