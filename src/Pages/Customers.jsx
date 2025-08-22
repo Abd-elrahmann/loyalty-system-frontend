@@ -12,6 +12,7 @@ import {
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
 import Spinner from '../utilities/Spinner';
+import { Helmet } from 'react-helmet-async';
 
 const Box = lazy(() => import('@mui/material/Box'));
 const Stack = lazy(() => import('@mui/material/Stack'));
@@ -189,6 +190,10 @@ const Customers = () => {
 
   return (
       <Box sx={{ p: 3, mt: 1 }}>
+        <Helmet>
+          <title>{t("Customers.Customers")}</title>
+          <meta name="description" content={t("Customers.CustomersDescription")} />
+        </Helmet>
         <Box sx={{ p: 2, mb: 2 }}>
           <Box
             sx={{

@@ -34,6 +34,7 @@ import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import { FaQrcode } from "react-icons/fa";
 import { useUser } from "../utilities/user.jsx";
 import DeleteModal from "../Components/Modals/DeleteModal";
+import { Helmet } from 'react-helmet-async';
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -414,6 +415,10 @@ const Rewards = () => {
   };
   return (
     <Box sx={{ p: 3 }}>
+      <Helmet>
+        <title>{t("Rewards.Rewards")}</title>
+        <meta name="description" content={t("Rewards.RewardsDescription")} />
+      </Helmet>
       <Box sx={{ 
         borderBottom: 1, 
         borderColor: "divider", 

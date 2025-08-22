@@ -21,6 +21,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
+import { Helmet } from 'react-helmet-async';
 
 const Login = () => {
   const {t} =useTranslation()
@@ -86,6 +87,10 @@ const Login = () => {
 
   return (
     <MainLayout>
+      <Helmet>
+        <title>{t('Login.login')}</title>
+        <meta name="description" content={t('Login.loginDescription')} />
+      </Helmet>
       <Container component="main" maxWidth= "sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 8}}>
         <Box component="form" onSubmit={formik.handleSubmit}>

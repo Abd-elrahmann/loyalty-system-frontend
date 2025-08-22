@@ -21,6 +21,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PersonIcon from '@mui/icons-material/Person';
+import { Helmet } from 'react-helmet-async';
 const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
 
 const Register = () => {
@@ -110,6 +111,10 @@ const Register = () => {
 
   return (
     <MainLayout>
+      <Helmet>
+        <title>{t('Register.register')}</title>
+        <meta name="description" content={t('Register.registerDescription')} />
+      </Helmet>
       <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: isMobile ? '90vw' : '100%' }}>
       <Paper 
         elevation={3} 

@@ -1,14 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./src/assets/images/logo.webp" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="./src/assets/images/logo.webp"
+    />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Loyalty System</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-   
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-PFQG6VN2JR"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-PFQG6VN2JR");
+      window.gtag("event", "signup", {
+        method: "email",
+      });
+      window.gtag("event", "login", {
+        method: "email",
+      });
+      window.gtag("event", "logout", {
+        method: "email",
+      });
+    </script>
   </body>
 </html>

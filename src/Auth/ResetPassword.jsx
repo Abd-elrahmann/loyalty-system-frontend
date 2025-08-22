@@ -17,6 +17,7 @@ import MainLayout from '../Components/Shared/MainLayout';
 import Spinner from '../utilities/Spinner';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { Helmet } from 'react-helmet-async';
 
 const ResetPassword = () => {
     const {t} =useTranslation()
@@ -72,6 +73,10 @@ const ResetPassword = () => {
 
     return (
         <MainLayout>
+            <Helmet>
+                <title>{t('ResetPassword.resetPassword')}</title>
+                <meta name="description" content={t('ResetPassword.resetPasswordDescription')} />
+            </Helmet>
             <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
                     <Box component="form" onSubmit={formik.handleSubmit}>

@@ -15,6 +15,7 @@ import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
 import Dashboard from './Pages/Dashboard';
+import AnalyticsTracker from './utilities/AnalyticsTracker.jsx';
 
 const ToastContainer = React.lazy(() =>
   import('react-toastify').then(m => ({ default: m.ToastContainer }))
@@ -28,6 +29,7 @@ const Settings = React.lazy(() => import('./Pages/Settings'));
 const Rewards = React.lazy(() => import('./Pages/Rewards'));
 const Layout = React.lazy(() => import('./Layout'));
 import MainRoutes from './Config/routes';
+
 
 const routeComponents = {
   '/dashboard': Dashboard,
@@ -62,6 +64,7 @@ const PublicRoute = ({ children }) => {
 function App() {
   const { i18n } = useTranslation();
 
+
   useEffect(() => {
     document.dir = i18n.dir();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,6 +88,7 @@ function App() {
         <Layout >
       <CacheProvider value={cacheRtl}>
       <BrowserRouter> 
+      <AnalyticsTracker />
           <Routes>
             <Route path="/" element={
               <Navigate to={localStorage.getItem('token') ? "/dashboard" : "/login"} replace />

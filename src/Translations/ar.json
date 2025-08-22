@@ -6,53 +6,15 @@
     "Logout": "تسجيل الخروج",
     "Welcome": "مرحبا"
    },
-   "DefaultLayout": {
-    "HowItWorks": "كيف يعمل",
-    "PowerfulFeatures": "ميزات قوية",
-    "TransformYourBusiness": "تحويل شركتك باستخدام نظام النقاط والولاء",
-    "ElevateYourCustomerExperience": "رفع تجربة العميل باستخدام نظام النقاط والولاء",
-    "StartFreeTrial": "ابدأ التجربة المجانية",
-    "LearnMore": "اعرف المزيد",
-    "Smart":"نظام نقاط ذكي",
-    "Loyalty":"ولاء",
-    "Points":"نقاط",
-    "Rewards":"مكافآت",
-    "Insights":"الرؤى",
-    "Auto":"حساب نقاط وتتبع لكل عملية شراء للعميل.",
-    "Customizable":"قواعد وخيارات تخصيصية للنقاط والمكافآت.",
-    "Details":"تحليلات وتقارير مفصلة لتحسين برنامج الولاء.",
-    "Start":"ابدأ في دقائق مع منصتنا السهلة الاستخدام",
-    "Step":"الخطوة",
-    "Purchase":"الشراء",
-    "ScanQRCode":"التحميل من الكود الاساسي",
-    "PointsCredited":"تم اضافة النقاط",
-    "TrackPoints":"تتبع النقاط من خلال التطبيق",
-    "RedeemRewards":"استرجاع المكافآت",
-    "ReadyToGetStarted":"هل أنت مستعد لتحويل شركتك؟",
-    "Join":"انضم إلى آلاف الشركات التي تنمو باستخدام منصة الولاء الخاصة بنا",
-    "ContactUs":"تواصل معنا"
-   },
-   "Footer": {
-    "AboutUs": "عن الشركة",
-    "ContactUs": "تواصل معنا",
-    "PrivacyPolicy": "سياسة الخصوصية",
-    "TermsOfService": "الشروط والأحكام",
-    "Copyright": "حقوق النشر © 2025 نظام نقاط الولاء. جميع الحقوق محفوظة.",
-    "QuickLinks": "روابط سريعة",
-    "Home": "الرئيسية",
-    "Login": "تسجيل الدخول",
-    "SignUp": "إنشاء حساب",
-    "Contact": "اتصل بنا",
-    "FollowUs": "تابعنا",
-    "Email": "البريد الإلكتروني"
-  },
+  
   "Login": {
     "login": "تسجيل الدخول",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "forgotPassword": "هل نسيت كلمة المرور؟",
     "dontHaveAccount": "ليس لديك حساب؟",
-    "signUp": "إنشاء حساب"
+    "signUp": "إنشاء حساب",
+    "loginDescription": "تسجيل الدخول إلى نظام النقاط والولاء الخاص بك"
   },
   "Register": {
     "createNewAccount": "إنشاء حساب جديد",
@@ -64,13 +26,15 @@
     "confirmPassword": "تأكيد كلمة المرور",
     "alreadyHaveAccount": "لديك حساب؟",
     "signUp": "إنشاء حساب",
-    "login": "تسجيل الدخول" 
+    "login": "تسجيل الدخول",
+    "registerDescription": "إنشاء حساب جديد في نظام النقاط والولاء الخاص بك"
   },
   "ForgetPassword": {
     "enterEmail": "أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور.",
     "email": "البريد الإلكتروني",
     "sendResetLink": "إرسال رابط إعادة التعيين",
-    "backToLogin": "العودة إلى تسجيل الدخول"
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "forgetPasswordDescription": "إرسال رابط إعادة التعيين لكلمة المرور"
   },
   "ResetPassword": {
     "title": "إعادة تعيين كلمة المرور",
@@ -79,9 +43,11 @@
     "resetPassword": "إعادة تعيين كلمة المرور",
     "missMatchPassword": "كلمة المرور وتأكيد كلمة المرور لا تطابق بعضهما البعض",
     "passwordRequired": "كلمة المرور مطلوبة",
-    "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب"
+    "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
+    "resetPasswordDescription": "إعادة تعيين كلمة المرور"
   },
   "Dashboard": {
+    "Dashboard": "لوحة التحكم",
     "TotalCustomers": "عدد العملاء",
     "CustomersCount": "عدد العملاء",
     "TotalPoints": "النقاط الكلية",
@@ -110,7 +76,8 @@
     "year": "سنة",
     "ExportToPDF": "تصدير إلى PDF",
     "DashboardReport": "تقرير النظام",
-    "Unauthorized": "ليس لديك صلاحية للدخول إلى هذه الصفحة"
+    "Unauthorized": "ليس لديك صلاحية للدخول إلى هذه الصفحة",
+    "DashboardDescription": "نظام متكامل لإدارة نقاط الولاء للمطاعم والمقاهي يتيح لك متابعة نشاط العملاء، تحليل المبيعات، إدارة المكافآت، وتتبع استخدام النقاط في الوقت الفعلي. مع تقارير تفصيلية عن أداء برنامج الولاء وسلوك العملاء لتعزيز نمو أعمالك"
   },
   "Profile": {
     "Title": "الملف الشخصي",
@@ -136,9 +103,12 @@
     "ImageRemovedFailed": "فشل حذف الصورة",
     "ChangeImage": "تغيير الصورة",
     "RemoveImage": "حذف الصورة",
-    "UploadImage": "رفع الصورة"
+    "UploadImage": "رفع الصورة",
+    "ProfileDescription": "الملف الشخصي للعميل"
   },
   "Customers": {
+    "Customers": "العملاء",
+    "CustomersDescription": "إدارة العملاء ونقاطهم",
     "AddCustomer": "إضافة عميل",
     "EditCustomer": "تعديل العميل",
     "NoCustomers": "لا يوجد عملاء",
@@ -205,6 +175,7 @@
     "GoToSettings": "الذهاب إلى الإعدادات"
   },
   "Products": {
+    "Products": "المنتجات",
     "Cafe": "المقهى",
     "Restaurant": "المطعم",
     "AddCafeProduct": "إضافة منتج للمقهى",
@@ -253,9 +224,11 @@
     "InvalidImageUrl": "رابط الصورة غير صالح. يرجى توفير رابط مباشر لملف الصورة.",
     "ImageNotAccessible": "لا يمكن الوصول إلى الصورة. يرجى تجربة رابط آخر.",
     "GoogleImagesNotSupported": "صور Google المصغرة غير مدعومة. يرجى استخدام رابط الصورة الأصلي.",
-    "ImageLoadError": "فشل تحميل الصورة"
+    "ImageLoadError": "فشل تحميل الصورة",
+    "ProductsDescription": "إدارة المنتجات في المقهى والمطعم"
   },
   "Transactions": {
+    "Transactions": "المعاملات",
     "Search": "بحث",
     "ExportCSV": "تصدير CSV",
     "ExportPDF": "تصدير PDF",
@@ -291,10 +264,12 @@
     "Currency": "العملة",
     "TransactionUpdated": "تم تحديث التحويل بنجاح",
     "TransactionNotAdded": "فشل إضافة التحويل",
-    "TransactionAdded": "تم إضافة التحويل بنجاح"
+    "TransactionAdded": "تم إضافة التحويل بنجاح",
+    "TransactionsDescription": "إدارة المعاملات في المقهى والمطعم"
 
   },
   "Settings": {
+    "Settings": "الإعدادات",
     "CurrencySettings": "إعدادات العملة",
     "TimezoneSettings": "إعدادات التوقيت",
     "PointsSettings": "إعدادات النقاط",
@@ -309,9 +284,11 @@
     "EnterPointsPer": "أدخل كم نقطة لكل 1",
     "SettingsSavedSuccessfully": "تم حفظ الإعدادات بنجاح",
     "Saving": "جاري حفظ الإعدادات...",
-    "ChooseCurrency": "اختر العملة"
+    "ChooseCurrency": "اختر العملة",
+    "SettingsDescription": "إعدادات النظام"
   },
   "Rewards": {
+    "Rewards": "المكافآت",
     "Pending": "قيد الانتظار",
     "Approved": "موافق عليه",
     "Rejected": "مرفوض",
@@ -368,6 +345,7 @@
     "DeleteRejectedRewardsFailed": "فشل حذف المكافآت المرفوضة",
     "DeleteRejectedRewardsNotFound": "المكافآت المرفوضة غير موجودة",
     "DeleteRejectedRewardsNotDeleted": "فشل حذف المكافآت المرفوضة",
-    "DeleteRejectedRewardsNotUpdated": "فشل تحديث المكافآت المرفوضة"
+    "DeleteRejectedRewardsNotUpdated": "فشل تحديث المكافآت المرفوضة",
+    "RewardsDescription": "إدارة المكافآت في المقهى والمطعم"
   }
 }

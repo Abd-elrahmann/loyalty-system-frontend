@@ -11,6 +11,7 @@ import {
   CompareArrows as CompareIcon,
 } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
+import { Helmet } from 'react-helmet-async';
 
 const DashboardCharts = lazy(() => import('../Components/Dashboard/DashboardCharts'));
 
@@ -110,6 +111,10 @@ const Dashboard = () => {
       </Box>
     ) : (
     <Box sx={{ p: 3 }}>
+      <Helmet>
+        <title>{t('Dashboard.Dashboard')}</title>
+        <meta name="description" content={t('Dashboard.DashboardDescription')} />
+      </Helmet>
       <Stack spacing={3}>
         {/* Filters */}
         <Stack 

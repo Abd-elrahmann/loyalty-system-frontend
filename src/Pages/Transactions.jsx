@@ -30,6 +30,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
 import { useUser } from '../utilities/user';
+import { Helmet } from 'react-helmet-async';
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -207,6 +208,10 @@ const Transactions = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      <Helmet>
+        <title>{t("Transactions.Transactions")}</title>
+        <meta name="description" content={t("Transactions.TransactionsDescription")} />
+      </Helmet>
       {/* Back button and customer info for customer-specific view */}
       {customerId && (
         <Box sx={{ mb: 3 , display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

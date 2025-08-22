@@ -14,6 +14,7 @@ import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
 import { useUser } from '../utilities/user';
+import { Helmet } from 'react-helmet-async';
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
@@ -117,6 +118,10 @@ const Settings = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 4, mt: 6 }}>
+      <Helmet>
+        <title>{t('Settings.Settings')}</title>
+        <meta name="description" content={t('Settings.SettingsDescription')} />
+      </Helmet>
       {user.role === 'ADMIN' && (
         <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
           <Typography variant="subtitle1" gutterBottom>

@@ -26,6 +26,7 @@ import DeleteModal from '../Components/Modals/DeleteModal';
 import { useMediaQuery } from '@mui/material';
 import Swal from 'sweetalert2';
 import { useUser } from '../utilities/user';
+import { Helmet } from 'react-helmet-async';
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
@@ -177,6 +178,10 @@ const Products = () => {
 
   return (
       <Box sx={{ p: isMobile ? 1 : 3,mt:isMobile ? 6 : 0 }}>
+        <Helmet>
+          <title>{t('Products.Products')}</title>
+          <meta name="description" content={t('Products.ProductsDescription')} />
+        </Helmet>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary" sx={{
           '& .MuiTabs-flexContainer': {

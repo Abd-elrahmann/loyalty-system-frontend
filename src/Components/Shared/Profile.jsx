@@ -23,6 +23,7 @@ import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import { Helmet } from 'react-helmet-async';
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -183,6 +184,10 @@ const Profile = () => {
         py: 4
       }}
     >
+      <Helmet>
+        <title>{t('Profile.Title')}</title>
+        <meta name="description" content={t('Profile.ProfileDescription')} />
+      </Helmet>
       <Paper 
         elevation={3} 
         sx={{ 
