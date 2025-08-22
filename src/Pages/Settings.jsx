@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-const Box = React.lazy(() => import('@mui/material/Box'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Paper = React.lazy(() => import('@mui/material/Paper'));
-const Divider = React.lazy(() => import('@mui/material/Divider'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
-const Container = React.lazy(() => import('@mui/material/Container'));
-const Autocomplete = React.lazy(() => import('@mui/material/Autocomplete'));
-
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
+import Container from '@mui/material/Container';
+import Autocomplete from '@mui/material/Autocomplete';
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
 import { useUser } from '../utilities/user';
+import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 
 const Settings = () => {
-  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -29,7 +27,7 @@ const Settings = () => {
   });
   const user = useUser();
   const timezones = moment.tz.names();
-
+  const { t, i18n } = useTranslation();
   const currencies = [
     { enValue: 'IQD', arValue: 'الدينار العراقي' },
     { enValue: 'USD', arValue: 'الدولار الأمريكي' }
@@ -117,11 +115,12 @@ const Settings = () => {
   }
 
   return (
+    <>
+    <Helmet>
+      <title>{t('Settings.Settings')}</title>
+      <meta name="description" content={t('Settings.SettingsDescription')} />
+    </Helmet>
     <Container maxWidth="sm" sx={{ py: 4, mt: 6 }}>
-      <Helmet>
-        <title>{t('Settings.Settings')}</title>
-        <meta name="description" content={t('Settings.SettingsDescription')} />
-      </Helmet>
       {user.role === 'ADMIN' && (
         <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
           <Typography variant="subtitle1" gutterBottom>
@@ -207,6 +206,7 @@ const Settings = () => {
         </Button>
       </Box>
     </Container>
+    </>
   );
 };
 

@@ -15,7 +15,7 @@ import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
 import Dashboard from './Pages/Dashboard';
-import AnalyticsTracker from './utilities/AnalyticsTracker.jsx';
+
 
 const ToastContainer = React.lazy(() =>
   import('react-toastify').then(m => ({ default: m.ToastContainer }))
@@ -42,7 +42,7 @@ const routeComponents = {
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
 
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -53,7 +53,7 @@ const ProtectedRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
-  
+
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -88,7 +88,7 @@ function App() {
         <Layout >
       <CacheProvider value={cacheRtl}>
       <BrowserRouter> 
-      <AnalyticsTracker />
+
           <Routes>
             <Route path="/" element={
               <Navigate to={localStorage.getItem('token') ? "/dashboard" : "/login"} replace />
