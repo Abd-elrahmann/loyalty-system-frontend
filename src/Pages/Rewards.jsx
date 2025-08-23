@@ -95,7 +95,7 @@ const Rewards = () => {
   const FetchProfile = async () => {
     const profileResponse = await Api.get('/api/auth/profile');
     localStorage.setItem('profile', JSON.stringify(profileResponse.data));
-    updateUserProfile();
+    updateUserProfile(profileResponse.data);
   };
 
   useEffect(() => {
@@ -183,7 +183,7 @@ const Rewards = () => {
       fetchRewards();
       FetchProfile();
     } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
+        notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
   };
 
@@ -211,7 +211,7 @@ const Rewards = () => {
       fetchRewards();
       FetchProfile();
     } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
+        notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
   };
 
@@ -244,12 +244,9 @@ const Rewards = () => {
     try {
       const exportData = filteredRewards.map((reward) => ({
         ID: reward.id,
-        "Customer English Name": reward.user?.enName || "",
-        "Customer Arabic Name": reward.user?.arName || "",
-        "Product English Name":
-          reward.cafeProduct?.enName || reward.restaurantProduct?.enName || "",
-        "Product Arabic Name":
-          reward.cafeProduct?.arName || reward.restaurantProduct?.arName || "",
+        "Customer Name": i18n.language === "ar" ? reward.user?.arName : reward.user?.enName,
+        "Product Name":
+          i18n.language === "ar" ? reward.cafeProduct?.arName || reward.restaurantProduct?.arName : reward.cafeProduct?.enName || reward.restaurantProduct?.enName || "",
         Points: reward.points,
         Type: reward.type,
         Status: reward.status,
@@ -284,7 +281,7 @@ const Rewards = () => {
 
       doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
       doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
-
+      doc.setFont("Amiri");
       doc.setFontSize(16);
       doc.text(
         `${
@@ -327,14 +324,12 @@ const Rewards = () => {
         headStyles: { fillColor: [128, 0, 128] },
         columnStyles: {
           1: {
-            // Customer Name column
             font: "Amiri",
             fontStyle: "bold",
             halign: i18n.language === "ar" ? "right" : "left",
             cellWidth: 40,
           },
           2: {
-            // Product Name column
             font: "Amiri",
             fontStyle: "bold",
             halign: i18n.language === "ar" ? "right" : "left",

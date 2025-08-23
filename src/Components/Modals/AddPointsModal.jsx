@@ -20,11 +20,22 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
   useEffect(() => {
     if (open) {
       fetchSettings();
+      fetchProfile();
     }
   }, [open]);
 
 
-
+ const fetchProfile = async () => {
+  try {
+    const response = await Api.get('/api/auth/profile');
+    if (response.data) {
+      localStorage.setItem('profile', JSON.stringify(response.data));
+      updateUserProfile();
+    }
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+  }
+ };
 
   const fetchSettings = async () => {
     try {
@@ -67,14 +78,11 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
         currency: settings.enCurrency,
         price: price ? Number(price) : null
       });
-
-      // Fetch updated profile to reflect new points
-      const profileResponse = await Api.get('/api/auth/profile');
-      localStorage.setItem('profile', JSON.stringify(profileResponse.data));
-      updateUserProfile();
+      await fetchProfile();
       
       notifySuccess(`${points} ${t("Customers.pointsAdded")}`);
       await fetchCustomers();
+
       handleClose();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));

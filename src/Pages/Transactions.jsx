@@ -111,12 +111,19 @@ const Transactions = () => {
     }
   };
 
+  const getArabicName = (transaction) => {
+
+    if (i18n.language === "ar") {
+      return String(transaction.user.arName).normalize("NFC");
+    }
+    return transaction.user.enName;
+  };
+
   const exportToCSV = () => {
     try {
       const exportData = transactions.map(transaction => ({
         ID: transaction.id,
-        'English Name': transaction.user.enName,
-        'Arabic Name': transaction.user.arName,
+        'Name': getArabicName(transaction),
         Points: transaction.points,
         Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
         Type: transaction.type,
@@ -139,26 +146,37 @@ const Transactions = () => {
       
       doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
       doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
-      
+      doc.setFont("Amiri");
       doc.setFontSize(16);
       doc.text('Transactions Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
       
       const columns = [
         'ID',
-        'English Name', 
-        'Arabic Name',
+        i18n.language === 'ar' ? 'Arabic Name' : 'English Name', 
         'Points',
         'Currency',
         'Type',
         'Date'
       ];
+
+      const getCurrency = (transaction) => {
+        if (i18n.language === "ar") {
+          return String(transaction.currency.arCurrency).normalize("NFC");
+        }
+        return transaction.currency.enCurrency;
+      };
+      const getArabicName = (transaction) => {
+        if (i18n.language === "ar") {
+          return String(transaction.user.arName).normalize("NFC");
+        }
+        return transaction.user.enName;
+      };
       
       const rows = transactions.map(transaction => [
         transaction.id,
-        transaction.user.enName,
-        transaction.user.arName,
+        getArabicName(transaction),
         transaction.points,
-        i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+        getCurrency(transaction),
         transaction.type,
         transaction.formattedDate
       ]);
@@ -169,18 +187,27 @@ const Transactions = () => {
         body: rows,
         theme: 'grid',
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [128, 0, 128] }, // Changed to #800080 (RGB: 128,0,128)
+        headStyles: { fillColor: [128, 0, 128] }, 
         columnStyles: {
-          2: { 
+          1: { 
             font: "Amiri",
             fontStyle: "bold",
-            halign: 'right',
-            cellWidth: 40,
+            halign: 'center',
+            cellWidth: 30,
+            direction: 'rtl'
+            
+          },
+          3: {
+            font: "Amiri",
+            fontStyle: "bold",
+            halign: 'center',
+            cellWidth: 30,
             direction: 'rtl'
           }
+
         },
         didDrawCell: function(data) {
-          if (data.column.index === 2 && data.cell.section === 'body') {
+          if (data.column.index === 3 && data.cell.section === 'body') {
             const text = data.cell.text[0];
             if (text && /[\u0600-\u06FF]/.test(text)) {
               data.cell.text = [text];
@@ -345,7 +372,7 @@ const Transactions = () => {
                     {transaction.id}
                   </StyledTableCell>
                   <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    {i18n.language === 'ar' ? transaction.user?.arName : transaction.user?.enName || '-'}
+                    {i18n.language === 'ar' ? transaction.user?.arName : transaction.user?.enName}
                   </StyledTableCell>
                   <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.points}

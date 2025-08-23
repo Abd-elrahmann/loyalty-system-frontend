@@ -122,15 +122,21 @@ const Customers = () => {
       
       doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
       doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
-      
+      doc.setFont("Amiri");
       doc.setFontSize(16);
       doc.text('Customers Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
-      
-      const columns = ['ID', 'English Name', 'Arabic Name', 'Role', 'Email', 'Phone', 'Points', 'Created At'];
+
+      const getArabicName = (customer) => {
+        if (i18n.language === "ar") {
+          return String(customer.arName).normalize("NFC");
+        }
+        return customer.enName;
+      };
+
+      const columns = ['ID', i18n.language === 'ar' ? 'Arabic Name' : 'English Name', 'Role', 'Email', 'Phone', 'Points', 'Created At'];
       const rows = customers.map(customer => [
         customer.id,
-        customer.enName,
-        customer.arName,
+        getArabicName(customer),
         customer.role,
         customer.email,
         customer.phone,
@@ -152,7 +158,7 @@ const Customers = () => {
           fontSize: 8
         },
         columnStyles: {
-          2: {
+          1: {
             font: "Amiri",
             fontStyle: "bold",
             halign: 'right',
@@ -173,17 +179,28 @@ const Customers = () => {
   const exportToCSV = async () => {
     try {
       const xlsxModule = await import('xlsx');
-      const fields = ['id', 'enName', 'arName', 'role', 'email', 'phone', 'points', 'createdAt'];
-      const csv = xlsxModule.utils.json_to_sheet(customers, { header: fields });
+  
+      const rows = customers.map(customer => ({
+        ID: customer.id,
+        [i18n.language === 'ar' ? 'الاسم' : 'Name']: 
+          i18n.language === 'ar' ? customer.arName : customer.enName,
+        Role: customer.role,
+        Email: customer.email,
+        Phone: customer.phone,
+        Points: customer.points,
+        "Created At": customer.createdAt
+      }));
+  
+      const worksheet = xlsxModule.utils.json_to_sheet(rows);
       const workbook = xlsxModule.utils.book_new();
-      xlsxModule.utils.book_append_sheet(workbook, csv, 'Customers');
+      xlsxModule.utils.book_append_sheet(workbook, worksheet, 'Customers');
       xlsxModule.writeFile(workbook, 'customers_report.xlsx');
     } catch (error) {
       console.error(error);
       notifyError(t("Errors.generalError"));
     }
   };
-
+  
 
 
   return (
