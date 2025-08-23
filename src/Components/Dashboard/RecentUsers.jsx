@@ -14,10 +14,16 @@ import {
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+
 const RecentUsers = ({ users = [] }) => {
   const theme = useTheme();
-  const { i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const { t, i18n } = useTranslation();
+
+  const formatDate = (date) => {
+    return format(new Date(date), 'PPP p', {
+      locale: i18n.language === 'ar' ? ar : enUS
+    });
+  };
 
   return (
     <Paper
@@ -30,15 +36,15 @@ const RecentUsers = ({ users = [] }) => {
       }}
     >
       <Typography variant="h6" sx={{ mb: 3 }}>
-        {isRTL ? 'أحدث المستخدمين' : 'Recent Users'}
+        {t('Dashboard.RecentUsers')}
       </Typography>
 
-      <Table>
+      <Table sx={{ minWidth: 650, width: '100%' }}>
         <TableHead>
           <TableRow>
-            <TableCell>{isRTL ? 'المستخدم' : 'User'}</TableCell>
-            <TableCell>{isRTL ? 'النقاط' : 'Points'}</TableCell>
-            <TableCell align="right">{isRTL ? 'تاريخ التسجيل' : 'Join Date'}</TableCell>
+            <TableCell>{t('Dashboard.User')}</TableCell>
+            <TableCell>{t('Dashboard.Points')}</TableCell>
+            <TableCell align="right">{t('Dashboard.JoinDate')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -54,11 +60,11 @@ const RecentUsers = ({ users = [] }) => {
                       bgcolor: theme.palette.primary.main
                     }}
                   >
-                    {user[isRTL ? 'arName' : 'enName']?.charAt(0)}
+                    {user[i18n.language === 'ar' ? 'arName' : 'enName']?.charAt(0)}
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle2">
-                      {user[isRTL ? 'arName' : 'enName']}
+                      {user[i18n.language === 'ar' ? 'arName' : 'enName']}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {user.email}
@@ -78,9 +84,7 @@ const RecentUsers = ({ users = [] }) => {
               </TableCell>
               <TableCell align="right">
                 <Typography variant="caption" color="text.secondary">
-                  {format(new Date(user.createdAt), 'PPP', {
-                    locale: isRTL ? ar : enUS
-                  })}
+                  {formatDate(user.createdAt)}
                 </Typography>
               </TableCell>
             </TableRow>

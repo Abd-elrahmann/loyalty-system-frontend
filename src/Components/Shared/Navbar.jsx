@@ -1,13 +1,5 @@
 import React from 'react';
-const AppBar = React.lazy(() => import('@mui/material/AppBar'));
-const Toolbar = React.lazy(() => import('@mui/material/Toolbar'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Box = React.lazy(() => import('@mui/material/Box'));
-const IconButton = React.lazy(() => import('@mui/material/IconButton'));
-const Menu = React.lazy(() => import('@mui/material/Menu'));
-const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
-const Avatar = React.lazy(() => import('@mui/material/Avatar'));
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar } from '@mui/material';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';

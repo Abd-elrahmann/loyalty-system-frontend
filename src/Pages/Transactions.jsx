@@ -3,17 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import dayjs from 'dayjs';
-const Box = React.lazy(() => import('@mui/material/Box'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Stack = React.lazy(() => import('@mui/material/Stack'));
-const IconButton = React.lazy(() => import('@mui/material/IconButton'));
-const Table = React.lazy(() => import('@mui/material/Table'));
-const TableBody = React.lazy(() => import('@mui/material/TableBody'));
-const TableContainer = React.lazy(() => import('@mui/material/TableContainer'));
-const TableHead = React.lazy(() => import('@mui/material/TableHead'));
-const TableRow = React.lazy(() => import('@mui/material/TableRow'));
-const TablePagination = React.lazy(() => import('@mui/material/TablePagination'));
-const Paper = React.lazy(() => import('@mui/material/Paper'));
+import { Box, Button, Stack, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper } from '@mui/material';
 
 import {
   StyledTableCell,

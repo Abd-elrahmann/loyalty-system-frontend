@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-const Box = React.lazy(() => import('@mui/material/Box'));
-import { useTheme, useMediaQuery } from '@mui/material';
+import { Box, useTheme, useMediaQuery } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useTranslation } from 'react-i18next';

@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-const Dialog = React.lazy(() => import('@mui/material/Dialog'));
-const DialogTitle = React.lazy(() => import('@mui/material/DialogTitle'));
-const DialogContent = React.lazy(() => import('@mui/material/DialogContent'));
-const DialogActions = React.lazy(() => import('@mui/material/DialogActions'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const Divider = React.lazy(() => import('@mui/material/Divider'));
-const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
-const Box = React.lazy(() => import('@mui/material/Box'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Link = React.lazy(() => import('@mui/material/Link'));
+import { Box, Button, TextField, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Link } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";

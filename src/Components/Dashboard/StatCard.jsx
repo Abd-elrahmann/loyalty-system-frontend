@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Paper, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ icon: Icon, title, value, trend, color = 'primary' }) => {
   const theme = useTheme();
 

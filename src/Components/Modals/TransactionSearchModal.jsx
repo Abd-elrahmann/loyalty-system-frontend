@@ -1,12 +1,5 @@
 import React from "react";
-const Modal = React.lazy(() => import('@mui/material/Modal'));
-const Box = React.lazy(() => import('@mui/material/Box'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Stack = React.lazy(() => import('@mui/material/Stack'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
-const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
+import { Box, Button, Stack, TextField, Typography, MenuItem, CircularProgress, Modal } from '@mui/material';
 import { DatePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
 const TransactionSearchModal = ({ open, onClose, onSearch }) => {

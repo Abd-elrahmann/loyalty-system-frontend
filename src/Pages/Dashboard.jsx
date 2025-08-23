@@ -166,7 +166,7 @@ const Dashboard = () => {
               color="primary" 
               onClick={exportToPDF} 
               sx={{ 
-                width: { xs: '100%', sm: '200px' },
+                width: { xs: '180px', sm: '200px' },
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center' 

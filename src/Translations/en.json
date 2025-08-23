@@ -79,7 +79,10 @@
     "ExportToPDF": "Export to PDF",
     "DashboardReport": "Dashboard Report",
     "Unauthorized": "You are not authorized to access this page",
-    "DashboardDescription": "A comprehensive loyalty system for cafes and restaurants that allows you to track customer activity, analyze sales, manage rewards, and track point usage in real-time. With detailed reports on loyalty program performance and customer behavior to drive your business growth"
+    "DashboardDescription": "A comprehensive loyalty system for cafes and restaurants that allows you to track customer activity, analyze sales, manage rewards, and track point usage in real-time. With detailed reports on loyalty program performance and customer behavior to drive your business growth",
+    "RecentUsers": "Recent Users",
+    "User": "User",
+    "JoinDate": "Join Date"
   },
   "Profile": {
     "Title": "Profile",

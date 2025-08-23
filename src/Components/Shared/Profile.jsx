@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
-  const Box = React.lazy(() => import('@mui/material/Box'));
-  const Typography = React.lazy(() => import('@mui/material/Typography'));
-  const Paper = React.lazy(() => import('@mui/material/Paper'));
-  const Container = React.lazy(() => import('@mui/material/Container'));
-  const Avatar = React.lazy(() => import('@mui/material/Avatar'));
-  const CircularProgress = React.lazy(() => import('@mui/material/CircularProgress'));
-  const Grid = React.lazy(() => import('@mui/material/Grid'));
-  const TextField = React.lazy(() => import('@mui/material/TextField'));
-  const Button = React.lazy(() => import('@mui/material/Button'));
-  const IconButton = React.lazy(() => import('@mui/material/IconButton'));
-  const Menu = React.lazy(() => import('@mui/material/Menu'));
-  const MenuItem = React.lazy(() => import('@mui/material/MenuItem'));
+import { Box, Typography, Paper, Container, Avatar, CircularProgress, Grid, TextField, Button, IconButton, Menu, MenuItem } from '@mui/material';
   import { useMediaQuery } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';

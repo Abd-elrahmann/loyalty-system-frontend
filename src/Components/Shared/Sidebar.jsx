@@ -1,11 +1,5 @@
 import React, { useLayoutEffect, useMemo } from 'react';
-const Drawer = React.lazy(() => import('@mui/material/Drawer'));
-const List = React.lazy(() => import('@mui/material/List'));
-const ListItem = React.lazy(() => import('@mui/material/ListItem'));
-const ListItemIcon = React.lazy(() => import('@mui/material/ListItemIcon'));
-const ListItemText = React.lazy(() => import('@mui/material/ListItemText'));
-const Box = React.lazy(() => import('@mui/material/Box'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material';
 import { useMediaQuery, Button } from '@mui/material';
 import { Support as SupportIcon } from '@mui/icons-material';

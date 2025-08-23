@@ -1,6 +1,5 @@
 import React from 'react';
-const Paper = React.lazy(() => import('@mui/material/Paper'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
+import { Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material';
 import {
   AreaChart,

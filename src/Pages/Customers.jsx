@@ -13,19 +13,7 @@ import {
 } from "../Components/Shared/tableLayout";
 import Spinner from '../utilities/Spinner';
 import { Helmet } from 'react-helmet-async';
-
-const Box = lazy(() => import('@mui/material/Box'));
-const Stack = lazy(() => import('@mui/material/Stack'));
-const InputBase = lazy(() => import('@mui/material/InputBase'));
-const IconButton = lazy(() => import('@mui/material/IconButton'));
-const Table = lazy(() => import('@mui/material/Table'));
-const TableBody = lazy(() => import('@mui/material/TableBody'));
-const TableContainer = lazy(() => import('@mui/material/TableContainer'));
-const TableHead = lazy(() => import('@mui/material/TableHead'));
-const TableRow = lazy(() => import('@mui/material/TableRow'));
-const TablePagination = lazy(() => import('@mui/material/TablePagination'));
-const Paper = lazy(() => import('@mui/material/Paper'));
-const Button = lazy(() => import('@mui/material/Button'));
+import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button } from '@mui/material';
 const AddCustomer = lazy(() => import("../Components/Modals/AddCustomer"));
 const DeleteModal = lazy(() => import("../Components/Modals/DeleteModal"));
 const AddPointsModal = lazy(() => import("../Components/Modals/AddPointsModal")); 

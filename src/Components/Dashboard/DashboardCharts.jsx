@@ -47,18 +47,17 @@ const DistributionChart = memo(({ data }) => (
         data={data}
         cx="50%"
         cy="50%"
-        labelLine={false}
-        outerRadius={150}
-        fill="#800080"
+        innerRadius={70}
         dataKey="value"
-        label={({ name, value }) => `${name}: ${value}%`}
+        labelLine= {true}
+        label={({ name, value }) => value > 0 ? `${name}: ${value}%` : ""}
       >
         {data.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
         ))}
       </Pie>
-      <Tooltip />
-      <Legend />
+      <Tooltip formatter={(value, name) => [`${value}%`, name]} />
+      <Legend verticalAlign="bottom" />
     </PieChart>
   </ResponsiveContainer>
 ));

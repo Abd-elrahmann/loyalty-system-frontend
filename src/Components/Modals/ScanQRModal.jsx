@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-const Dialog = React.lazy(() => import('@mui/material/Dialog'));
-const DialogTitle = React.lazy(() => import('@mui/material/DialogTitle'));
-const DialogContent = React.lazy(() => import('@mui/material/DialogContent'));
-const Box = React.lazy(() => import('@mui/material/Box'));
-const IconButton = React.lazy(() => import('@mui/material/IconButton'));
-const Stack = React.lazy(() => import('@mui/material/Stack'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
+import { Box, IconButton, Stack, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { QrReader } from 'react-qr-reader';
 import { useTranslation } from "react-i18next";
