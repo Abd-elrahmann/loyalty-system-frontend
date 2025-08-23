@@ -14,15 +14,15 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
-    padding: "12px 16px",
+    padding: "12px 14px",
     fontWeight: 500,
     fontSize: '0.9rem',
     whiteSpace: 'nowrap',
     borderBottom: `1px solid ${theme.palette.primary.dark}`
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: '0.9rem',
-    padding: "12px 16px",
+    fontSize: '0.88rem',
+    padding: "12px 14px",
     color: theme.palette.text.primary,
     borderBottom: `1px solid ${theme.palette.secondary.light}`
   },

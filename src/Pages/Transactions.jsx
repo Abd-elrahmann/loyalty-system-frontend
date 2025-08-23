@@ -316,10 +316,7 @@ const Transactions = () => {
                 {t("Transactions.ID")}
               </StyledTableCell>
               <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                {t("Transactions.CustomerEnName")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                {t("Transactions.CustomerArName")}
+                {t("Transactions.CustomerName")}
               </StyledTableCell>
               <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                 {t("Transactions.Points")}
@@ -358,10 +355,7 @@ const Transactions = () => {
                     {transaction.id}
                   </StyledTableCell>
                   <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    {transaction.user?.enName || '-'}
-                  </StyledTableCell>
-                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    {transaction.user?.arName || '-'}
+                    {i18n.language === 'ar' ? transaction.user?.arName : transaction.user?.enName || '-'}
                   </StyledTableCell>
                   <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     {transaction.points}

@@ -45,8 +45,8 @@ const MainLayout = ({ children }) => {
       {shouldShowSidebar && (
         <Sidebar 
           key={i18n.language}
-          open={sidebarOpen} 
-          onToggle={handleSidebarToggle}
+          open={isMobile ? sidebarOpen : sidebarVisible} 
+          onToggle={isMobile ? handleSidebarToggle : () => setSidebarVisible(!sidebarVisible)}
           sidebarVisible={sidebarVisible}
           isRTL={isRTL}
         />

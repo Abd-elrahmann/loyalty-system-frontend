@@ -16,7 +16,7 @@ import { useUser, updateUserProfile } from '../../utilities/user.jsx';
 
 const drawerWidth = 260;
 
-const Sidebar = ({ onToggle, sidebarVisible }) => {
+const Sidebar = ({ onToggle, sidebarVisible, open }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,10 +25,14 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
   const isRTL = i18n.language === 'ar';
   const user = useUser(); 
 
+  const toggleSidebar = () => {
+    onToggle?.();
+  }
+
   useLayoutEffect(() => {
     document.dir = isRTL ? 'rtl' : 'ltr';
   }, [isRTL]);
-
+  
   const navigationItems = useMemo(() => routes.map(route => ({
     ...route,
     icon: <route.icon />
@@ -38,7 +42,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
     requestAnimationFrame(() => {
       navigate(path);
       if (isMobile) {
-        onToggle();
+        onToggle?.();
       }
     });
   }, [navigate, isMobile, onToggle]);
@@ -60,9 +64,8 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
             <ListItem
               key={item.path}
               onClick={() => {
-                // Directly navigate without animation frame
                 navigate(item.path);
-                if (isMobile) onToggle();
+                if (isMobile) onToggle?.();
               }}
               sx={{
                 mx: 1,
@@ -81,7 +84,7 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
                 '& .MuiListItemText-primary': {
                   color: isActive ? 'white' : 'inherit'
                 },
-                transition: 'background-color 0.1s ease', // Faster transition
+                transition: 'background-color 0.1s ease',
                 justifyContent: 'flex-start',
                 px: 2
               }}
@@ -154,14 +157,14 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
       </Box>
     </Box>
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ), [navigationItems, isRTL, t, location.pathname, isMobile, handleNavigation, navigate]);
+  ), [navigationItems, isRTL, t, location.pathname, isMobile, handleNavigation, navigate, toggleSidebar]);
 
   return (
     <Drawer
       key={isRTL}
       variant={isMobile ? "temporary" : "permanent"} 
       anchor={isRTL ? 'right' : 'left'}
-      open={sidebarVisible}
+      open={isMobile ? open : sidebarVisible}
       onClose={onToggle}
       sx={{
         display: { xs: 'block', sm: sidebarVisible ? 'block' : 'none' },
@@ -178,7 +181,6 @@ const Sidebar = ({ onToggle, sidebarVisible }) => {
       }}
       ModalProps={{
         keepMounted: true,
-        onClose: onToggle
       }}
     >
       {drawerContent}

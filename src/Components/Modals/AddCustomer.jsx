@@ -70,7 +70,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         formik.resetForm();
         onClose();
       } else {
-        delete dataToSubmit.points;
+        delete dataToSubmit.points; 
         await Api.post('/api/users', dataToSubmit);
         notifySuccess(t('Customers.CustomerAdded'));
         formik.resetForm();
@@ -93,6 +93,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
       points: 0,
       password: '',
       confirmPassword: '',
+      createdAt: new Date()
     },
     onSubmit: handleSubmit,
   });
@@ -107,7 +108,8 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         points: customer.points || 0,
         role: customer.role || 'USER',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        createdAt: customer.createdAt || new Date()
       });
     } else {
       formik.setValues({
@@ -118,7 +120,8 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         points: 0,
         role: 'USER',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        createdAt: new Date()
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

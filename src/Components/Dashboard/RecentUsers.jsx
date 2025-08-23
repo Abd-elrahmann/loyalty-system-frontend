@@ -14,8 +14,7 @@ import {
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
-
-const RecentUsers = ({ users }) => {
+const RecentUsers = ({ users = [] }) => {
   const theme = useTheme();
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -43,7 +42,7 @@ const RecentUsers = ({ users }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map((user) => (
+          {users?.map((user) => (
             <TableRow key={user.id}>
               <TableCell>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -55,7 +54,7 @@ const RecentUsers = ({ users }) => {
                       bgcolor: theme.palette.primary.main
                     }}
                   >
-                    {user[isRTL ? 'arName' : 'enName'].charAt(0)}
+                    {user[isRTL ? 'arName' : 'enName']?.charAt(0)}
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle2">

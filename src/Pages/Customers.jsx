@@ -33,7 +33,7 @@ const ScanQRModal = lazy(() => import("../Components/Modals/ScanQRModal"));
 
 
 const Customers = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -138,7 +138,7 @@ const Customers = () => {
       doc.setFontSize(16);
       doc.text('Customers Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
       
-      const columns = ['ID', 'English Name', 'Arabic Name', 'Role', 'Email', 'Phone', 'Points'];
+      const columns = ['ID', 'English Name', 'Arabic Name', 'Role', 'Email', 'Phone', 'Points', 'Created At'];
       const rows = customers.map(customer => [
         customer.id,
         customer.enName,
@@ -146,7 +146,8 @@ const Customers = () => {
         customer.role,
         customer.email,
         customer.phone,
-        customer.points
+        customer.points,
+        customer.createdAt
       ]);
 
       autoTableModule.default(doc, {
@@ -177,7 +178,7 @@ const Customers = () => {
   const exportToCSV = async () => {
     try {
       const xlsxModule = await import('xlsx');
-      const fields = ['id', 'enName', 'arName', 'role', 'email', 'phone', 'points'];
+      const fields = ['id', 'enName', 'arName', 'role', 'email', 'phone', 'points', 'createdAt'];
       const csv = xlsxModule.utils.json_to_sheet(customers, { header: fields });
       const workbook = xlsxModule.utils.book_new();
       xlsxModule.utils.book_append_sheet(workbook, csv, 'Customers');
@@ -187,6 +188,8 @@ const Customers = () => {
       notifyError(t("Errors.generalError"));
     }
   };
+
+
 
   return (
       <Box sx={{ p: 3, mt: 1 }}>
@@ -290,12 +293,12 @@ const Customers = () => {
             <TableHead>
               <TableRow>
                 <StyledTableCell align="center">{t("Customers.ID")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.EnglishName")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.ArabicName")}</StyledTableCell>
+                <StyledTableCell align="center">{t("Customers.Name")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.Role")}</StyledTableCell>
                 <StyledTableCell align="center" sx={{ maxWidth: '300px' }}>{t("Customers.Email")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.Phone")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.Points")}</StyledTableCell>
+                <StyledTableCell align="center">{t("Customers.CreatedAt")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.AddPoints")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.ViewTransactions")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.Update")}</StyledTableCell>
@@ -319,8 +322,7 @@ const Customers = () => {
                 customers.slice(0, rowsPerPage).map((customer) => (
                   <StyledTableRow key={customer.id}>
                     <StyledTableCell align="center">{customer.id}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.enName}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.arName}</StyledTableCell>
+                    <StyledTableCell align="center">{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
                     <StyledTableCell align="center">
                       <Box sx={{ 
                         color: customer.role === 'ADMIN' ? '#1976d2' : 'inherit',
@@ -334,6 +336,7 @@ const Customers = () => {
                     </StyledTableCell>
                     <StyledTableCell align="center">{customer.phone}</StyledTableCell>
                     <StyledTableCell align="center">{customer.points}</StyledTableCell>
+                    <StyledTableCell align="center">{customer.createdAt}</StyledTableCell>
                     <StyledTableCell align="center">
                       <IconButton
                         size="small"

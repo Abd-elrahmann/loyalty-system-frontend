@@ -14,8 +14,7 @@ import Grid from '@mui/material/Grid';
 import { Helmet } from 'react-helmet-async';
 
 const DashboardCharts = lazy(() => import('../Components/Dashboard/DashboardCharts'));
-
-const COLORS = ['#800080', '#b300b3', '#e600e6', '#ff33ff'];
+import RecentUsers from '../Components/Dashboard/RecentUsers';
 
 const PERIODS = ['day', 'week', 'month', 'year'];
 
@@ -80,7 +79,8 @@ const Dashboard = () => {
     totalRedeemPoints: 0,
     topEarners: [],
     pointsDistribution: {},
-    mostUsedProducts: []
+    mostUsedProducts: [],
+    recentUsers: []
   });
 
   useEffect(() => {
@@ -210,6 +210,9 @@ const Dashboard = () => {
               value={dashboardData.transactionsCount.toLocaleString()}
               color="info"
             />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <RecentUsers users={dashboardData.recentUsers} />
           </Grid>
         </Grid>
 

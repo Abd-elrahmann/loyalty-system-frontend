@@ -196,7 +196,8 @@ const Products = () => {
 
       <Box sx={{ 
         display: 'flex', 
-        justifyContent: 'space-between', 
+        justifyContent: isMobile ? 'center' : 'space-between', 
+        flexDirection: isMobile ? 'column' : 'row',
         alignItems: 'center', 
         mb: isMobile ? 1 : 3,
         gap: 2
@@ -239,11 +240,11 @@ const Products = () => {
           onClick={() => handleOpenModal()}
           sx={{
             flexShrink: 0,
-            width: isMobile ? '50%' : '220px',
-            height:  '40px',
+            width: isMobile ? '60%' : '220px',
+            height: '40px',
             fontSize: isMobile ? '14px' : '16px',
             borderRadius: isMobile ? '5px' : '10px',
-            display: profile.role === 'ADMIN' ? 'block' : 'none',
+            display: profile.role === 'ADMIN' ? '' : 'none',
           }}
         >
           {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}

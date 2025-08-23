@@ -440,13 +440,13 @@ const Rewards = () => {
           sx={{ mt: isMobile ? 2 : 0 }}
           alignItems="center"
         >
-          <Button variant="contained" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "130px" }}>
+          <Button variant="contained" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px" }}>
             {t("Rewards.ExportExcel")}
           </Button>
-          <Button variant="contained" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "130px" }}>
+          <Button variant="contained" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "135px" }}>
             {t("Rewards.ExportPdf")}
           </Button>
-          <Button variant="contained" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "130px" }}>
+          <Button variant="contained" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "135px" }}>
             {t("Rewards.Print")}
           </Button>
         </Stack>
