@@ -3,7 +3,7 @@ import { Box, Button, TextField, Divider, CircularProgress, Dialog, DialogTitle,
 import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
-
+import { updateUserProfile } from "../../utilities/user";
 const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
   const { t, i18n } = useTranslation();
   const [points, setPoints] = useState("");
@@ -23,6 +23,9 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
     }
   }, [open]);
 
+
+
+
   const fetchSettings = async () => {
     try {
       const response = await Api.get('/api/settings');
@@ -37,7 +40,7 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
   const calculatePoints = (priceValue) => {
     if (!priceValue) return "";
     
-    const calculatedPoints = Math.floor(parseFloat(priceValue) * settings.pointsPerDollar);
+    const calculatedPoints = Math.floor(parseFloat(priceValue) * (settings.enCurrency==="IQD" ? settings.pointsPerIQD : settings.pointsPerDollar));
     return calculatedPoints.toString();
   };
 
@@ -64,6 +67,11 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
         currency: settings.enCurrency,
         price: price ? Number(price) : null
       });
+
+      // Fetch updated profile to reflect new points
+      const profileResponse = await Api.get('/api/auth/profile');
+      localStorage.setItem('profile', JSON.stringify(profileResponse.data));
+      updateUserProfile();
       
       notifySuccess(`${points} ${t("Customers.pointsAdded")}`);
       await fetchCustomers();

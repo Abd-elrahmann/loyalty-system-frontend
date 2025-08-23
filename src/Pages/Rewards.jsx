@@ -34,7 +34,7 @@ import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import { FaQrcode } from "react-icons/fa";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
-import { useUser } from "../utilities/user.jsx";
+import { useUser, updateUserProfile } from "../utilities/user.jsx";
 
 const Rewards = () => {
   const { t, i18n } = useTranslation();
@@ -92,9 +92,15 @@ const Rewards = () => {
       setIsLoading(false);
     }
   };
+  const FetchProfile = async () => {
+    const profileResponse = await Api.get('/api/auth/profile');
+    localStorage.setItem('profile', JSON.stringify(profileResponse.data));
+    updateUserProfile();
+  };
 
   useEffect(() => {
     fetchRewards();
+    FetchProfile();
     // Reset selection when data changes
     setSelectedRewards([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,6 +118,7 @@ const Rewards = () => {
       }); 
       notifySuccess(t("Rewards.RewardApproved"));
       fetchRewards();
+      FetchProfile();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
@@ -131,6 +138,7 @@ const Rewards = () => {
       setSelectedRewards([]);
       setIsAllChecked(false);
       fetchRewards();
+      FetchProfile();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
@@ -144,11 +152,13 @@ const Rewards = () => {
         rewardIds: [rewardToReject],
         note: rejectNote,
       });
+
       notifySuccess(t("Rewards.RewardRejected"));
       setOpenRejectDialog(false);
       setRewardToReject(null);
       setRejectNote("");
       fetchRewards();
+      FetchProfile();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
@@ -171,6 +181,7 @@ const Rewards = () => {
       setOpenRejectDialog(false);
       setRejectNote("");
       fetchRewards();
+      FetchProfile();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
@@ -184,6 +195,7 @@ const Rewards = () => {
       await Api.delete(`/api/rewards`, {
         data: { rewardIds: rewardsToDelete }
       });
+    
       
       setOpenDeleteDialog(false);
       setRewardToDelete(null);
@@ -197,6 +209,7 @@ const Rewards = () => {
       );
       
       fetchRewards();
+      FetchProfile();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
