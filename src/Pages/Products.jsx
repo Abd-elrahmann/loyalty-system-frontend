@@ -11,7 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
 import Swal from 'sweetalert2';
-import { useUser } from '../utilities/user';
+import { useUser, updateUserProfile } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
 const Products = () => {
   const { t, i18n } = useTranslation();
@@ -37,6 +37,7 @@ const Products = () => {
     fetchProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+  
 
   useEffect(() => {
     const filtered = products.filter(product => 
@@ -154,6 +155,10 @@ const Products = () => {
         productId,
         type: activeTab
       });
+      
+      const profileResponse = await Api.get('/api/auth/profile');
+       localStorage.setItem('profile', JSON.stringify(profileResponse.data));
+       updateUserProfile();
   
       notifySuccess(t('Products.ProductRedeemed'));
     } catch (error) {

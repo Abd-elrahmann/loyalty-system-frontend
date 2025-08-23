@@ -50,7 +50,7 @@ const DistributionChart = memo(({ data }) => (
         innerRadius={70}
         dataKey="value"
         labelLine= {true}
-        label={({ name, value }) => value > 0 ? `${name}: ${value}%` : ""}
+        label={({ value }) => value > 0 ? `${value}%` : ""}
       >
         {data.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -90,6 +90,20 @@ const DashboardCharts = memo(({ dashboardData }) => {
         >
           {t('Dashboard.PointsComparison')}
         </Typography>
+        <Grid container spacing={2} mb={3}>
+          <Grid item xs={6} sm={3}>
+            <Typography variant="subtitle2" color="text.secondary">
+              {t('Dashboard.TotalEarnPoints')}
+            </Typography>
+            <Typography variant="h5">{dashboardData.totalEarnPoints}</Typography>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Typography variant="subtitle2" color="text.secondary">
+              {t('Dashboard.TotalRedeemPoints')}
+            </Typography>
+            <Typography variant="h5">{dashboardData.totalRedeemPoints}</Typography>
+          </Grid>
+        </Grid>
         <PointsComparisonChart data={pointsComparisonData} />
       </Box>
 
@@ -155,20 +169,6 @@ const DashboardCharts = memo(({ dashboardData }) => {
         >
           {t('Dashboard.PointsDistribution')}
         </Typography>
-        <Grid container spacing={2} mb={3}>
-          <Grid item xs={6} sm={3}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t('Dashboard.TotalEarnPoints')}
-            </Typography>
-            <Typography variant="h5">{dashboardData.totalEarnPoints}</Typography>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t('Dashboard.TotalRedeemPoints')}
-            </Typography>
-            <Typography variant="h5">{dashboardData.totalRedeemPoints}</Typography>
-          </Grid>
-        </Grid>
         <DistributionChart data={pointsDistributionData} />
       </Box>
     </>

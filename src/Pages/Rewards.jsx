@@ -32,9 +32,10 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import { FaQrcode } from "react-icons/fa";
-import { useUser } from "../utilities/user.jsx";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
+import { useUser } from "../utilities/user.jsx";
+
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -55,7 +56,6 @@ const Rewards = () => {
   const [openScanModal, setOpenScanModal] = useState(false);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [selectedRewards, setSelectedRewards] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [rewardToDelete, setRewardToDelete] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -107,7 +107,9 @@ const Rewards = () => {
 
   const handleApprove = async (rewardId) => {
     try {
-      await Api.patch(`/api/rewards/${rewardId}/approve`);
+      await Api.patch(`/api/rewards/approve`, {
+        rewardIds: [rewardId]
+      }); 
       notifySuccess(t("Rewards.RewardApproved"));
       fetchRewards();
     } catch (error) {
@@ -122,9 +124,9 @@ const Rewards = () => {
     }
     
     try {
-      await Api.patch(`/api/rewards/approve-many`, {
-        rewardIds: selectedRewards,
-      });
+      await Api.patch(`/api/rewards/approve`, {
+        rewardIds: selectedRewards 
+      })
       notifySuccess(t("Rewards.RewardsApproved", { count: selectedRewards.length }));
       setSelectedRewards([]);
       setIsAllChecked(false);
@@ -138,7 +140,8 @@ const Rewards = () => {
   const handleReject = async () => {
     if (!rewardToReject) return;
     try {
-      await Api.patch(`/api/rewards/${rewardToReject}/reject`, {
+      await Api.patch(`/api/rewards/reject`, {
+        rewardIds: [rewardToReject],
         note: rejectNote,
       });
       notifySuccess(t("Rewards.RewardRejected"));
@@ -158,9 +161,9 @@ const Rewards = () => {
     }
     
     try {
-      await Api.patch(`/api/rewards/reject-many`, {
-        rewardIds: selectedRewards,
-        note: rejectNote,
+      await Api.patch(`/api/rewards/reject`, {
+       rewardIds: selectedRewards,
+       note: rejectNote,
       });
       notifySuccess(t("Rewards.RewardsRejected", { count: selectedRewards.length }));
       setSelectedRewards([]);
@@ -175,10 +178,24 @@ const Rewards = () => {
 
   const handleDeleteRejectedRewards = async () => {
     try {
-      await Api.delete(`/api/rewards/delete-rejected`);
+      // If we have selected rewards, use those. Otherwise, use the single rewardToDelete
+      const rewardsToDelete = selectedRewards.length > 0 ? selectedRewards : [rewardToDelete];
+      
+      await Api.delete(`/api/rewards`, {
+        data: { rewardIds: rewardsToDelete }
+      });
+      
       setOpenDeleteDialog(false);
       setRewardToDelete(null);
-      notifySuccess(t("Rewards.DeleteRejectedRewardsSuccess"));
+      setSelectedRewards([]);
+      setIsAllChecked(false);
+      
+      notifySuccess(
+        selectedRewards.length > 0 
+          ? t("Rewards.DeleteMultipleRewardsSuccess", { count: selectedRewards.length })
+          : t("Rewards.DeleteRejectedRewardsSuccess")
+      );
+      
       fetchRewards();
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
@@ -539,6 +556,24 @@ const Rewards = () => {
                 </Button>
               </>
             )}
+
+            {isAllChecked && (tabValue === 1 || tabValue === 2) && (
+              <Button 
+                sx={{
+                  display: profile.role === "ADMIN" ? "flex" : "none",
+                  alignItems: "center",
+                  width:isMobile? "140px":"190px",
+                  height: "40px",
+                  fontSize: "12px",
+                }}
+                variant="contained" 
+                color="error"
+                onClick={() => setOpenDeleteDialog(true)}
+                disabled={selectedRewards.length === 0}
+              >
+                {t("Rewards.DeleteSelected", { count: selectedRewards.length })}
+              </Button>
+            )}
           </Stack>
 
           <Stack
@@ -627,12 +662,12 @@ const Rewards = () => {
                   {t("Rewards.Actions")}
                 </StyledTableCell>
               )}
-              {tabValue === 2 && profile.role === "ADMIN" && (
+              {tabValue === 2 && !isAllChecked && profile.role === "ADMIN" && (
                 <StyledTableCell align="center">
                   {t("Rewards.RejectionNote")}
                 </StyledTableCell>
               )}
-              {tabValue === 2 && profile.role === "ADMIN" && (
+              {(tabValue === 1 || tabValue === 2) && !isAllChecked && profile.role === "ADMIN" && (
                 <StyledTableCell align="center">
                   {t("Rewards.Actions")}
                 </StyledTableCell>
@@ -751,12 +786,12 @@ const Rewards = () => {
                       </Stack>
                     </StyledTableCell>
                   )}
-                  {tabValue === 2 && (
+                  {tabValue === 2 && !isAllChecked && (
                     <StyledTableCell align="center">
                       {reward.note || "-"}
                     </StyledTableCell>
                   )}
-                  {tabValue === 2 && profile.role === "ADMIN" && (
+                  {(tabValue === 1 || tabValue === 2) && !isAllChecked && profile.role === "ADMIN" && (
                     <StyledTableCell align="center">
                       <IconButton
                         color="error"
@@ -841,10 +876,16 @@ const Rewards = () => {
         onClose={() => {
           setOpenDeleteDialog(false);
           setRewardToDelete(null);
+          setSelectedRewards([]);
+          setIsAllChecked(false);
         }}
-        message={t("Rewards.DeleteRejectedRewards")}
-        title={t("Rewards.Delete")}
-        ButtonText={t("Rewards.Deelete")}
+        message={
+          selectedRewards.length > 0
+            ? t("Rewards.DeleteMultipleRewardsConfirm", { count: selectedRewards.length })
+            : t("Rewards.DeleteRejectedRewards")
+        }
+        title={t("Rewards.DeleteSelected")}
+        ButtonText={t("Rewards.DeleteSelected")}
         onConfirm={handleDeleteRejectedRewards}
         isLoading={isLoading}
       />

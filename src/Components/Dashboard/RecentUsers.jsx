@@ -15,7 +15,10 @@ import {
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
-
+import {
+  StyledTableCell,
+  StyledTableRow,
+} from "../Shared/tableLayout";
 const RecentUsers = ({ users = [] }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
@@ -43,29 +46,29 @@ const RecentUsers = ({ users = [] }) => {
 
       <Table sx={{ minWidth: isMobile ? 300 : 650 }}>
         <TableHead>
-          <TableRow>
+          <StyledTableRow>
             {!isMobile ? (
               <>
-                <TableCell>{t('Dashboard.User')}</TableCell>
-                <TableCell>{t('Dashboard.Points')}</TableCell>
-                <TableCell align="right" sx={{display:isMobile ? 'none' : 'block'}}>{t('Dashboard.JoinDate')}</TableCell>
+                <StyledTableCell>{t('Dashboard.User')}</StyledTableCell>
+                <StyledTableCell>{t('Dashboard.Points')}</StyledTableCell>
+                <StyledTableCell align="right" sx={{display:isMobile ? 'none' : 'block'}}>{t('Dashboard.JoinDate')}</StyledTableCell>
               </>
             ) : (
-              <TableCell>{t('Dashboard.User')}</TableCell>
+              <StyledTableCell>{t('Dashboard.User')}</StyledTableCell>
             )}
-          </TableRow>
+          </StyledTableRow>
         </TableHead>
         <TableBody>
           {users?.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>
+            <StyledTableRow key={user.id}>
+              <StyledTableCell>
                 <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar 
                       src={user.profileImage}
                       sx={{ 
-                        width: 40, 
-                        height: 40,
+                        width: 30, 
+                        height: 30,
                         bgcolor: theme.palette.primary.main
                       }}
                     >
@@ -96,10 +99,10 @@ const RecentUsers = ({ users = [] }) => {
                     </Box>
                   )}
                 </Box>
-              </TableCell>
+              </StyledTableCell>
               {!isMobile && (
                 <>
-                  <TableCell>
+                  <StyledTableCell>
                     <Typography
                       sx={{
                         color: 'primary.main',
@@ -108,15 +111,15 @@ const RecentUsers = ({ users = [] }) => {
                     >
                       {user.points}
                     </Typography>
-                  </TableCell>
-                  <TableCell align="right">
+                  </StyledTableCell>
+                  <StyledTableCell align="right" sx={{display:isMobile ? 'none' : 'block'}}>
                     <Typography variant="caption" color="text.secondary">
                       {formatDate(user.createdAt)}
                     </Typography>
-                  </TableCell>
+                  </StyledTableCell>
                 </>
               )}
-            </TableRow>
+            </StyledTableRow>
           ))}
         </TableBody>
       </Table>

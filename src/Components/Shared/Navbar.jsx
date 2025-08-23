@@ -51,7 +51,12 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('userProfileUpdate', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userProfileUpdate', handleStorageChange);
+    };
   }, []);
 
   const toggleLanguage = () => {

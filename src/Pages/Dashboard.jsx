@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
 import { Helmet } from 'react-helmet-async';
+import { animate } from 'framer-motion';
 
 const DashboardCharts = lazy(() => import('../Components/Dashboard/DashboardCharts'));
 import RecentUsers from '../Components/Dashboard/RecentUsers';
@@ -22,6 +23,7 @@ const PERIODS = ['day', 'week', 'month', 'year'];
 const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary' }) => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const [displayValue, setDisplayValue] = useState(0);
   const colorMap = {
     primary: theme.palette.primary.main,
     secondary: theme.palette.secondary.main,
@@ -30,6 +32,19 @@ const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary
     error: theme.palette.error.main,
     info: theme.palette.info.main
   };
+
+  useEffect(() => {
+    const numericValue = parseInt(value.replace(/,/g, ''));
+    const controls = animate(0, numericValue, {
+      duration: 2,
+      ease: [0.43, 0.13, 0.23, 0.96], // Custom easing for smoother animation
+      onUpdate: (latest) => {
+        setDisplayValue(Math.floor(latest).toLocaleString());
+      }
+    });
+
+    return () => controls.stop();
+  }, [value]);
 
   return (
     <Box sx={{
@@ -54,7 +69,7 @@ const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary
         </Typography>
       </Box>
       <Typography component="h4" variant="h4">
-        {value}
+        {displayValue}
       </Typography>
       {trend !== undefined && (
         <Typography variant="caption" sx={{ color: trend >= 0 ? 'success.main' : 'error.main' }}>
@@ -178,8 +193,21 @@ const Dashboard = () => {
         </Stack>
 
         {/* Stats Cards Row */}
-        <Grid container spacing={3} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          <Grid item xs={12} sm={6} md={3}>
+        <Grid container spacing={3} sx={{ 
+          width: '100%', 
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Grid item xs={12} sm={6} md={3} sx={{ 
+            width: { xs: '100%', sm: '220px' },
+            maxWidth: { xs: '300px', sm: '220px' },
+            height: '100px',
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center' 
+          }}>
             <StatCard
               icon={PeopleIcon}
               title={t('Dashboard.TotalCustomers')}
@@ -187,7 +215,14 @@ const Dashboard = () => {
               color="primary"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ 
+            width: { xs: '100%', sm: '220px' },
+            maxWidth: { xs: '300px', sm: '220px' },
+            height: '100px',
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center' 
+          }}>
             <StatCard
               icon={PointsIcon}
               title={t('Dashboard.TotalPoints')}
@@ -195,7 +230,14 @@ const Dashboard = () => {
               color="primary"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ 
+            width: { xs: '100%', sm: '220px' },
+            maxWidth: { xs: '300px', sm: '220px' },
+            height: '100px',
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center' 
+          }}>
             <StatCard
               icon={TrendingUpIcon}
               title={t('Dashboard.AvgPoints')}
@@ -203,7 +245,14 @@ const Dashboard = () => {
               color="success"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ 
+            width: { xs: '100%', sm: '220px' },
+            maxWidth: { xs: '300px', sm: '220px' },
+            height: '100px',
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center' 
+          }}>
             <StatCard
               icon={CompareIcon}
               title={t('Dashboard.TransactionsCount')}
@@ -211,7 +260,14 @@ const Dashboard = () => {
               color="info"
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3} sx={{ 
+            width: { xs: '100%', sm: '70%' },
+            maxWidth: { xs: '300px', sm: 'none' },
+            height: '70%',
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center' 
+          }}>
             <RecentUsers users={dashboardData.recentUsers} />
           </Grid>
         </Grid>
