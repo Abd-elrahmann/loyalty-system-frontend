@@ -23,6 +23,7 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
     onToggle?.();
   }
 
+  
   useLayoutEffect(() => {
     document.dir = isRTL ? 'rtl' : 'ltr';
   }, [isRTL]);

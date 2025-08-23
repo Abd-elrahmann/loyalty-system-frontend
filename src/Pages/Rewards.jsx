@@ -252,8 +252,8 @@ const Rewards = () => {
     try {
       const doc = new jsPDF();
 
-      doc.addFont("./src/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
-      doc.addFont("./src/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
+      doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
+      doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
 
       doc.setFontSize(16);
       doc.text(

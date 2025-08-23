@@ -120,8 +120,8 @@ const Customers = () => {
       
       const doc = new jsPDFModule.default();
       
-      doc.addFont("./src/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
-      doc.addFont("./src/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
+      doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
+      doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
       
       doc.setFontSize(16);
       doc.text('Customers Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
@@ -143,17 +143,24 @@ const Customers = () => {
         head: [columns],
         body: rows,
         theme: 'grid',
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [128, 0, 128] },
+        styles: { 
+          fontSize: 7,
+          cellPadding: 1
+        },
+        headStyles: { 
+          fillColor: [128, 0, 128],
+          fontSize: 8
+        },
         columnStyles: {
           2: {
             font: "Amiri",
             fontStyle: "bold",
             halign: 'right',
-            cellWidth: 40,
+            cellWidth: 35,
             direction: 'rtl'
           }
-        }
+        },
+        margin: { left: 10, right: 10 }
       });
 
       doc.save('customers_report.pdf');
