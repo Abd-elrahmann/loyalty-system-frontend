@@ -164,14 +164,14 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
       sx={{
         display: { xs: 'block', sm: sidebarVisible ? 'block' : 'none' },
         '& .MuiDrawer-paper': {
-          position: 'fixed',
-          width: drawerWidth,
+          position: isRTL ? 'relative' : 'fixed',
+          width: drawerWidth, 
           boxSizing: 'border-box',
           border: 'none',
           borderRight: !isRTL ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
           borderLeft: isRTL ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
-          height: '100%',
-          zIndex: (theme) => theme.zIndex.drawer
+          height: '100vh',
+          zIndex: (theme) => theme.zIndex.drawer,
         },
       }}
       ModalProps={{

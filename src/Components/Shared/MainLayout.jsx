@@ -64,7 +64,7 @@ const MainLayout = ({ children }) => {
             duration: theme.transitions.duration.leavingScreen,
           }),
           ...(isRTL && {
-            marginRight: shouldShowSidebar && !isMobile && sidebarVisible ? '260px' : 0,
+            marginRight: shouldShowSidebar && !isMobile && sidebarVisible ? '0' : 0,
             marginLeft: 0,
           })
         }}

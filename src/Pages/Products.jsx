@@ -180,7 +180,7 @@ const Products = () => {
             justifyContent: isMobile ? 'center' : 'flex-start',
           },
         }}>
-          <Tab label={t('Products.Cafe')} value="cafe" />
+          <Tab label={t('Products.Cafe')} value="cafe"  />
           <Tab label={t('Products.Restaurant')} value="restaurant" />
         </Tabs>
       </Box>

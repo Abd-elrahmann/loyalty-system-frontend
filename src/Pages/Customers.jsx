@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { lazy } from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";

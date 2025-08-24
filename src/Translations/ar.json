@@ -199,7 +199,7 @@
     "ProductUpdated": "تم تحديث المنتج بنجاح",
     "ProductNotUpdated": "فشل تحديث المنتج",
     "ProductNotFound": "المنتج غير موجود",
-    "Redeem": "الحصول على المنتج",
+    "Redeem": "طلب المنتج",
     "RedeemProduct": "الحصول على المنتج",
     "RedeemProductMessage": "هل أنت متأكد من الحصول على المنتج ؟",
     "RedeemProductSuccess": "تم الحصول على المنتج بنجاح",
