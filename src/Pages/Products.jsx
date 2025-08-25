@@ -164,6 +164,8 @@ const Products = () => {
     } catch (error) {
       handleApiError(error);
       notifyError(t('Products.ProductNotRedeemed'));
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -1,13 +1,13 @@
 import React, { memo } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { EmojiEvents as TrophyIcon } from '@mui/icons-material';
+import { EmojiEvents as TrophyIcon, People as PeopleIcon, Assessment as AssessmentIcon } from '@mui/icons-material';
 import { 
   BarChart, Bar, 
   PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts/es6';
-
+import { useUser } from '../../utilities/user';
 const COLORS = ['#800080', '#b300b3', '#e600e6', '#ff33ff'];
 
 const PointsComparisonChart = memo(({ data }) => (
@@ -64,7 +64,7 @@ const DistributionChart = memo(({ data }) => (
 
 const DashboardCharts = memo(({ dashboardData }) => {
   const { t, i18n } = useTranslation();
-
+  const user = useUser();
   const pointsDistributionData = Object.entries(dashboardData.pointsDistribution || {}).map(([name, value]) => ({
     name,
     value: parseFloat(value)
@@ -107,7 +107,7 @@ const DashboardCharts = memo(({ dashboardData }) => {
         <PointsComparisonChart data={pointsComparisonData} />
       </Box>
 
-      <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+      <Box sx={{ display: user.role === 'ADMIN' ? '' : 'none', p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
         <Typography 
           variant="h6" 
           component="h2"
@@ -122,7 +122,7 @@ const DashboardCharts = memo(({ dashboardData }) => {
           {t('Dashboard.TopEarners')}
         </Typography>
         <Grid container spacing={2} justifyContent={{ xs: 'center', sm: 'flex-start' }}>
-          {dashboardData.topEarners.map((earner, index) => (
+          {user.role === 'ADMIN' && dashboardData.topEarners.map((earner, index) => (
             <Grid item xs={12} sm={6} key={earner.userId}>
               <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
                 <Typography variant="subtitle1" fontWeight="bold">
