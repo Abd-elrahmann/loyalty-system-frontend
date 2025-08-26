@@ -15,7 +15,7 @@ import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
 import Dashboard from './Pages/Dashboard';
-
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const ToastContainer = React.lazy(() =>
   import('react-toastify').then(m => ({ default: m.ToastContainer }))
@@ -29,6 +29,8 @@ const Settings = React.lazy(() => import('./Pages/Settings'));
 const Rewards = React.lazy(() => import('./Pages/Rewards'));
 const Layout = React.lazy(() => import('./Layout'));
 import MainRoutes from './Config/routes';
+
+const queryClient = new QueryClient();
 
 
 const routeComponents = {
@@ -85,9 +87,10 @@ function App() {
   }, [i18n.dir()]);
 
   return (
-        <Layout >
-      <CacheProvider value={cacheRtl}>
-      <BrowserRouter> 
+    <QueryClientProvider client={queryClient}>
+      <Layout >
+        <CacheProvider value={cacheRtl}>
+          <BrowserRouter> 
 
           <Routes>
             <Route path="/" element={
@@ -144,6 +147,7 @@ function App() {
         </BrowserRouter>
       </CacheProvider>
       </Layout>
+    </QueryClientProvider>
   );
 }
 

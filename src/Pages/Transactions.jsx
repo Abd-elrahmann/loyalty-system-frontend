@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import dayjs from 'dayjs';
@@ -15,21 +15,23 @@ import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
 
 import TransactionSearchModal from "../Components/Modals/TransactionSearchModal";
-import { Search, ArrowBack } from "@mui/icons-material";
+import { SearchOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, FilePdfOutlined } from "@ant-design/icons";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
 import { useUser } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";  
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
   const navigate = useNavigate();
-  const [transactions, setTransactions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const [filters, setFilters] = useState({
     type: "",
@@ -38,82 +40,64 @@ const Transactions = () => {
   });
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
-  const [customerInfo, setCustomerInfo] = useState(null);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const profile = useUser();
 
-
   const fetchTransactions = async () => {
-    setIsLoading(true);
-    try {
-      const queryParams = new URLSearchParams();
-      if (filters.type) queryParams.append("type", filters.type);
-      if (filters.fromDate) queryParams.append("fromDate", dayjs(filters.fromDate).format('YYYY-MM-DD'));
-      if (filters.toDate) queryParams.append("toDate", dayjs(filters.toDate).format('YYYY-MM-DD'));
-      if (customerId) queryParams.append("userId", customerId);
-       
-      queryParams.append("limit", rowsPerPage);
-      queryParams.append("page", page);
+    const queryParams = new URLSearchParams();
+    if (filters.type) queryParams.append("type", filters.type);
+    if (filters.fromDate) queryParams.append("fromDate", dayjs(filters.fromDate).format('YYYY-MM-DD'));
+    if (filters.toDate) queryParams.append("toDate", dayjs(filters.toDate).format('YYYY-MM-DD'));
+    if (customerId) queryParams.append("userId", customerId);
+    queryParams.append("limit", rowsPerPage);
+    queryParams.append("page", page);
 
-      const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
-      if (response?.data?.transactions) {
-        setTransactions(response.data.transactions);
-        setTotalItems(response.data.total);
-
-        
-        if (customerId && response.data.transactions.length > 0) {
-          const points = response.data.transactions.reduce((sum, transaction) => {
-            return sum + (transaction.type === 'earn' ? transaction.points : -transaction.points);
-          }, 0);
-          setTotalPoints(points);
-          setCustomerInfo(response.data.transactions[0].user);
-        }
-      } else {
-        setTransactions([]);
-        setTotalItems(0);
-      }
-    } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
-    } finally {
-      setIsLoading(false);
-    }
+    const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
+    return response.data;
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(1);
-  };  
+  const { data, isLoading } = useQuery({
+    queryKey: ['transactions', page, filters, customerId, rowsPerPage],
+    queryFn: fetchTransactions,
+    keepPreviousData: true,
+    staleTime: 30000,
+  });
 
-  useEffect(() => {
-    fetchTransactions();
-    
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filters, customerId, rowsPerPage]);
+  const transactions = data?.transactions || [];
+  const totalItems = data?.total || 0;
+  const customerInfo = customerId && transactions.length > 0 ? transactions[0].user : null;
+  const totalPoints = customerId && transactions.length > 0 ? 
+    transactions.reduce((sum, transaction) => 
+      sum + (transaction.type === 'earn' ? transaction.points : -transaction.points), 0) : 0;
+
+  const deleteMutation = useMutation({
+    mutationFn: (transactionId) => Api.delete(`/api/transactions/${transactionId}`),
+    onSuccess: () => {
+      notifySuccess(t("Transactions.TransactionDeleted"));
+      queryClient.invalidateQueries(['transactions']);
+      setOpenDeleteModal(false);
+      setTransactionToDelete(null);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  });
 
   const handleSearch = (searchFilters) => {
     setFilters(searchFilters);
     setPage(1);
   };
 
-  
-
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!transactionToDelete?.id) return;
-    
-    try {
-      await Api.delete(`/api/transactions/${transactionToDelete.id}`);
-      notifySuccess(t("Transactions.TransactionDeleted"));
-      await fetchTransactions();
-      setOpenDeleteModal(false);
-      setTransactionToDelete(null);
-    } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
-    }
+    deleteMutation.mutate(transactionToDelete.id);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1);
   };
 
   const getArabicName = (transaction) => {
-
     if (i18n.language === "ar") {
       return String(transaction.user.arName).normalize("NFC");
     }
@@ -166,13 +150,7 @@ const Transactions = () => {
         }
         return transaction.currency.enCurrency;
       };
-      const getArabicName = (transaction) => {
-        if (i18n.language === "ar") {
-          return String(transaction.user.arName).normalize("NFC");
-        }
-        return transaction.user.enName;
-      };
-      
+
       const rows = transactions.map(transaction => [
         transaction.id,
         getArabicName(transaction),
@@ -196,7 +174,6 @@ const Transactions = () => {
             halign: 'center',
             cellWidth: 30,
             direction: 'rtl'
-            
           },
           3: {
             font: "Amiri",
@@ -205,7 +182,6 @@ const Transactions = () => {
             cellWidth: 30,
             direction: 'rtl'
           }
-
         },
         didDrawCell: function(data) {
           if (data.column.index === 3 && data.cell.section === 'body') {
@@ -235,7 +211,7 @@ const Transactions = () => {
         <Box sx={{ mb: 3 , display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Button
             variant="outlined"
-            startIcon={<ArrowBack />}
+            startIcon={<ArrowLeftOutlined />}
             onClick={() => navigate('/customers')}
             sx={{ mb: 2 }}
           >
@@ -282,8 +258,12 @@ const Transactions = () => {
                     textAlign: "center",
                     fontSize: "14px",
                     width: "120px",
+                    "&:hover": {
+                      backgroundColor: "primary.main",
+                      color: "white",
+                    },
                   }}>
-                    <Search sx={{ fontSize: "25px", mr: 1 }} />
+                    <SearchOutlined sx={{ fontSize: "25px", ml: 4 }} />
                     {t("Transactions.Search")}
                 </Button>
                 {(filters.type || filters.fromDate || filters.toDate) && (
@@ -310,14 +290,28 @@ const Transactions = () => {
 
           <Stack direction="row" spacing={2}>
             <Button
-              variant="text"
+              variant="outlined"
+              startIcon={<FileExcelOutlined />}
               onClick={() => exportToCSV()}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+              }}
             >
               {t("Transactions.ExportCSV")}
             </Button>
             <Button
-              variant="text"
+              variant="outlined"
+              startIcon={<FilePdfOutlined />}
               onClick={() => exportToPDF()}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+              }}
             >
               {t("Transactions.ExportPDF")}
             </Button>
@@ -406,7 +400,6 @@ const Transactions = () => {
                       onClick={() => {
                         setOpenDeleteModal(true);
                         setTransactionToDelete(transaction);
-                        
                       }}
                     >
                       <DeleteOutlined />
@@ -424,7 +417,6 @@ const Transactions = () => {
            onPageChange={(e, newPage) => setPage(newPage + 1)}
            rowsPerPage={rowsPerPage}
            rowsPerPageOptions={[5, 10, 20]}
-
            onRowsPerPageChange={handleChangeRowsPerPage}
            labelRowsPerPage={t("Transactions.RowsPerPage")}
         />
@@ -447,10 +439,8 @@ const Transactions = () => {
         message={t("Transactions.DeleteTransactionMessage")}
         title={t("Transactions.DeleteTransaction")}
         onConfirm={handleDelete}
-        isLoading={isLoading}
+        isLoading={deleteMutation.isLoading}
       />
-
-   
     </Box>
   );
 };

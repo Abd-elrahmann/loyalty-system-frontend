@@ -1,9 +1,9 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import { useTranslation } from "react-i18next";
-import { Search } from "@mui/icons-material";
+import { SearchOutlined, FilePdfOutlined,FileExcelOutlined } from "@ant-design/icons";
 import AddIcon from "@mui/icons-material/Add";
 import { DeleteOutlined, EditOutlined, PlusOutlined, QrcodeOutlined, EyeOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
@@ -18,16 +18,13 @@ import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
 import ScanQRModal from "../Components/Modals/ScanQRModal";
-
-
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const Customers = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [customers, setCustomers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchFilters, setSearchFilters] = useState({
     id: "",
@@ -47,37 +44,39 @@ const Customers = () => {
   const [scannedEmail, setScannedEmail] = useState("");
 
   const fetchCustomers = async () => {
-    try {
-      const queryParams = new URLSearchParams();
-      Object.entries(searchFilters).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
-      });
-      if (scannedEmail) queryParams.append("email", scannedEmail);
-      queryParams.append('limit', rowsPerPage);
+    const queryParams = new URLSearchParams();
+    Object.entries(searchFilters).forEach(([key, value]) => {
+      if (value) queryParams.append(key, value);
+    });
+    if (scannedEmail) queryParams.append("email", scannedEmail);
+    queryParams.append('limit', rowsPerPage);
 
-      const response = await Api.get(`/api/users/${page}?${queryParams}`);
-      if (response?.data?.users) {
-        setCustomers(response.data.users);
-        setTotalPages(response.data.totalPages);
-      } else {
-        setCustomers([]);
-        setTotalPages(0); 
-      }
-    } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
-    } finally {
-      setIsLoading(false);
-    }
+    const response = await Api.get(`/api/users/${page}?${queryParams}`);
+    return response.data;
   };
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      fetchCustomers();
-    }, 300);
+  const { data, isLoading } = useQuery({
+    queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail],
+    queryFn: fetchCustomers,
+    keepPreviousData: true,
+    staleTime: 30000,
+  });
 
-    return () => clearTimeout(debounceTimer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchFilters, rowsPerPage, scannedEmail]);
+  const customers = data?.users || [];
+  const totalPages = data?.totalPages || 0;
+
+  const deleteMutation = useMutation({
+    mutationFn: (customerId) => Api.delete(`/api/users/${customerId}`),
+    onSuccess: () => {
+      notifySuccess(t("Customers.CustomerDeleted"));
+      queryClient.invalidateQueries(['customers']);
+      setOpenDeleteModal(false);
+      setCustomerToDelete(null);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  });
 
   const handleSearch = () => {
     setPage(1);
@@ -85,16 +84,7 @@ const Customers = () => {
 
   const handleDelete = async () => {
     if (!customerToDelete?.id) return;
-    
-    try {
-      await Api.delete(`/api/users/${customerToDelete.id}`);
-      notifySuccess(t("Customers.CustomerDeleted"));
-      await fetchCustomers();
-      setOpenDeleteModal(false);
-      setCustomerToDelete(null);
-    } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
-    }
+    deleteMutation.mutate(customerToDelete.id);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -201,7 +191,6 @@ const Customers = () => {
       notifyError(t("Errors.generalError"));
     }
   };
-  
 
 
   return (
@@ -227,7 +216,7 @@ const Customers = () => {
                   setSearchFilters((prev) => ({
                     ...prev,
                     email: e.target.value,
-                  }));
+                  })); 
                   setScannedEmail("");
                   setPage(1);
                 }}
@@ -242,7 +231,7 @@ const Customers = () => {
                 sx={{ color: "primary.main", padding: 0 }}
                 onClick={handleSearch}
               >
-                <Search />
+                <SearchOutlined  />
               </IconButton>
               <Stack direction="row" spacing={1}>
                 <IconButton
@@ -274,14 +263,28 @@ const Customers = () => {
             </Stack>
             <Stack direction="row" spacing={2}>
               <Button
-                variant="text"
+                variant="outlined"
+                startIcon={<FileExcelOutlined />}
                 onClick={exportToCSV}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                  },
+                }}
               >
                 {t("Customers.ExportCSV")}
               </Button>
               <Button
-                variant="text"
+                variant="outlined"
+                startIcon={<FilePdfOutlined />}
                 onClick={exportToPDF}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                  },
+                }}
               >
                 {t("Customers.ExportPDF")}
               </Button>
@@ -294,7 +297,12 @@ const Customers = () => {
                 setOpenAddCustomer(true);
                 setCustomer(null);
               }}
-              sx={{ ml: 2 }}
+              sx={{ ml: 2,
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+              }}
             >
               {t("Customers.AddCustomer")}
             </Button>
@@ -432,7 +440,7 @@ const Customers = () => {
               message={t("Customers.DeleteCustomerMessage")}
               title={t("Customers.DeleteCustomer")}
               onConfirm={handleDelete}
-              isLoading={isLoading}
+              isLoading={deleteMutation.isLoading}
             />
           )}
           {openAddPointsModal && (

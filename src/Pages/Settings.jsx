@@ -8,16 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
 import { SaveOutlined } from '@ant-design/icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 const Settings = () => {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [settings, setSettings] = useState({
-    enCurrency: null,
-    arCurrency: null,
-    timezone: 'Asia/Baghdad',
-    pointsPerDollar: 0,
-    pointsPerIQD: 0
-  });
+  const queryClient = useQueryClient();
   const user = useUser();
   const timezones = moment.tz.names();
   const { t, i18n } = useTranslation();
@@ -26,30 +20,52 @@ const Settings = () => {
     { enValue: 'USD', arValue: 'الدولار الأمريكي' }
   ];
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await Api.get('/api/settings');
-        if (response.data) {
-          const currencyObj = currencies.find(c => c.enValue === response.data.enCurrency);
-          setSettings({
-            ...response.data,
-            pointsPerDollar: parseInt(response.data.pointsPerDollar) || 0,
-            pointsPerIQD: parseInt(response.data.pointsPerIQD) || 0,
-            enCurrency: currencyObj?.enValue || null,
-            arCurrency: currencyObj?.arValue || null
-          });
-        }
-      } catch (error) {
-        notifyError(error.response?.data?.message || t('Errors.generalError'));
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [settings, setSettings] = useState({
+    enCurrency: null,
+    arCurrency: null,
+    timezone: 'Asia/Baghdad',
+    pointsPerDollar: 0,
+    pointsPerIQD: 0
+  });
 
-    fetchSettings();
+  const { data, isLoading } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      const response = await Api.get('/api/settings');
+      return response.data;
+    },
+    staleTime: 30000,
+    cacheTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true
+  });
+
+  useEffect(() => {
+    if (data) {
+      const currencyObj = currencies.find(c => c.enValue === data.enCurrency);
+      setSettings({
+        ...data,
+        pointsPerDollar: parseInt(data.pointsPerDollar) || 0,
+        pointsPerIQD: parseInt(data.pointsPerIQD) || 0,
+        enCurrency: currencyObj?.enValue || null,
+        arCurrency: currencyObj?.arValue || null
+      });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t]);
+  }, [data]);
+
+  const settingsMutation = useMutation({
+    mutationFn: async (settingsToSave) => {
+      return await Api.post('/api/settings', settingsToSave);
+    },
+    onSuccess: () => {
+      notifySuccess(t('Settings.SettingsSavedSuccessfully'));
+      queryClient.invalidateQueries(['settings']);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t('Errors.generalError'));
+    }
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,47 +75,27 @@ const Settings = () => {
     }));
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      let settingsToSave;
-      if (user.role === 'ADMIN') {
-        settingsToSave = {
-          ...settings,
-          pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
-          pointsPerIQD: parseInt(settings.pointsPerIQD) || 0,
-          enCurrency: settings.enCurrency,
-          arCurrency: settings.arCurrency,
-          timezone: settings.timezone
-        };
-      } else {
-        settingsToSave = {
-          timezone: settings.timezone
-        };
-      }
-
-      await Api.post('/api/settings', settingsToSave);
-      notifySuccess(t('Settings.SettingsSavedSuccessfully'));
-      
-      const response = await Api.get('/api/settings');
-      if (response.data) {
-        const currencyObj = currencies.find(c => c.enValue === response.data.enCurrency);
-        setSettings({
-          ...response.data,
-          pointsPerDollar: parseInt(response.data.pointsPerDollar) || null,
-          pointsPerIQD: parseInt(response.data.pointsPerIQD) || null,
-          enCurrency: currencyObj?.enValue || null,
-          arCurrency: currencyObj?.arValue || null
-        });
-      }
-    } catch (error) {
-      notifyError(error.response?.data?.message || t('Errors.generalError'));
-    } finally {
-      setSaving(false);
+  const handleSave = () => {
+    let settingsToSave;
+    if (user.role === 'ADMIN') {
+      settingsToSave = {
+        ...settings,
+        pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
+        pointsPerIQD: parseInt(settings.pointsPerIQD) || 0,
+        enCurrency: settings.enCurrency,
+        arCurrency: settings.arCurrency,
+        timezone: settings.timezone
+      };
+    } else {
+      settingsToSave = {
+        timezone: settings.timezone
+      };
     }
+
+    settingsMutation.mutate(settingsToSave);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <Spin size="large" />
@@ -190,12 +186,12 @@ const Settings = () => {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={saving}
+          disabled={settingsMutation.isPending}
           size="small"
-          startIcon={saving ? <Spin size="large" /> : <SaveOutlined />}
+          startIcon={settingsMutation.isPending ? <Spin size="large" /> : <SaveOutlined />}
           sx={{ px: 4,fontSize: "12px" }}
         >
-          {saving ? <Spin size="large" /> : t('Settings.Save')}
+          {settingsMutation.isPending ? <Spin size="large" /> : t('Settings.Save')}
         </Button>
       </Box>
     </Container>

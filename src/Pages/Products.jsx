@@ -1,77 +1,128 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, Pagination, useMediaQuery } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
 import { useTranslation } from 'react-i18next';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import RedeemIcon from '@mui/icons-material/Redeem';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../Components/Modals/DeleteModal';
 import Swal from 'sweetalert2';
 import { useUser, updateUserProfile } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [openModal, setOpenModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [productId, setProductId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const isMobile = useMediaQuery('(max-width: 400px)');
   const profile = useUser();
-  useEffect(() => {
-    setProducts([]);
-    setFilteredProducts([]);
-    setLoading(true);
-    setCurrentPage(1);
-    fetchProducts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
-  
-
-  useEffect(() => {
-    const filtered = products.filter(product => 
-      product.enName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.arName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-  }, [searchTerm, products]);
+  const queryClient = useQueryClient();
 
   const fetchProducts = async () => {
-    try {
-      const endpoint = activeTab === 'cafe' 
-        ? `/api/cafe-products/${currentPage}` 
-        : `/api/restaurant-products/${currentPage}`;
-      
-      const response = await Api.get(endpoint);
-      setProducts(response.data.products || []);
-      setFilteredProducts(response.data.products || []);
-      setTotalItems(response.data.totalItems || 0);
-    } catch (error) {
-      handleApiError(error);
-      setProducts([]); 
-      setFilteredProducts([]);
-    } finally {
-      setLoading(false);
-    }
+    const endpoint = activeTab === 'cafe' 
+      ? `/api/cafe-products/${currentPage}` 
+      : `/api/restaurant-products/${currentPage}`;
+    
+    const response = await Api.get(endpoint);
+    return response.data;
   };
 
-  useEffect(() => {
-    fetchProducts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  const { data, isLoading } = useQuery({
+    queryKey: ['products', activeTab, currentPage],
+    queryFn: fetchProducts,
+    keepPreviousData: true,
+    staleTime: 30000
+  });
+
+  const products = data?.products || [];
+  const totalItems = data?.totalItems || 0;
+
+  const filteredProducts = products.filter(product => 
+    product.enName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.arName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const addProductMutation = useMutation({
+    mutationFn: (productData) => {
+      const endpoint = activeTab === 'cafe' 
+        ? '/api/cafe-products' 
+        : '/api/restaurant-products';
+      return Api.post(endpoint, productData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['products']);
+      handleCloseModal();
+      notifySuccess(t('Products.ProductAdded'));
+    },
+    onError: (error) => {
+      handleApiError(error);
+    }
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: (productData) => {
+      const endpoint = activeTab === 'cafe' 
+        ? `/api/cafe-products/${productData.id}` 
+        : `/api/restaurant-products/${productData.id}`;
+      return Api.patch(endpoint, productData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['products']);
+      notifySuccess(t('Products.ProductUpdated'));
+      handleCloseModal();
+    },
+    onError: (error) => {
+      handleApiError(error);
+      notifyError(t('Products.ProductNotUpdated'));
+    }
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: (id) => {
+      const endpoint = activeTab === 'cafe' 
+        ? `/api/cafe-products/${id}` 
+        : `/api/restaurant-products/${id}`;
+      return Api.delete(endpoint);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['products']);
+      notifySuccess(t('Products.ProductDeleted'));
+      setOpenDeleteModal(false);
+      setProductId(null);
+    },
+    onError: (error) => {
+      handleApiError(error);
+      notifyError(t('Products.ProductNotDeleted'));
+    }
+  });
+
+  const redeemProductMutation = useMutation({
+    mutationFn: (productId) => {
+      return Api.post('/api/redeem', {
+        productId,
+        type: activeTab
+      });
+    },
+    onSuccess: async () => {
+      const profileResponse = await Api.get('/api/auth/profile');
+      localStorage.setItem('profile', JSON.stringify(profileResponse.data));
+      updateUserProfile();
+      notifySuccess(t('Products.ProductRedeemed'));
+    },
+    onError: (error) => {
+      handleApiError(error);
+      notifyError(t('Products.ProductNotRedeemed'));
+    }
+  });
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
@@ -92,83 +143,26 @@ const Products = () => {
     setOpenModal(false);
   };
 
-  const handleAddProduct = async (productData) => {
-    try {
-      const endpoint = activeTab === 'cafe' 
-        ? '/api/cafe-products' 
-        : '/api/restaurant-products';
-      
-      await Api.post(endpoint, productData);
-      fetchProducts();
-      handleCloseModal();
-      notifySuccess(t('Products.ProductAdded'));
-    } catch (error) {
-      handleApiError(error);
-    }
+  const handleAddProduct = (productData) => {
+    addProductMutation.mutate(productData);
   };
 
-  const handleUpdateProduct = async (productData) => {
-    setIsLoading(true);
-    try {
-      const endpoint = activeTab === 'cafe' 
-        ? `/api/cafe-products/${productData.id}` 
-        : `/api/restaurant-products/${productData.id}`;
-      await Api.patch(endpoint, productData);
-      fetchProducts();
-      notifySuccess(t('Products.ProductUpdated'));
-      handleCloseModal();
-    } catch (error) {
-      handleApiError(error);
-      notifyError(t('Products.ProductNotUpdated'));
-    } finally {
-      setIsLoading(false);
-    }
+  const handleUpdateProduct = (productData) => {
+    updateProductMutation.mutate(productData);
   };
 
-  const handleDeleteProduct = async (id) => {
-    setIsLoading(true);
+  const handleDeleteProduct = (id) => {
     setProductId(id);
     setOpenDeleteModal(true);
-    try {
-      const endpoint = activeTab === 'cafe' 
-        ? `/api/cafe-products/${id}` 
-        : `/api/restaurant-products/${id}`;
-      
-      await Api.delete(endpoint);
-      fetchProducts();
-      notifySuccess(t('Products.ProductDeleted'));
-      setOpenDeleteModal(false);
-      setProductId(null);
-    } catch (error) {
-      handleApiError(error);
-      notifyError(t('Products.ProductNotDeleted'));
-    } finally {
-      setIsLoading(false);
-    }
+    deleteProductMutation.mutate(id);
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleRedeemProduct = async (productId) => {
-    try {
-      await Api.post('/api/redeem', {
-        productId,
-        type: activeTab
-      });
-      
-      const profileResponse = await Api.get('/api/auth/profile');
-       localStorage.setItem('profile', JSON.stringify(profileResponse.data));
-       updateUserProfile();
-  
-      notifySuccess(t('Products.ProductRedeemed'));
-    } catch (error) {
-      handleApiError(error);
-      notifyError(t('Products.ProductNotRedeemed'));
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRedeemProduct = (productId) => {
+    redeemProductMutation.mutate(productId);
   };
 
   return (
@@ -223,7 +217,7 @@ const Products = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon color="primary" />
+                <SearchOutlined color="primary" />
               </InputAdornment>
             ),
           }}
@@ -240,6 +234,10 @@ const Products = () => {
             fontSize: isMobile ? '12px' : '13px',
             borderRadius: isMobile ? '5px' : '10px',
             display: profile.role === 'ADMIN' ? '' : 'none',
+            "&:hover": {
+              backgroundColor: "primary.main",
+              color: "white",
+            },
           }}
         >
                     <PlusOutlined style={{marginRight: '1px'}} />
@@ -248,7 +246,7 @@ const Products = () => {
         </Button>
       </Box>
 
-      {loading ? (
+      {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
           <Spin size="large" />
         </Box>
@@ -296,7 +294,7 @@ const Products = () => {
                   </CardContent>
                   <Box sx={{ p: 2, display: 'flex', justifyContent: profile.role === 'ADMIN' ? 'space-between' : 'center' }}>
                     <Button 
-                      variant="contained" 
+                      variant="outlined" 
                       color="primary"
                       size="small"
                       startIcon={<RedeemIcon />}
@@ -318,6 +316,12 @@ const Products = () => {
                             handleRedeemProduct(product.id);
                           }
                         });
+                      }}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "primary.main",
+                          color: "white",
+                        },
                       }}
                     >
                       {t('Products.Redeem')}
@@ -381,8 +385,7 @@ const Products = () => {
         title={t('Products.DeleteProduct')}
         message={t('Products.DeleteProductMessage')}
         onConfirm={() => handleDeleteProduct(productId)}
-        isLoading={isLoading}
-        
+        isLoading={deleteProductMutation.isLoading}
       />
     </Box>
   );

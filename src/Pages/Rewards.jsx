@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Api from "../Config/Api";
 import {
@@ -33,16 +33,14 @@ import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
 import { useUser, updateUserProfile } from "../utilities/user.jsx";
 import { Spin } from "antd";
-import { DeleteOutlined, CheckOutlined,CheckCircleOutlined, CloseOutlined, SearchOutlined, QrcodeOutlined,SelectOutlined,DoubleLeftOutlined,FileExcelOutlined } from "@ant-design/icons";
-import { FilePdfOutlined } from '@ant-design/icons';
+import { DeleteOutlined,CheckCircleOutlined, CloseOutlined, SearchOutlined, QrcodeOutlined,SelectOutlined,DoubleLeftOutlined,FileExcelOutlined,FilePdfOutlined } from "@ant-design/icons";
 import { PrinterOutlined } from '@ant-design/icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
-  const [rewards, setRewards] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const [filters, setFilters] = useState({
     fromDate: null,
@@ -60,6 +58,8 @@ const Rewards = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const isMobile = useMediaQuery("(max-width: 600px)");
   const profile = useUser();
+  const queryClient = useQueryClient();
+
   const statusMap = {
     PENDING: { label: "PENDING", color: "warning" },
     APPROVED: { label: "APPROVED", color: "success" },
@@ -67,152 +67,124 @@ const Rewards = () => {
   };
 
   const fetchRewards = async () => {
-    try {
-      setIsLoading(true);
-      const queryParams = new URLSearchParams();
-      const statusLabels = ["PENDING", "APPROVED", "REJECTED"];
-      queryParams.append("status", statusLabels[tabValue]);
-      if (filters.userId) queryParams.append("userId", filters.userId);
-      if (filters.fromDate) queryParams.append("fromDate", filters.fromDate);
-      if (filters.toDate) queryParams.append("toDate", filters.toDate);
-      if (filters.type) queryParams.append("type", filters.type);
-      if (filters.minPoints) queryParams.append("minPoints", filters.minPoints);
+    const queryParams = new URLSearchParams();
+    const statusLabels = ["PENDING", "APPROVED", "REJECTED"];
+    queryParams.append("status", statusLabels[tabValue]);
+    if (filters.userId) queryParams.append("userId", filters.userId);
+    if (filters.fromDate) queryParams.append("fromDate", filters.fromDate);
+    if (filters.toDate) queryParams.append("toDate", filters.toDate);
+    if (filters.type) queryParams.append("type", filters.type);
+    if (filters.minPoints) queryParams.append("minPoints", filters.minPoints);
 
-      const response = await Api.get(`/api/rewards/${page}?${queryParams}`);
-      if (response?.data?.rewards) {
-        setRewards(response.data.rewards);
-        setTotalPages(response.data.totalPages);
-      } else {
-        setRewards([]);
-        setTotalPages(0);
-      }
-    } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
-    } finally {
-      setIsLoading(false);
+    const response = await Api.get(`/api/rewards/${page}?${queryParams}`);
+    return response.data;
+  };
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['rewards', page, tabValue, filters],
+    queryFn: fetchRewards,
+    keepPreviousData: true,
+    staleTime: 30000
+  });
+
+  const rewards = data?.rewards || [];
+  const totalPages = data?.totalPages || 0;
+
+  useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const response = await Api.get('/api/auth/profile');
+      localStorage.setItem('profile', JSON.stringify(response.data));
+      updateUserProfile(response.data);
+      return response.data;
     }
-  };
-  const FetchProfile = async () => {
-    const profileResponse = await Api.get('/api/auth/profile');
-    localStorage.setItem('profile', JSON.stringify(profileResponse.data));
-    updateUserProfile(profileResponse.data);
-  };
+  });
 
-  useEffect(() => {
-    fetchRewards();
-    FetchProfile();
-    // Reset selection when data changes
-    setSelectedRewards([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, tabValue, filters]);
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-    setPage(1);
-  };
-
-  const handleApprove = async (rewardId) => {
-    try {
-      await Api.patch(`/api/rewards/approve`, {
-        rewardIds: [rewardId]
-      }); 
+  const approveMutation = useMutation({
+    mutationFn: (rewardIds) => Api.patch(`/api/rewards/approve`, { rewardIds }),
+    onSuccess: () => {
       notifySuccess(t("Rewards.RewardApproved"));
-      fetchRewards();
-      FetchProfile();
-    } catch (error) {
+      queryClient.invalidateQueries(['rewards']);
+      queryClient.invalidateQueries(['profile']);
+    },
+    onError: (error) => {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
-  };
+  });
 
-  const handleApproveMany = async () => {
-    if (selectedRewards.length === 0) {
-      notifyError(t("Rewards.NoRewardsSelected"));
-      return;
-    }
-    
-    try {
-      await Api.patch(`/api/rewards/approve`, {
-        rewardIds: selectedRewards 
-      })
-      notifySuccess(t("Rewards.RewardsApproved", { count: selectedRewards.length }));
-      setSelectedRewards([]);
-      setIsAllChecked(false);
-      fetchRewards();
-      FetchProfile();
-    } catch (error) {
-      notifyError(error.response?.data?.message || t("Errors.generalError"));
-    }
-  };
-  
-
-  const handleReject = async () => {
-    if (!rewardToReject) return;
-    try {
-      await Api.patch(`/api/rewards/reject`, {
-        rewardIds: [rewardToReject],
-        note: rejectNote,
-      });
-
+  const rejectMutation = useMutation({
+    mutationFn: ({ rewardIds, note }) => 
+      Api.patch(`/api/rewards/reject`, { rewardIds, note }),
+    onSuccess: () => {
       notifySuccess(t("Rewards.RewardRejected"));
       setOpenRejectDialog(false);
       setRewardToReject(null);
       setRejectNote("");
-      fetchRewards();
-      FetchProfile();
-    } catch (error) {
+      queryClient.invalidateQueries(['rewards']);
+      queryClient.invalidateQueries(['profile']);
+    },
+    onError: (error) => {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
-  };
+  });
 
-  const handleRejectMany = async () => {
-    if (selectedRewards.length === 0) {
-      notifyError(t("Rewards.NoRewardsSelected"));
-      return;
-    }
-    
-    try {
-      await Api.patch(`/api/rewards/reject`, {
-       rewardIds: selectedRewards,
-       note: rejectNote,
-      });
-      notifySuccess(t("Rewards.RewardsRejected", { count: selectedRewards.length }));
-      setSelectedRewards([]);
-      setIsAllChecked(false);
-      setOpenRejectDialog(false);
-      setRejectNote("");
-      fetchRewards();
-      FetchProfile();
-    } catch (error) {
-        notifyError(error.response?.data?.message || t("Errors.generalError"));
-    }
-  };
-
-  const handleDeleteRejectedRewards = async () => {
-    try {
-      // If we have selected rewards, use those. Otherwise, use the single rewardToDelete
-      const rewardsToDelete = selectedRewards.length > 0 ? selectedRewards : [rewardToDelete];
-      
-      await Api.delete(`/api/rewards`, {
-        data: { rewardIds: rewardsToDelete }
-      });
-    
-      
+  const deleteMutation = useMutation({
+    mutationFn: (rewardIds) => 
+      Api.delete(`/api/rewards`, { data: { rewardIds } }),
+    onSuccess: () => {
       setOpenDeleteDialog(false);
       setRewardToDelete(null);
       setSelectedRewards([]);
       setIsAllChecked(false);
-      
-      notifySuccess(
-        selectedRewards.length > 0 
-          ? t("Rewards.DeleteMultipleRewardsSuccess", { count: selectedRewards.length })
-          : t("Rewards.DeleteRejectedRewardsSuccess")
-      );
-      
-      fetchRewards();
-      FetchProfile();
-    } catch (error) {
-        notifyError(error.response?.data?.message || t("Errors.generalError"));
+      notifySuccess(t("Rewards.DeleteRejectedRewardsSuccess"));
+      queryClient.invalidateQueries(['rewards']);
+      queryClient.invalidateQueries(['profile']);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
+  });
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+    setPage(1);
+    setSelectedRewards([]);
+  };
+
+  const handleApprove = (rewardId) => {
+    approveMutation.mutate([rewardId]);
+  };
+
+  const handleApproveMany = () => {
+    if (selectedRewards.length === 0) {
+      notifyError(t("Rewards.NoRewardsSelected"));
+      return;
+    }
+    approveMutation.mutate(selectedRewards);
+  };
+
+  const handleReject = () => {
+    if (!rewardToReject) return;
+    rejectMutation.mutate({
+      rewardIds: [rewardToReject],
+      note: rejectNote
+    });
+  };
+
+  const handleRejectMany = () => {
+    if (selectedRewards.length === 0) {
+      notifyError(t("Rewards.NoRewardsSelected"));
+      return;
+    }
+    rejectMutation.mutate({
+      rewardIds: selectedRewards,
+      note: rejectNote
+    });
+  };
+
+  const handleDeleteRejectedRewards = () => {
+    const rewardsToDelete = selectedRewards.length > 0 ? selectedRewards : [rewardToDelete];
+    deleteMutation.mutate(rewardsToDelete);
   };
 
   const handleSelectReward = (rewardId) => {
@@ -465,15 +437,30 @@ const Rewards = () => {
           sx={{ mt: isMobile ? 2 : 0 }}
           alignItems="center"
         >
-          <Button variant="outlined" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px" }}>
+          <Button variant="outlined" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
+            "&:hover": {
+              backgroundColor: "primary.main",
+              color: "white",
+            },
+          }}>
             <FileExcelOutlined style={{marginRight: '4px'}} />
             {t("Rewards.ExportExcel")}
           </Button>
-          <Button variant="outlined" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px" }}>
+          <Button variant="outlined" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
+            "&:hover": {
+              backgroundColor: "primary.main",
+              color: "white",
+            },
+          }}>
             <FilePdfOutlined style={{marginRight: '4px'}} />
             {t("Rewards.ExportPdf")}
           </Button>
-          <Button variant="outlined" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px" }}>
+          <Button variant="outlined" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
+            "&:hover": {
+              backgroundColor: "primary.main",
+              color: "white",
+            },
+          }}>
             <PrinterOutlined style={{marginRight: '4px'}} />
             {t("Rewards.Print")}
           </Button>
@@ -494,7 +481,12 @@ const Rewards = () => {
             alignItems="center"
           >
             <Button
-              sx={{ display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '130px' }}
+              sx={{ display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '130px',
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+              }}
               variant="outlined"
               startIcon={<SearchOutlined />}
               onClick={() => setOpenSearchModal(true)}
@@ -517,13 +509,17 @@ const Rewards = () => {
           >
               <Button
                 variant={isAllChecked ? "contained" : "outlined"}
-                color={isAllChecked ? "success" : "primary"}
+                color={isAllChecked ? "warning" : "primary"}
                 sx={{
                   display: profile.role === "ADMIN" ? "flex" : "none",
                   alignItems: "center",
                   width:isMobile? "140px":"150px",
                   height: "40px",
                   fontSize: "12px",
+                  "&:hover": {
+                    backgroundColor: isAllChecked ? "warning.main" : "primary.main",
+                    color: "white",
+                  },
                 }}
                 onClick={() => {
                   setIsAllChecked(!isAllChecked);
@@ -538,6 +534,7 @@ const Rewards = () => {
               <>
                 <Button 
                    sx={{
+                    backgroundColor: "success.main",
                     display: profile.role === "ADMIN" ? "flex" : "none",
                     alignItems: "center",
                     width:isMobile? "140px":"130px",
@@ -559,6 +556,10 @@ const Rewards = () => {
                     width:isMobile? "140px":"130px",
                     height: "40px",
                     fontSize: "12px",
+                    "&:hover": {
+                      backgroundColor: "error.main",
+                      color: "white",
+                    },
                   }}
                   variant="contained" 
                   color="error"
@@ -579,6 +580,10 @@ const Rewards = () => {
                   width:isMobile? "140px":"190px",
                   height: "40px",
                   fontSize: "12px",
+                  "&:hover": {
+                    backgroundColor: "error.main",
+                    color: "white",
+                  },
                 }}
                 variant="contained" 
                 color="error"
@@ -697,7 +702,7 @@ const Rewards = () => {
                   align="center"
                   justifyContent="center"
                 >
-                  <Spin size="large" />
+                  <Spin size="large" style={{left:'130px'}} />
                 </StyledTableCell>
               </StyledTableRow>
             ) : filteredRewards.length === 0 ? (
@@ -765,7 +770,7 @@ const Rewards = () => {
                     </span>
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <Chip
+                    <Chip sx={{fontSize: "12px"}}
                       label={reward.status}
                       color={statusMap[reward.status]?.color || "default"}
                     />
@@ -879,7 +884,7 @@ const Rewards = () => {
         }
         ButtonText={t("Rewards.Reject")}
         onConfirm={rewardToReject ? handleReject : handleRejectMany}
-        isLoading={isLoading}
+        isLoading={rejectMutation.isLoading}
       />
 
 
@@ -895,7 +900,7 @@ const Rewards = () => {
           setOpenDeleteDialog(false);
           setRewardToDelete(null);
           setSelectedRewards([]);
-          setIsAllChecked(false);
+          setIsAllChecked(false);   
         }}
         message={
           selectedRewards.length > 0
@@ -905,7 +910,7 @@ const Rewards = () => {
         title={t("Rewards.DeleteSelected")}
         ButtonText={t("Rewards.DeleteSelected")}
         onConfirm={handleDeleteRejectedRewards}
-        isLoading={isLoading}
+        isLoading={deleteMutation.isLoading}
       />
     </Box>
   );

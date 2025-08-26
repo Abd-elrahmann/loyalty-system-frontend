@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
-import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
 import { updateUserProfile } from '../utilities/user.jsx';
 import Visibility from '@mui/icons-material/Visibility';
@@ -77,12 +76,12 @@ const Login = () => {
   });
 
   return (
-    <MainLayout>
+    <>
       <Helmet>
         <title>{t('Login.login')}</title>
         <meta name="description" content={t('Login.loginDescription')} />
       </Helmet>
-      <Container component="main" maxWidth= "sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+      <Container component="main" maxWidth= "sm" sx={{ mt: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 8}}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 
@@ -183,7 +182,7 @@ const Login = () => {
         </Box>
       </Paper>
     </Container>
-    </MainLayout>
+    </>
   );
 };
 

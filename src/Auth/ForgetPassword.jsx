@@ -50,12 +50,11 @@ const ForgetPassword = () => {
 
   return (
     <>
-      <Navbar />
       <Helmet>
         <title>{t('ForgetPassword.forgetPassword')}</title>
         <meta name="description" content={t('ForgetPassword.forgetPasswordDescription')} />
       </Helmet>
-    <Container component="main" maxWidth="md" sx={{ mt: 13, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Container component="main" maxWidth="md" sx={{ mt: 16, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Paper elevation={1} sx={{ p: 4, borderRadius: 2, mt: 12 }}>
         <Box component="form" onSubmit={formik.handleSubmit}>
           <Typography 

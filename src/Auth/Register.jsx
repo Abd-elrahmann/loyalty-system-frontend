@@ -7,7 +7,6 @@ import { notifyError, notifySuccess } from '../utilities/Toastify';
 import { Spin } from "antd";
 import { useNavigate } from 'react-router-dom';
 import Api from '../Config/Api';
-import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -102,12 +101,12 @@ const Register = () => {
   });
 
   return (
-    <MainLayout>
+    <>
       <Helmet>
         <title>{t('Register.register')}</title>
         <meta name="description" content={t('Register.registerDescription')} />
       </Helmet>
-      <Container component="main" maxWidth="sm" sx={{ mt: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: isMobile ? '90vw' : '100%' }}>
+      <Container component="main" maxWidth="sm" sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center', width: isMobile ? '90vw' : '100%' }}>
       <Paper 
         elevation={3} 
         sx={{ 
@@ -273,7 +272,7 @@ const Register = () => {
         </Box>
       </Paper>
     </Container>
-    </MainLayout>
+    </>
   );
 };
 

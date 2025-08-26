@@ -26,6 +26,7 @@ const notifyInfo = (message) => {
     pauseOnHover: true,
     draggable: true,
   });
+  
 };
 
 export { notifySuccess, notifyError, notifyInfo };

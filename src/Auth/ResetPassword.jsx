@@ -6,7 +6,6 @@ import React from 'react';
 import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
-import MainLayout from '../Components/Shared/MainLayout';
 import { Spin } from "antd";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -66,12 +65,12 @@ const ResetPassword = () => {
     });
 
     return (
-        <MainLayout>
+        <>
             <Helmet>
                 <title>{t('ResetPassword.resetPassword')}</title>
                 <meta name="description" content={t('ResetPassword.resetPasswordDescription')} />
             </Helmet>
-            <Container component="main" maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Container component="main" maxWidth="sm" sx={{ mt: 12, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Paper elevation={3} sx={{ p: 4, borderRadius: 2 ,mt: 12}}>
                     <Box component="form" onSubmit={formik.handleSubmit}>
                         <Typography variant="h5" align="center" color="primary" sx={{ mb: 4, fontWeight: 600 }}>
@@ -139,7 +138,7 @@ const ResetPassword = () => {
                     </Box>
                 </Paper>
             </Container>
-        </MainLayout>
+        </>
     );
 };
 

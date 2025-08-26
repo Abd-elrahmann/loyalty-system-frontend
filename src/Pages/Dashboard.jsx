@@ -1,5 +1,5 @@
-import React, { useState, useEffect, Suspense } from 'react';
-import { Layout, Card, Row, Col, DatePicker, Button, Space, Spin, Typography, Select } from 'antd';
+import React, { useState, Suspense, useRef } from 'react';
+import { Layout, Card, Row, Col, DatePicker, Space, Spin, Typography, Select, Skeleton } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Api from '../Config/Api';
 import {
@@ -9,15 +9,19 @@ import {
   BarChartOutlined,
   AreaChartOutlined
 } from '@ant-design/icons';
+import {Button} from "@mui/material";
+import { FilePdfOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet-async';
 import { animate } from 'framer-motion';
 import { useUser } from '../utilities/user';
 import dayjs from 'dayjs';
 import Theme from '../utilities/Theme';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 const { Header, Content } = Layout;
 import PointsChart from '../Components/Dashboard/PointsChart';
 import DashboardCharts from '../Components/Dashboard/DashboardCharts';
-
+import { useQuery } from '@tanstack/react-query';
 
 const PERIODS = ['day', 'week', 'month', 'year'];
 
@@ -26,7 +30,7 @@ const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary
   const { t } = useTranslation();
   const [displayValue, setDisplayValue] = useState(0);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const numericValue = parseInt(value.replace(/,/g, ''));
     const controls = animate(0, numericValue, {
       duration: 2,
@@ -62,44 +66,97 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedPeriod, setSelectedPeriod] = useState('week');
-  const [loading, setLoading] = useState(true);
   const user = useUser();
-  const [dashboardData, setDashboardData] = useState({
-    totalPoints: 0,
-    transactionsCount: 0,
-    totalEarnPoints: 0,
-    totalRedeemPoints: 0,
-    mostUsedProducts: [],
-    ...(user.role === 'ADMIN' && {
-      customersCount: 0,
-      avgPoints: 0,
-      topEarners: [],
-      pointsDistribution: {},
-      recentUsers: []
-    })
+  const contentRef = useRef(null);
+  const filterSectionRef = useRef(null);
+
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ['dashboard', selectedDate.format('YYYY-MM-DD'), selectedPeriod],
+    queryFn: async () => {
+      const response = await Api.get('/api/dashboard');
+      return {
+        totalPoints: 0,
+        transactionsCount: 0,
+        totalEarnPoints: 0,
+        totalRedeemPoints: 0,
+        mostUsedProducts: [],
+        ...(user.role === 'ADMIN' && {
+          customersCount: 0,
+          avgPoints: 0,
+          topEarners: [],
+          pointsDistribution: {},
+          recentUsers: []
+        }),
+        ...response.data
+      };
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 30 * 60 * 1000 // 30 minutes
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const dashboardResponse = await Api.get('/api/dashboard');
-        setLoading(false);
-        setDashboardData(dashboardResponse.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+  const exportToPDF = async () => {
+    try {
+      if (!contentRef.current) return;
+
+      // Temporarily hide the filters section
+      if (filterSectionRef.current) {
+        filterSectionRef.current.style.display = 'none';
       }
-    };
 
-    fetchData();
-  }, [selectedDate, selectedPeriod]);
+      // Create PDF with A4 dimensions
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
 
-  const exportToPDF = () => {
+      // Capture the dashboard content
+      const canvas = await html2canvas(contentRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        backgroundColor: '#f0f2f5'
+      });
+
+      // Calculate dimensions to fit A4 while maintaining aspect ratio
+      const imgWidth = pageWidth - 20;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 10;
+      
+      const imgData = canvas.toDataURL('image/png');
+
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add new pages if content overflows
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Restore the filters section display
+      if (filterSectionRef.current) {
+        filterSectionRef.current.style.display = 'block';
+      }
+
+      pdf.save('dashboard_report.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Ensure filters are restored even if there's an error
+      if (filterSectionRef.current) {
+        filterSectionRef.current.style.display = 'block';
+      }
+    }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" />
+        <Skeleton active />
       </div>
     );
   }
@@ -111,45 +168,54 @@ const Dashboard = () => {
         <meta name="description" content={t('Dashboard.DashboardDescription')} />
       </Helmet>
 
-      <Content style={{ padding: '24px' }}>
+      <Content style={{ padding: '24px' }} ref={contentRef}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {/* Filters Section */}
-          <Row justify={user.role === 'ADMIN' ? "space-between" : "center"} align="middle" gutter={[16, 16]}>
-            <Col>
-              <Space wrap>
-                <DatePicker
-                  color='primary'
-                  value={dayjs(selectedDate)}
-                  onChange={setSelectedDate}
-                  format="DD/MM/YYYY"
-                  placeholder={t('Dashboard.SelectDate')}
-                />
-                <Select
-                  value={selectedPeriod}
-                  onChange={setSelectedPeriod}
-                  style={{ width: 120 }}
-                >
-                  {PERIODS.map(period => (
-                    <Select.Option key={period} value={period}>
-                      {t(`Dashboard.${period}`)}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Space>
-            </Col>
-            {user.role === 'ADMIN' && (
+          <div ref={filterSectionRef}>
+            <Row justify={user.role === 'ADMIN' ? "space-between" : "center"} align="middle" gutter={[16, 16]}>
               <Col>
-                <Button
-                  type="primary"
-                  icon={<AreaChartOutlined />}
-                  onClick={exportToPDF}
-                  style={{backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText}}
-                >
-                  {t('Dashboard.DashboardReport')}
-                </Button>
+                <Space wrap>
+                  <DatePicker
+                    color='primary'
+                    value={dayjs(selectedDate)}
+                    onChange={setSelectedDate}
+                    format="DD/MM/YYYY"
+                    placeholder={t('Dashboard.SelectDate')}
+                  />
+                  <Select
+                    value={selectedPeriod}
+                    onChange={setSelectedPeriod}
+                    style={{ width: 120 }}
+                  >
+                    {PERIODS.map(period => (
+                      <Select.Option key={period} value={period}>
+                        {t(`Dashboard.${period}`)}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Space>
               </Col>
-            )}
-          </Row>
+              {user.role === 'ADMIN' && (
+                <Col>
+                  <Button
+                    variant="outlined"
+                    startIcon={<FilePdfOutlined />}
+                    onClick={exportToPDF}
+                    style={{
+                      backgroundColor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
+                      "&:hover": {
+                        backgroundColor: "primary.main",
+                        color: "white",
+                      },
+                    }}
+                  >
+                    {t('Dashboard.DashboardReport')}
+                  </Button>
+                </Col>
+              )}
+            </Row>
+          </div>
 
           {/* Stats Cards */}
           {user.role === 'ADMIN' && (
