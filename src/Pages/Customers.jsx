@@ -1,24 +1,24 @@
-import React, { lazy } from "react";
+import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import { useTranslation } from "react-i18next";
 import { Search } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
-import { FaTrash, FaEdit, FaPlus, FaQrcode, FaEye } from "react-icons/fa";
+import { DeleteOutlined, EditOutlined, PlusOutlined, QrcodeOutlined, EyeOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import {
   StyledTableCell,
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
-import Spinner from '../utilities/Spinner';
 import { Helmet } from 'react-helmet-async';
 import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button } from '@mui/material';
 import { Spin } from "antd";
-const AddCustomer = lazy(() => import("../Components/Modals/AddCustomer"));
-const DeleteModal = lazy(() => import("../Components/Modals/DeleteModal"));
-const AddPointsModal = lazy(() => import("../Components/Modals/AddPointsModal")); 
-const ScanQRModal = lazy(() => import("../Components/Modals/ScanQRModal"));
+import AddCustomer from "../Components/Modals/AddCustomer";
+import DeleteModal from "../Components/Modals/DeleteModal";
+import AddPointsModal from "../Components/Modals/AddPointsModal";
+import ScanQRModal from "../Components/Modals/ScanQRModal";
+
 
 
 const Customers = () => {
@@ -254,11 +254,11 @@ const Customers = () => {
                   }}
                   title={t("Customers.ScanQR")}
                 >
-                  <FaQrcode />
+                  <QrcodeOutlined />
                 </IconButton>
                 {scannedEmail && (
                   <Button
-                    variant="outlined"
+                    variant="text"
                     onClick={() => {
                       setScannedEmail("");
                       setPage(1);
@@ -274,13 +274,13 @@ const Customers = () => {
             </Stack>
             <Stack direction="row" spacing={2}>
               <Button
-                variant="contained"
+                variant="text"
                 onClick={exportToCSV}
               >
                 {t("Customers.ExportCSV")}
               </Button>
               <Button
-                variant="contained"
+                variant="text"
                 onClick={exportToPDF}
               >
                 {t("Customers.ExportPDF")}
@@ -288,7 +288,7 @@ const Customers = () => {
             </Stack>
 
             <Button
-              variant="contained"
+              variant="outlined"
               startIcon={<AddIcon />}
               onClick={() => {
                 setOpenAddCustomer(true);
@@ -353,34 +353,34 @@ const Customers = () => {
                     <StyledTableCell align="center">
                       <IconButton
                         size="small"
-                        color="primary"
+                        color="success"
                         onClick={() => {
                           setOpenAddPointsModal(true);
                           setCustomerToAddPoints(customer);
                         }}>
-                        <FaPlus />
+                        <PlusOutlined />
                       </IconButton>
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <IconButton
                         size="small"
-                        color="primary"
+                        color="info"
                         onClick={() => navigate(`/transactions/${customer.id}`)}
                         title={t("Customers.ViewTransactions")}
                       >
-                        <FaEye />
+                        <EyeOutlined />
                       </IconButton>
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <IconButton
                         size="small"
-                        color="primary"
+                        color="warning"
                         onClick={() => {
                           setOpenAddCustomer(true);
                           setCustomer(customer);
                         }}
                       >
-                        <FaEdit color="green" />
+                        <EditOutlined color="warning" />
                       </IconButton>
                     </StyledTableCell>
                     <StyledTableCell align="center">
@@ -392,7 +392,7 @@ const Customers = () => {
                           setCustomerToDelete(customer);
                         }}
                       >
-                        <FaTrash />
+                        <DeleteOutlined />
                       </IconButton>
                     </StyledTableCell>
                   </StyledTableRow>

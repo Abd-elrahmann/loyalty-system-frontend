@@ -1,7 +1,10 @@
 import React from "react";
-import { Box, Button, Stack, TextField, Typography, MenuItem, CircularProgress, Modal } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography, MenuItem, Modal } from '@mui/material';
 import { DatePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
+import { Spin } from "antd";
+import { CloseOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 const TransactionSearchModal = ({ open, onClose, onSearch }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = React.useState(false);
@@ -88,9 +91,11 @@ const TransactionSearchModal = ({ open, onClose, onSearch }) => {
             <Stack direction="row"  justifyContent="space-between">
               <Button variant="outlined" onClick={handleReset} disabled={!filters.type && !filters.fromDate && !filters.toDate}>
                 {t("Transactions.Reset")}
+                <CloseOutlined style={{marginLeft: '4px'}} />
               </Button>
-              <Button type="submit" variant="contained" disabled={!filters.type && !filters.fromDate && !filters.toDate} >
-                {loading ? <CircularProgress size={20} /> : t("Transactions.Search")}
+              <Button type="submit" variant="contained" disabled={!filters.type && !filters.fromDate && !filters.toDate} size="small">
+                {loading ? <Spin size="large" /> : t("Transactions.Search")}
+                <SearchOutlined style={{marginLeft: '4px'}} />
               </Button>
             </Stack>
           </Stack>

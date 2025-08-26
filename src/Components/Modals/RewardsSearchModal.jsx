@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
-
+import { Spin } from "antd";
+import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
 const style = {
   position: "absolute",
   top: "50%",
@@ -99,11 +100,13 @@ const RewardsSearchModal = ({ open, onClose, onSearch }) => {
           />
           <Stack direction="row" spacing={2} justifyContent="space-between">
             {}
-            <Button variant="outlined" onClick={handleReset} disabled={!hasActiveFilters}>
+            <Button variant="outlined" onClick={handleReset} disabled={!hasActiveFilters} size="small">
               {t("Rewards.Reset")}
+              <CloseOutlined style={{marginLeft: '4px'}} />
             </Button>
-            <Button variant="contained" onClick={handleSearch}>
+            <Button variant="contained" onClick={handleSearch} size="small">
               {t("Rewards.Search")}
+              <SearchOutlined style={{marginLeft: '4px'}} />
             </Button>
           </Stack>
         </Stack>

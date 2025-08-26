@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useFormik } from 'formik';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-
+import { FaCoins } from 'react-icons/fa';
+import { MailOutlined, PhoneOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, customer = null }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -136,6 +137,13 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
             error={!!errors.enName}
             helperText={errors.enName}
             fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <UserOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
             label={t('Customers.ArabicName')}
@@ -144,6 +152,13 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
             error={!!errors.arName}
             helperText={errors.arName}
             fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <UserOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
             label={t('Customers.Email')}
@@ -152,6 +167,13 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
             error={!!errors.email}
             helperText={errors.email}
             fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
             label={t('Customers.Phone')}
@@ -161,6 +183,13 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
             type="number"
             helperText={errors.phone}
             fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                </InputAdornment>
+              )
+            }}
           />
           {isEdit && (
             <TextField
@@ -171,6 +200,13 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
               type="number"
               helperText={errors.points}
               fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                  </InputAdornment>
+                )
+              }}
             />
           )}
               <FormControl fullWidth>
@@ -199,6 +235,11 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
                     <IconButton onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? <VisibilityOff sx={{ color: 'primary.main', fontSize: 20 }} /> : <Visibility sx={{ color: 'primary.main', fontSize: 20 }} />}
                     </IconButton>
+                  ),
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
                   )
                 }}
               />
@@ -215,6 +256,11 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
                     <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                       {showConfirmPassword ? <VisibilityOff sx={{ color: 'primary.main', fontSize: 20 }} /> : <Visibility sx={{ color: 'primary.main', fontSize: 20 }} />}
                     </IconButton>
+                  ),
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
                   )
                 }}
               />
@@ -223,10 +269,10 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         </Box>
       </DialogContent>
       <DialogActions sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 ,flexDirection: isRTL ? 'row-reverse' : 'row'}}>
-        <Button onClick={onClose} disabled={isLoading}>
+        <Button onClick={onClose} variant="outlined" size="small" disabled={isLoading}>
           {t('Customers.cancel')}
         </Button>
-        <Button onClick={formik.handleSubmit} variant="contained" disabled={isLoading}>
+        <Button onClick={formik.handleSubmit} variant="contained" size="small" disabled={isLoading}>
           {isEdit ? t('Customers.Update') : t('Customers.add')}
         </Button>
       </DialogActions>

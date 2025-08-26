@@ -58,7 +58,7 @@ const MainLayout = ({ children }) => {
           p: 1,
           width: '100%',
           marginTop: '64px', 
-          marginLeft: shouldShowSidebar && !isMobile && sidebarVisible ? '230px' : 0,
+          marginLeft: shouldShowSidebar && !isMobile && sidebarVisible ? '260px' : 0,
           transition: theme => theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,

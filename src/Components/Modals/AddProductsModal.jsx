@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Typography, TextField, Button, Grid, IconButton, CircularProgress, Modal } from '@mui/material';
+import { Box, Typography, TextField, Button, Grid, IconButton, Modal, InputAdornment } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormik } from 'formik';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { Spin } from "antd";
+import { FaCoins,FaProductHunt, FaLink, FaFile } from 'react-icons/fa';
 
 const style = {
   position: "absolute",
@@ -201,6 +204,13 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 value={formik.values.enName}
                 onChange={handleChange}
                 required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaProductHunt style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
+                  )
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -211,6 +221,13 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 value={formik.values.arName}
                 onChange={handleChange}
                 required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaProductHunt style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
+                  )
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -222,6 +239,13 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 value={formik.values.points}
                 onChange={handleChange}
                 required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
+                  )
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -231,10 +255,12 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                   onClick={() => setImageUploadType('file')}
                   sx={{ mr: 1 }}
                 >
+                  <FaFile style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />
                   {t("Products.ImageUploadTypeFile")}
                 </Button>
                 <Button
                   variant={imageUploadType === 'link' ? 'contained' : 'outlined'}
+                  startIcon={<FaLink style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />}
                   onClick={() => setImageUploadType('link')
                      
                   }
@@ -426,7 +452,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               justifyContent: "space-between",
             }}
           >
-            <Button variant="outlined" onClick={onClose} sx={{ mr: 2 }}>
+            <Button variant="outlined" onClick={onClose} sx={{ mr: 2 }} size="small">
               {t("Products.Cancel")}
             </Button>
             <Button
@@ -434,9 +460,11 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               variant="contained"
               color="primary"
               disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.points || (!formik.values.imagePreview && !formik.values.imageUrl)}
+              startIcon={loading ? <Spin size="large" /> : productToEdit ? <EditOutlined /> : <FaCoins style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+              size="small"
             >
               {loading ? (
-                <CircularProgress size={24} />
+                <Spin size="large" />
               ) : (
                 productToEdit ? t("Products.UpdateProduct") : t("Products.AddProduct")
               )}

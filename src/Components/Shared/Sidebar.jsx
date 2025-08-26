@@ -6,9 +6,9 @@ import { Support as SupportIcon } from '@mui/icons-material';
 import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUser, updateUserProfile } from '../../utilities/user.jsx';
-
-const drawerWidth = 230;
+import { useUser } from '../../utilities/user.jsx';
+import { LogoutOutlined } from '@ant-design/icons';
+const drawerWidth = 260;
 
 const Sidebar = ({ onToggle, sidebarVisible, open }) => {
   const { t, i18n } = useTranslation();
@@ -143,10 +143,11 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
           onClick={() => {
             localStorage.removeItem('token');
             localStorage.removeItem('profile');
-            updateUserProfile(); 
             navigate('/login');
           }}
+          size="small"
         >
+          <LogoutOutlined style={{marginRight: '4px'}} />
           {t('Navbar.Logout')}
         </Button>
       </Box>

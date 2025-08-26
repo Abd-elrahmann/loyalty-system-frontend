@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { useUser, updateUserProfile } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
+import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
@@ -229,19 +230,21 @@ const Products = () => {
         />
         
         <Button 
-          variant="contained" 
+          variant="outlined" 
           color="primary" 
           onClick={() => handleOpenModal()}
           sx={{
             flexShrink: 0,
-            width: isMobile ? '60%' : '220px',
-            height: '40px',
-            fontSize: isMobile ? '14px' : '16px',
+            width: isMobile&&activeTab === 'cafe' ? '60%' : '210px',
+            height: '43px',
+            fontSize: isMobile ? '12px' : '13px',
             borderRadius: isMobile ? '5px' : '10px',
             display: profile.role === 'ADMIN' ? '' : 'none',
           }}
         >
+                    <PlusOutlined style={{marginRight: '1px'}} />
           {activeTab === 'cafe' ? t('Products.AddCafeProduct') : t('Products.AddRestaurantProduct')}
+          
         </Button>
       </Box>
 
@@ -326,13 +329,15 @@ const Products = () => {
                      justifyContent: 'center'
                      }}>
                     <IconButton
+                      size="small"
                       color="primary"
                       onClick={() => handleOpenModal(product)}
                       aria-label="edit"
                     >
-                      <EditIcon sx={{ color: 'green' }} />
+                      <EditOutlined sx={{ color: 'green' }} />
                     </IconButton>
                     <IconButton 
+                      size="small"
                       color="error"
                       onClick={() => {
                         setOpenDeleteModal(true);
@@ -340,7 +345,7 @@ const Products = () => {
                       }}
                       aria-label="delete"
                       >
-                        <DeleteIcon sx={{ color: 'red' }} />
+                        <DeleteOutlined sx={{ color: 'red' }} />
                       </IconButton>
                     </Box>
                   </Box>

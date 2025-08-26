@@ -23,19 +23,19 @@ import {
   StyledTableCell,
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
-import { FaCheck, FaTimes, FaSearch, FaSync, FaTrash } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import RewardsSearchModal from "../Components/Modals/RewardsSearchModal";
 import * as xlsx from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
-import { FaQrcode } from "react-icons/fa";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
 import { useUser, updateUserProfile } from "../utilities/user.jsx";
 import { Spin } from "antd";
-
+import { DeleteOutlined, CheckOutlined,CheckCircleOutlined, CloseOutlined, SearchOutlined, QrcodeOutlined,SelectOutlined,DoubleLeftOutlined,FileExcelOutlined } from "@ant-design/icons";
+import { FilePdfOutlined } from '@ant-design/icons';
+import { PrinterOutlined } from '@ant-design/icons';
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -465,13 +465,16 @@ const Rewards = () => {
           sx={{ mt: isMobile ? 2 : 0 }}
           alignItems="center"
         >
-          <Button variant="contained" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px" }}>
+          <Button variant="outlined" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px" }}>
+            <FileExcelOutlined style={{marginRight: '4px'}} />
             {t("Rewards.ExportExcel")}
           </Button>
-          <Button variant="contained" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "135px" }}>
+          <Button variant="outlined" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px" }}>
+            <FilePdfOutlined style={{marginRight: '4px'}} />
             {t("Rewards.ExportPdf")}
           </Button>
-          <Button variant="contained" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "135px" }}>
+          <Button variant="outlined" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px" }}>
+            <PrinterOutlined style={{marginRight: '4px'}} />
             {t("Rewards.Print")}
           </Button>
         </Stack>
@@ -492,8 +495,8 @@ const Rewards = () => {
           >
             <Button
               sx={{ display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '130px' }}
-              variant="contained"
-              startIcon={<FaSearch size={16} />}
+              variant="outlined"
+              startIcon={<SearchOutlined />}
               onClick={() => setOpenSearchModal(true)}
             >
               {t("Rewards.Search")}
@@ -502,7 +505,7 @@ const Rewards = () => {
               sx={{ color: "primary.main", padding: 0 ,display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '50px' }}
               onClick={() => setOpenScanModal(true)}
             >
-              <FaQrcode />
+              <QrcodeOutlined />
             </IconButton>
           </Stack>
 
@@ -518,7 +521,7 @@ const Rewards = () => {
                 sx={{
                   display: profile.role === "ADMIN" ? "flex" : "none",
                   alignItems: "center",
-                  width:isMobile? "140px":"130px",
+                  width:isMobile? "140px":"150px",
                   height: "40px",
                   fontSize: "12px",
                 }}
@@ -527,6 +530,7 @@ const Rewards = () => {
                   if (!isAllChecked) setSelectedRewards([]);
                 }}
               >
+                <SelectOutlined style={{marginRight: '4px'}} />
                 {isAllChecked ? t("Rewards.CancelSelect") : t("Rewards.SelectMultiple")}
               </Button>
 
@@ -545,6 +549,7 @@ const Rewards = () => {
                   onClick={handleApproveMany}
                   disabled={selectedRewards.length === 0}
                 >
+                  <CheckCircleOutlined style={{marginRight: '4px'}} />
                   {t("Rewards.ApproveSelected", { count: selectedRewards.length })}
                 </Button>
                 <Button 
@@ -560,6 +565,7 @@ const Rewards = () => {
                   onClick={() => setOpenRejectDialog(true)}
                   disabled={selectedRewards.length === 0}
                 >
+                  <CloseOutlined style={{marginRight: '4px'}} />
                   {t("Rewards.RejectSelected", { count: selectedRewards.length })}
                 </Button>
               </>
@@ -579,6 +585,7 @@ const Rewards = () => {
                 onClick={() => setOpenDeleteDialog(true)}
                 disabled={selectedRewards.length === 0}
               >
+                <DeleteOutlined style={{marginRight: '4px'}} />
                 {t("Rewards.DeleteSelected", { count: selectedRewards.length })}
               </Button>
             )}
@@ -591,8 +598,8 @@ const Rewards = () => {
             alignItems="center"
           >
             <Button
-              variant="contained"
-              startIcon={<FaSync size={16} />}
+              variant="outlined"
+              startIcon={<DoubleLeftOutlined />}
               onClick={() => {
                 setFilters({
                   fromDate: null,
@@ -775,13 +782,15 @@ const Rewards = () => {
                         justifyContent="center"
                       >
                         <IconButton
+                          size="small"
                           color="success"
                           onClick={() => handleApprove(reward.id)}
                           title={t("Rewards.Approve")}
                         >
-                          <FaCheck />
+                          <CheckCircleOutlined />
                         </IconButton>
                         <IconButton
+                          size="small"
                           color="error"
                           onClick={() => {
                             setRewardToReject(reward.id);
@@ -789,7 +798,7 @@ const Rewards = () => {
                           }}
                           title={t("Rewards.Reject")}
                         >
-                          <FaTimes />
+                          <CloseOutlined />
                         </IconButton>
                       </Stack>
                     </StyledTableCell>
@@ -802,13 +811,14 @@ const Rewards = () => {
                   {(tabValue === 1 || tabValue === 2) && !isAllChecked && profile.role === "ADMIN" && (
                     <StyledTableCell align="center">
                       <IconButton
+                        size="small"
                         color="error"
                         onClick={() => {
                           setRewardToDelete(reward.id);
                           setOpenDeleteDialog(true);
                         }}
                       >
-                        <FaTrash size={20} />
+                        <DeleteOutlined />
                       </IconButton>
                     </StyledTableCell>
                   )}

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Box, IconButton, Stack, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import { Close } from '@mui/icons-material';
 import { QrReader } from 'react-qr-reader';
 import { useTranslation } from "react-i18next";
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useMediaQuery } from '@mui/material';
+import { CloseOutlined } from '@ant-design/icons';
 const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
   const { t } = useTranslation();
   // eslint-disable-next-line no-unused-vars
@@ -64,8 +64,8 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {t("Customers.ScanQRCode")}
-        <IconButton onClick={onClose} size="small">
-          <Close />
+        <IconButton onClick={onClose} size="small" sx={{ fontSize: '12px' }}>
+          <CloseOutlined />
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{

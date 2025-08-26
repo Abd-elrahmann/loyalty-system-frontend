@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Link } from '@mui/material';
+import { Box, Button, TextField, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Link, InputAdornment } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
 import { updateUserProfile } from "../../utilities/user";
+import { FaCoins, FaDollarSign } from 'react-icons/fa';
 const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
   const { t, i18n } = useTranslation();
   const [points, setPoints] = useState("");
@@ -125,6 +126,13 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
               inputProps={{ min: 0, step: 0.01 }}
               sx={{ mb: 2 }}
               helperText={`${t("Customers.PointsPerUnit")}: ${settings.enCurrency==="IQD" ? settings.pointsPerIQD : settings.pointsPerDollar} ${t("Customers.Points")}`}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaDollarSign style={{marginRight: '8px', fontSize: '18px', color: 'green'}} />
+                  </InputAdornment>
+                )
+              }}
             />
             
             <Divider sx={{ my: 2 }} />
@@ -138,18 +146,26 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
               disabled={true}
               required
               inputProps={{ min: 1 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                  </InputAdornment>
+                )
+              }}
             />
           </Box>
         </DialogContent>
         <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Button onClick={handleClose} disabled={isLoading}>
+          <Button onClick={handleClose} variant="outlined" size="small" disabled={isLoading}>
             {t("Customers.Cancel")}
           </Button>
           <Button
             type="submit"
             variant="contained"
+            size="small"
             disabled={isLoading}
-            startIcon={isLoading ? <CircularProgress size={20} /> : null}
+            startIcon={isLoading ? <CircularProgress size={20} /> : <FaCoins style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
           >
             {t("Customers.AddPoints")}
           </Button>

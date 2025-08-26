@@ -1,17 +1,16 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar } from '@mui/material';
 import { useMediaQuery, useTheme } from '@mui/material';
-
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import PersonIcon from '@mui/icons-material/Person';
 import { useState, useEffect } from 'react';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
-import MenuIcon from '@mui/icons-material/Menu';
 import { useUser, updateUserProfile } from '../../utilities/user.jsx';
 import Api from '../../Config/Api';
+import {MenuOutlined, LogoutOutlined, UserOutlined, SettingOutlined, GlobalOutlined} from '@ant-design/icons';
+import { FaCoins } from 'react-icons/fa';
+import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+
+
 const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -99,9 +98,8 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                 onMenuClick();
                 setSidebarVisible(!sidebarVisible);
               }}
-              sx={{ color: 'primary.main', mr: 0 }}
             >
-              <MenuIcon />
+              <MenuOutlined color='primary' style={{fontSize: isMobile ? '20px' : '21px'}} />
             </IconButton>
           )}
           
@@ -116,13 +114,14 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
               px: isMobile ? 1 : 2
             }}
           >
+            <GlobalOutlined style={{marginRight: '8px',marginLeft: '8px', fontSize: '18px', color: '#800080'}} />
             {i18n.language === 'en' ? 'Ar' : 'EN'}
           </Button>
 
           {user ? (
             <>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mr: isMobile ? 1 : 2 }}>
-                <MonetizationOnIcon sx={{ color: '#FFD700', fontSize: isMobile ? '18px' : '20px' }} />
+                <FaCoins style={{color: 'gold', fontSize: isMobile ? '18px' : '20px'}} />
                 <Typography sx={{ color: 'text.primary', fontSize: isMobile ? '14px' : '16px', fontWeight: 'bold' }}>
                   {profile?.points || '0'}
                 </Typography>
@@ -139,7 +138,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                       sx={{ width: isMobile ? 32 : 40, height: isMobile ? 32 : 40 }}
                     />
                   ) : (
-                    <SettingsIcon sx={{ color: 'primary.main', fontSize: isMobile ? '22px' : '25px' }} />
+                    <SettingOutlined sx={{ color: 'primary.main', fontSize: isMobile ? '22px' : '25px' }} />
                   )}
                 </IconButton>
                 <Menu
@@ -151,14 +150,14 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                     navigate('/profile');
                     setAnchorEl(null);
                   }}>
-                    <PersonIcon sx={{ mr: 1 }} />
+                    <UserOutlined style={{marginRight: '4px',color: '#800080'}} />
                     {i18n.language === 'en' ? user.enName.split(' ')[0] : user.arName.split('   ')[0]}
                   </MenuItem>
                   <MenuItem onClick={() => {
                     handleLogout();
                     setAnchorEl(null);
                   }}>
-                    <LogoutIcon sx={{ mr: 1 }} />
+                    <LogoutOutlined style={{marginRight: '4px',color: 'red'}} />
                     {t('Navbar.Logout')}
                   </MenuItem>
                 </Menu>
@@ -173,6 +172,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                 onClick={() => navigate('/login')}
                 sx={{ px: isMobile ? 3 : 2 }}
               >
+                <FaSignInAlt style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
                 {t('Navbar.Login')}
               </Button>
               
@@ -183,6 +183,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                 onClick={() => navigate('/signup')}
                 sx={{ px: isMobile ? 3 : 2 }}
               >
+                <FaUserPlus style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />
                 {t('Navbar.SignUp')}
               </Button>
             </>

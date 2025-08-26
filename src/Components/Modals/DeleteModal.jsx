@@ -2,8 +2,9 @@ import React from 'react';
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
-import Spinner from '../../utilities/Spinner';
-
+import { Spin } from "antd";
+import { DeleteOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, ButtonText}) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -46,6 +47,8 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, Butt
           onClick={onClose} 
           disabled={isLoading}
           variant="outlined"
+          startIcon={<CloseOutlined />}
+          size="small"
         >
           { t('Customers.Cancel')}
         </Button>
@@ -54,8 +57,10 @@ const DeleteModal = ({ open, onClose, onConfirm, title, message, isLoading, Butt
           variant="contained" 
           color={"error"}
           disabled={isLoading}
+          startIcon={isLoading ? <Spin size="large" /> : <DeleteOutlined />}
+          size="small"
         >
-          {isLoading? <Spinner /> : ButtonText || t('Customers.Delete')}
+          {isLoading? <Spin size="large" /> : ButtonText || t('Customers.Delete')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -7,6 +7,7 @@ import { useUser } from '../utilities/user';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
+import { SaveOutlined } from '@ant-design/icons';
 const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -191,8 +192,8 @@ const Settings = () => {
           onClick={handleSave}
           disabled={saving}
           size="small"
-          startIcon={saving ? <Spin size="large" /> : null}
-          sx={{ px: 4 }}
+          startIcon={saving ? <Spin size="large" /> : <SaveOutlined />}
+          sx={{ px: 4,fontSize: "12px" }}
         >
           {saving ? <Spin size="large" /> : t('Settings.Save')}
         </Button>

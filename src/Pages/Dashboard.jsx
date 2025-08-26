@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Layout, Card, Row, Col, DatePicker, Button, Space, Spin, Typography, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Api from '../Config/Api';
@@ -15,9 +15,8 @@ import { useUser } from '../utilities/user';
 import dayjs from 'dayjs';
 import Theme from '../utilities/Theme';
 const { Header, Content } = Layout;
-const { Title } = Typography;
-const PointsChart = lazy(() => import('../Components/Dashboard/PointsChart'));
-const DashboardCharts = lazy(() => import('../Components/Dashboard/DashboardCharts'));
+import PointsChart from '../Components/Dashboard/PointsChart';
+import DashboardCharts from '../Components/Dashboard/DashboardCharts';
 
 
 const PERIODS = ['day', 'week', 'month', 'year'];

@@ -1,14 +1,6 @@
 import { useFormik } from 'formik';
 import React from 'react';
-const Box = React.lazy(() => import('@mui/material/Box'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Container = React.lazy(() => import('@mui/material/Container'));
-const Paper = React.lazy(() => import('@mui/material/Paper'));
-const Link = React.lazy(() => import('@mui/material/Link'));
-const IconButton = React.lazy(() => import('@mui/material/IconButton'));
-const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
+import { Box, TextField, Button, Typography, Container, Paper, Link, IconButton, InputAdornment } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
@@ -18,10 +10,10 @@ import { useTranslation } from 'react-i18next';
 import { updateUserProfile } from '../utilities/user.jsx';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { FaSignInAlt } from 'react-icons/fa';
 const Login = () => {
   const {t} =useTranslation()
   const navigate = useNavigate();
@@ -116,7 +108,7 @@ const Login = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon sx={{ color: 'primary.main' }} />
+                  <MailOutlined style={{color: '#800080'}} />
                 </InputAdornment>
               )
             }}
@@ -130,7 +122,7 @@ const Login = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon sx={{ color: 'primary.main' }} />
+                  <LockOutlined style={{color: '#800080'}} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -171,7 +163,8 @@ const Login = () => {
             size="large"
             disabled={loading}
           >
-            {loading ? <Spin size="large" /> : t('Login.login')}
+            {loading ? <Spin size="large" /> : <FaSignInAlt style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+            {t('Login.login')}
           </Button>
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>

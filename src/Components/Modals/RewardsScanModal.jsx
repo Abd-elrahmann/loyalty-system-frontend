@@ -13,7 +13,8 @@ import { Close } from '@mui/icons-material';
 import { QrReader } from 'react-qr-reader';
 import { useTranslation } from "react-i18next";
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
-
+import { Spin } from "antd";
+import { CloseOutlined } from '@ant-design/icons';
 const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
   const { t } = useTranslation();
   // eslint-disable-next-line no-unused-vars
@@ -73,8 +74,8 @@ const RewardsScanModal = ({ open, onClose, onScanSuccess }) => {
   >
     <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       {t("Rewards.ScanQRTitle")}
-      <IconButton onClick={onClose} size="small">
-        <Close />
+      <IconButton onClick={onClose} size="small" sx={{ fontSize: '12px' }}>
+        <CloseOutlined />
       </IconButton>
     </DialogTitle>
     <DialogContent sx={{

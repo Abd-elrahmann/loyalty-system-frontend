@@ -10,7 +10,7 @@ import {
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
 import { useTranslation } from "react-i18next";
-import { FaTrash } from "react-icons/fa";
+import { DeleteOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
 
@@ -21,7 +21,7 @@ import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
 import { useUser } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
-import { Spin } from "antd";
+import { Spin } from "antd";  
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -275,11 +275,10 @@ const Transactions = () => {
             {!customerId && (
               <>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={() => setOpenSearchModal(true)}
                   sx={{
-                    color: "white",
-                    backgroundColor: "primary.main",
+                    color: "#800080",
                     textAlign: "center",
                     fontSize: "14px",
                     width: "120px",
@@ -311,13 +310,13 @@ const Transactions = () => {
 
           <Stack direction="row" spacing={2}>
             <Button
-              variant="contained"
+              variant="text"
               onClick={() => exportToCSV()}
             >
               {t("Transactions.ExportCSV")}
             </Button>
             <Button
-              variant="contained"
+              variant="text"
               onClick={() => exportToPDF()}
             >
               {t("Transactions.ExportPDF")}
@@ -410,7 +409,7 @@ const Transactions = () => {
                         
                       }}
                     >
-                      <FaTrash />
+                      <DeleteOutlined />
                     </IconButton>
                   </StyledTableCell>
                 </StyledTableRow>

@@ -1,28 +1,20 @@
 import { useFormik } from 'formik';
 import React from 'react';
-const Box = React.lazy(() => import('@mui/material/Box'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Container = React.lazy(() => import('@mui/material/Container'));
-const Paper = React.lazy(() => import('@mui/material/Paper'));
-const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+import { Box, TextField, Button, Typography, Container, Paper, IconButton, InputAdornment } from '@mui/material';
 import { useState } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
-import Spinner from '../utilities/Spinner';
+import { Spin } from "antd";
 import { useNavigate } from 'react-router-dom';
 import Api from '../Config/Api';
 import MainLayout from '../Components/Shared/MainLayout';
 import { useTranslation } from 'react-i18next';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import PhoneIcon from '@mui/icons-material/Phone';
-import PersonIcon from '@mui/icons-material/Person';
+import { PhoneOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet-async';
-const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { FaUserPlus } from 'react-icons/fa';
 
 const Register = () => {
   const isMobile = useMediaQuery('(max-width: 600px)');
@@ -143,7 +135,7 @@ const Register = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <PersonIcon sx={{ color: 'primary.main' }} />
+                    <MailOutlined style={{color: '#800080'}} />
                   </InputAdornment>
                 )
               }}
@@ -159,7 +151,7 @@ const Register = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <PersonIcon sx={{ color: 'primary.main' }} />
+                    <MailOutlined style={{color: '#800080'}} />
                   </InputAdornment>
                 )
               }}
@@ -179,7 +171,7 @@ const Register = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon sx={{ color: 'primary.main' }} />
+                  <MailOutlined style={{color: '#800080'}} />
                 </InputAdornment>
               )
             }}
@@ -197,7 +189,7 @@ const Register = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PhoneIcon sx={{ color: 'primary.main' }} />
+                  <PhoneOutlined style={{color: '#800080'}} />
                 </InputAdornment>
               )
             }}
@@ -211,7 +203,7 @@ const Register = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon sx={{ color: 'primary.main' }} />
+                  <LockOutlined style={{color: '#800080'}} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -236,7 +228,7 @@ const Register = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <LockIcon sx={{ color: 'primary.main' }} />
+                  <LockOutlined style={{color: '#800080'}} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -261,7 +253,8 @@ const Register = () => {
             size="large"
             disabled={loading}
           >
-            {loading ? <Spinner /> : t('Register.signUp')}
+            {loading ? <Spin size="large" /> : <FaUserPlus style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+            {t('Register.signUp')}
           </Button>
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>

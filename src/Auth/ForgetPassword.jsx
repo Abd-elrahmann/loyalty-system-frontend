@@ -1,19 +1,16 @@
 import { useFormik } from 'formik';
 import React from 'react';
-const Box = React.lazy(() => import('@mui/material/Box'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Container = React.lazy(() => import('@mui/material/Container'));
-const Paper = React.lazy(() => import('@mui/material/Paper'));
+import { Box, TextField, Button, Typography, Container, Paper, InputAdornment } from '@mui/material';
 import Api from '../Config/Api';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
-import Spinner from '../utilities/Spinner';
+import { Spin } from "antd";
 import { useState } from 'react';
 import Navbar from '../Components/Shared/Navbar';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { FaEnvelope } from 'react-icons/fa';
+import { MailOutlined } from '@ant-design/icons';
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
@@ -71,6 +68,13 @@ const ForgetPassword = () => {
           </Typography>
 
           <TextField
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutlined style={{color: '#800080'}} />
+                </InputAdornment>
+              )
+            }}
             fullWidth
             id="email"
             name="email"
@@ -92,7 +96,8 @@ const ForgetPassword = () => {
             sx={{ mb: 2 }}
             disabled={loading}
           >
-            {loading ? <Spinner /> : t('ForgetPassword.sendResetLink')}
+            {loading ? <Spin size="large" /> : <FaEnvelope style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+            {t('ForgetPassword.sendResetLink')}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>

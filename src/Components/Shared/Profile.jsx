@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { Box, Typography, Paper, Container, Avatar, CircularProgress, Grid, TextField, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, Typography, Paper, Container, Avatar, Grid, TextField, Button, IconButton, Menu, MenuItem } from '@mui/material';
   import { useMediaQuery } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
@@ -8,12 +8,10 @@ import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
 import { useNavigate } from 'react-router-dom';
 import { updateUserProfile } from '../../utilities/user.jsx';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import DownloadIcon from '@mui/icons-material/Download';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
+import { DownloadOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { CameraOutlined } from '@ant-design/icons';
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -220,7 +218,7 @@ const Profile = () => {
                 }
               }}
             >
-              <PhotoCamera />
+              <CameraOutlined />
             </IconButton>
             <Menu
               anchorEl={imageMenuAnchorEl}
@@ -229,12 +227,12 @@ const Profile = () => {
             >
               <label htmlFor="icon-button-file">
                 <MenuItem component="span">
-                  <ChangeCircleIcon color='primary' sx={{ mr: 1 }} />
-              {profile?.profileImage ? t('Profile.ChangeImage') : t('Profile.UploadImage')}
+                    <EditOutlined style={{marginRight: '8px', fontSize: '18px', color: '#4caf50'}} />
+                    {profile?.profileImage ? t('Profile.ChangeImage') : t('Profile.UploadImage')}
                 </MenuItem>
               </label>
               <MenuItem onClick={handleRemoveImage}>
-                <DeleteIcon color='error' sx={{ mr: 1 }} />
+                <DeleteOutlined style={{marginRight: '8px', fontSize: '18px', color: '#f44336'}} />
                 {t('Profile.RemoveImage')}
               </MenuItem>
             </Menu>
@@ -312,7 +310,7 @@ const Profile = () => {
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
                       <Button  color="primary" onClick={handleDownloadQRCode} sx={{ mt: 2 }}>
-                        <DownloadIcon sx={{ fontSize: '25px' }} />
+                        <DownloadOutlined style={{fontSize: '25px'}} />
                       </Button>
                     </Box>
                     </>
@@ -348,7 +346,8 @@ const Profile = () => {
                 />
               </Grid>
             </Grid>
-            <Button variant="contained" sx={{ mt: 2 }} onClick={handleNameUpdate}>
+            <Button variant="outlined" sx={{ mt: 2 }} onClick={handleNameUpdate}>
+              <EditOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
               {t('Profile.Update')}
             </Button>
           </Box>
@@ -392,7 +391,8 @@ const Profile = () => {
                 />
               </Grid>
             </Grid>
-            <Button variant="contained" sx={{ mt: 2 }} onClick={handlePasswordUpdate}>
+            <Button variant="outlined" sx={{ mt: 2 }} onClick={handlePasswordUpdate}>
+              <EditOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
               {t('Profile.Update')}
             </Button>
           </Box>

@@ -3,21 +3,15 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
-const Box = React.lazy(() => import('@mui/material/Box'));
-const TextField = React.lazy(() => import('@mui/material/TextField'));
-const Button = React.lazy(() => import('@mui/material/Button'));
-const Typography = React.lazy(() => import('@mui/material/Typography'));
-const Container = React.lazy(() => import('@mui/material/Container'));
-const Paper = React.lazy(() => import('@mui/material/Paper'));
-const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
-const IconButton = React.lazy(() => import('@mui/material/IconButton'));
+import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
 import MainLayout from '../Components/Shared/MainLayout';
-import Spinner from '../utilities/Spinner';
+import { Spin } from "antd";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Helmet } from 'react-helmet-async';
+import { FaLock } from 'react-icons/fa';
 
 const ResetPassword = () => {
     const {t} =useTranslation()
@@ -139,7 +133,8 @@ const ResetPassword = () => {
                             size="large"
                             disabled={loading}
                         >
-                            {loading ? <Spinner /> : t('ResetPassword.resetPassword')}
+                            {loading ? <Spin size="large" /> : <FaLock style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+                            {t('ResetPassword.resetPassword')}
                         </Button>
                     </Box>
                 </Paper>
