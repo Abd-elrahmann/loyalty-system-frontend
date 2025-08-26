@@ -13,6 +13,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { Helmet } from 'react-helmet-async';
+import { Spin } from "antd";
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -148,7 +149,7 @@ const Profile = () => {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress />
+        <Spin size="large" />
       </Box>
     );
   }

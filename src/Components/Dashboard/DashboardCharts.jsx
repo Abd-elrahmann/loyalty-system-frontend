@@ -1,13 +1,31 @@
 import React, { memo } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { EmojiEvents as TrophyIcon, People as PeopleIcon, Assessment as AssessmentIcon } from '@mui/icons-material';
+import { 
+  Card, 
+  Row, 
+  Col, 
+  Typography, 
+  Space,
+  Avatar,
+  List,
+  Tag,
+} from 'antd';
+import { useMediaQuery } from '@mui/material';
+import { 
+  TrophyOutlined, 
+  UserOutlined, 
+  BarChartOutlined,
+  PieChartOutlined
+} from '@ant-design/icons';
 import { 
   BarChart, Bar, 
   PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
-} from 'recharts/es6';
+} from 'recharts';
 import { useUser } from '../../utilities/user';
+
+const { Title, Text } = Typography;
+
 const COLORS = ['#800080', '#b300b3', '#e600e6', '#ff33ff'];
 
 const PointsComparisonChart = memo(({ data }) => (
@@ -49,7 +67,7 @@ const DistributionChart = memo(({ data }) => (
         cy="50%"
         innerRadius={70}
         dataKey="value"
-        labelLine= {true}
+        labelLine={true}
         label={({ value }) => value > 0 ? `${value}%` : ""}
       >
         {data.map((entry, index) => (
@@ -65,6 +83,10 @@ const DistributionChart = memo(({ data }) => (
 const DashboardCharts = memo(({ dashboardData }) => {
   const { t, i18n } = useTranslation();
   const user = useUser();
+  const isSmallScreen = useMediaQuery('(max-width: 480px)');
+  const isMediumScreen = useMediaQuery('(max-width: 768px)');
+  const isLargeScreen = useMediaQuery('(min-width: 1200px)');
+
   const pointsDistributionData = Object.entries(dashboardData.pointsDistribution || {}).map(([name, value]) => ({
     name,
     value: parseFloat(value)
@@ -76,102 +98,115 @@ const DashboardCharts = memo(({ dashboardData }) => {
   ];
 
   return (
-    <>
-      <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
-        <Typography 
-          variant="h6" 
-          component="h2"
-          sx={{ 
-            fontWeight: 'bold', 
-            fontSize: '1.2rem',
-            mb: 3,
-            display: 'block'
-          }}
-        >
-          {t('Dashboard.PointsComparison')}
-        </Typography>
-        <Grid container spacing={2} mb={3}>
-          <Grid item xs={6} sm={3}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t('Dashboard.TotalEarnPoints')}
-            </Typography>
-            <Typography variant="h5">{dashboardData.totalEarnPoints}</Typography>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t('Dashboard.TotalRedeemPoints')}
-            </Typography>
-            <Typography variant="h5">{dashboardData.totalRedeemPoints}</Typography>
-          </Grid>
-        </Grid>
-        <PointsComparisonChart data={pointsComparisonData} />
-      </Box>
+    <Row gutter={[16, 16]} justify={isSmallScreen ? 'center' : isMediumScreen ? 'space-between' : isLargeScreen ? 'space-between' : 'center'}>
+      {/* Points Comparison Card */}
+      <Col xs={24} lg={12}>
+        <Card>
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Title level={4} style={{ margin: 0 }}>
+              {t('Dashboard.PointsComparison')}
+            </Title>
+            
+            <Row gutter={16} style={{width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}} justify="center">
+              <Col xs={24} sm={12} style={{display: 'flex', justifyContent: 'center'}}>
+                <Card size="small" style={{width: isSmallScreen ? '100%' : '200px'}}>
+                  <Space direction="vertical" align="center" style={{width: '100%'}}>
+                    <Text type="secondary">{t('Dashboard.TotalEarnPoints')}</Text>
+                    <Title level={3} style={{margin: 0}}>
+                      {dashboardData.totalEarnPoints}
+                    </Title>
+                  </Space>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} style={{display: 'flex', justifyContent: 'center'}}>
+                <Card size="small" style={{width: isSmallScreen ? '100%' : '200px'}}>
+                  <Space direction="vertical" align="center" style={{width: '100%'}}>
+                    <Text type="secondary">{t('Dashboard.TotalRedeemPoints')}</Text>
+                    <Title level={3} style={{margin: 0}}>
+                      {dashboardData.totalRedeemPoints}
+                    </Title>
+                  </Space>
+                </Card>
+              </Col>
+            </Row>
+            
+            <PointsComparisonChart data={pointsComparisonData} />
+          </Space>
+        </Card>
+      </Col>
 
-      <Box sx={{ display: user.role === 'ADMIN' ? '' : 'none', p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
-        <Typography 
-          variant="h6" 
-          component="h2"
-          sx={{ 
-            fontWeight: 'bold', 
-            fontSize: '1.2rem',
-            mb: 3,
-            display: 'block'
-          }}
-        >
-          <TrophyIcon sx={{ mr: 1, verticalAlign: 'middle', color: 'warning.main' }} />
-          {t('Dashboard.TopEarners')}
-        </Typography>
-        <Grid container spacing={2} justifyContent={{ xs: 'center', sm: 'flex-start' }}>
-          {user.role === 'ADMIN' && dashboardData.topEarners.map((earner, index) => (
-            <Grid item xs={12} sm={6} key={earner.userId}>
-              <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {index + 1}. {i18n.language === 'ar' ? earner.arName : earner.enName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {t('Dashboard.Points')}: {earner.points.toLocaleString()}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+      {/* Top Earners Card - Only for ADMIN */}
+      {user.role === 'ADMIN' && (
+        <Col xs={24} lg={12}>
+          <Card>
+            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+              <Title level={4} style={{ margin: 0 }}>
+                <TrophyOutlined style={{ color: '#faad14', marginRight: 8 }} />
+                {t('Dashboard.TopEarners')}
+              </Title>
+              
+              <List
+                itemLayout="horizontal"
+                dataSource={dashboardData.topEarners}
+                renderItem={(earner, index) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar 
+                          style={{ 
+                            backgroundColor: index === 0 ? '#fde3cf' : '#f0f0f0',
+                            color: index === 0 ? '#f56a00' : '#000000'
+                          }}
+                        >
+                          {index + 1}
+                        </Avatar>
+                      }
+                      title={i18n.language === 'ar' ? earner.arName : earner.enName}
+                      description={
+                        <Space>
+                          <Tag color="purple">
+                            {earner.points.toLocaleString()} {t('Dashboard.Points')}
+                          </Tag>
+                        </Space>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            </Space>
+          </Card>
+        </Col>
+      )}
 
-      <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
-        <Typography 
-          variant="h6" 
-          component="h2"
-          sx={{ 
-            fontWeight: 'bold', 
-            fontSize: '1.2rem',
-            mb: 3,
-            display: 'block'
-          }}
-        >
-          {t('Dashboard.MostUsedProducts')}
-        </Typography>
-        <ProductsChart 
-          data={dashboardData.mostUsedProducts}
-          nameKey={i18n.language === 'ar' ? 'arName' : 'enName'}
-        />
-      </Box>
+      {/* Most Used Products Card */}
+      <Col xs={24} lg={12}>
+        <Card>
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Title level={4} style={{ margin: 0 }}>
+              <BarChartOutlined style={{ marginRight: 8 }} />
+              {t('Dashboard.MostUsedProducts')}
+            </Title>
+            <ProductsChart 
+              data={dashboardData.mostUsedProducts}
+              nameKey={i18n.language === 'ar' ? 'arName' : 'enName'}
+            />
+          </Space>
+        </Card>
+      </Col>
 
-      <Box sx={{ p: 3, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1, textAlign: { xs: 'center', sm: 'left' } }}>
-        <Typography 
-          variant="h6" 
-          component="h2"
-          sx={{ 
-            fontWeight: 'bold', 
-            fontSize: '1.2rem',
-            mb: 3,
-            display: 'block'
-          }}
-        >
-          {t('Dashboard.PointsDistribution')}
-        </Typography>
-        <DistributionChart data={pointsDistributionData} />
-      </Box>
-    </>
+      {/* Points Distribution Card */}
+      <Col xs={24} lg={12}>
+        <Card>
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Title level={4} style={{ margin: 0 }}>
+              <PieChartOutlined style={{ marginRight: 8 }} />
+              {t('Dashboard.PointsDistribution')}
+            </Title>
+            <DistributionChart data={pointsDistributionData} />
+          </Space>
+        </Card>
+      </Col>
+    </Row>
   );
 });
 

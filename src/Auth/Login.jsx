@@ -11,7 +11,6 @@ const IconButton = React.lazy(() => import('@mui/material/IconButton'));
 const InputAdornment = React.lazy(() => import('@mui/material/InputAdornment'));
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import Spinner from '../utilities/Spinner';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
 import MainLayout from '../Components/Shared/MainLayout';
@@ -22,7 +21,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import { Helmet } from 'react-helmet-async';
-
+import { Spin } from "antd";
 const Login = () => {
   const {t} =useTranslation()
   const navigate = useNavigate();
@@ -172,7 +171,7 @@ const Login = () => {
             size="large"
             disabled={loading}
           >
-            {loading ? <Spinner /> : t('Login.login')}
+            {loading ? <Spin size="large" /> : t('Login.login')}
           </Button>
 
           <Box sx={{ mt: 2, textAlign: 'center' }}>

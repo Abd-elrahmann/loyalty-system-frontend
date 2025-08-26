@@ -8,7 +8,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser, updateUserProfile } from '../../utilities/user.jsx';
 
-const drawerWidth = 260;
+const drawerWidth = 230;
 
 const Sidebar = ({ onToggle, sidebarVisible, open }) => {
   const { t, i18n } = useTranslation();

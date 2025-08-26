@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { FaTrash } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
-import Spinner from '../utilities/Spinner';
+
 import TransactionSearchModal from "../Components/Modals/TransactionSearchModal";
 import { Search, ArrowBack } from "@mui/icons-material";
 import jsPDF from 'jspdf';
@@ -21,6 +21,7 @@ import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
 import { useUser } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
+import { Spin } from "antd";
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -356,7 +357,7 @@ const Transactions = () => {
             {isLoading ? (
               <StyledTableRow>
                 <StyledTableCell colSpan={8} align="center">
-                  <Spinner />
+                  <Spin size="large" />
                 </StyledTableCell>
               </StyledTableRow>
             ) : !transactions || transactions.length === 0 ? (

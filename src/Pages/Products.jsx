@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, CircularProgress, Pagination, useMediaQuery } from '@mui/material';
+import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, Pagination, useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
@@ -13,6 +13,7 @@ import DeleteModal from '../Components/Modals/DeleteModal';
 import Swal from 'sweetalert2';
 import { useUser, updateUserProfile } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
+import { Spin } from "antd";
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
@@ -246,7 +247,7 @@ const Products = () => {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
-          <CircularProgress />
+          <Spin size="large" />
         </Box>
       ) : (
         <>

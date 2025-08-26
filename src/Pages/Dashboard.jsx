@@ -1,38 +1,31 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { Box, Stack, Typography, useTheme, Button, TextField, CircularProgress } from '@mui/material';
+import { Layout, Card, Row, Col, DatePicker, Button, Space, Spin, Typography, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import Api from '../Config/Api';
-import { 
-  CardGiftcard as PointsIcon,
-  CompareArrows as CompareIcon,
-  People as PeopleIcon,
-  Assessment as AssessmentIcon
-} from '@mui/icons-material';
-import Grid from '@mui/material/Grid';
+import {
+  GiftOutlined,
+  SwapOutlined,
+  UserOutlined,
+  BarChartOutlined,
+  AreaChartOutlined
+} from '@ant-design/icons';
 import { Helmet } from 'react-helmet-async';
 import { animate } from 'framer-motion';
 import { useUser } from '../utilities/user';
-
+import dayjs from 'dayjs';
+import Theme from '../utilities/Theme';
+const { Header, Content } = Layout;
+const { Title } = Typography;
+const PointsChart = lazy(() => import('../Components/Dashboard/PointsChart'));
 const DashboardCharts = lazy(() => import('../Components/Dashboard/DashboardCharts'));
+
 
 const PERIODS = ['day', 'week', 'month', 'year'];
 
 // eslint-disable-next-line no-unused-vars
 const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary' }) => {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const user = useUser();
   const [displayValue, setDisplayValue] = useState(0);
-  const colorMap = {
-    primary: theme.palette.primary.main,
-    secondary: theme.palette.secondary.main,
-    success: theme.palette.success.main,
-    warning: theme.palette.warning.main,
-    error: theme.palette.error.main,
-    info: theme.palette.info.main
-  };
 
   useEffect(() => {
     const numericValue = parseInt(value.replace(/,/g, ''));
@@ -48,43 +41,27 @@ const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary
   }, [value]);
 
   return (
-    <Box sx={{
-      p: 3,
-      borderRadius: 2,
-      bgcolor: 'background.paper',
-      boxShadow: 1,
-      display: 'flex',
-      justifyContent: user.role==='ADMIN' ? 'flex-start' : 'center',
-      flexDirection: 'column',
-      height: '100%',
-      textAlign: { xs: 'center', sm: 'left' },
-      '& h4': {
-        fontSize: '1.5rem',
-        lineHeight: 1.2,
-        fontWeight: 600,
-      }
-    }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, justifyContent: user.role==='ADMIN' ? { xs: 'center', sm: 'flex-start' } : 'center' }}>
-        <Icon sx={{ color: colorMap[color], mr: 1 }} />
-        <Typography variant="subtitle2" color="text.secondary">
-          {title}
-        </Typography>
-      </Box>
-      <Typography component="h4" variant="h4">
-        {displayValue}
-      </Typography>
-      {trend !== undefined && (
-        <Typography variant="caption" sx={{ color: trend >= 0 ? 'success.main' : 'error.main' }}>
-          {trend >= 0 ? `+${trend}%` : `${trend}%`} {t('Dashboard.fromLastPeriod')}
-        </Typography>
-      )}
-    </Box>
+    <Card>
+      <Space direction="vertical" size="small">
+        <Space>
+          <Icon style={{ fontSize: '24px', color: color }} />
+          <Typography.Text type="secondary">{title}</Typography.Text>
+        </Space>
+        <Typography.Title level={3}>{displayValue}</Typography.Title>
+        {trend !== undefined && (
+          <Typography.Text type={trend >= 0 ? 'success' : 'danger'}>
+            {trend >= 0 ? `+${trend}%` : `${trend}%`} {t('Dashboard.fromLastPeriod')}
+          </Typography.Text>
+        )}
+      </Space>
+    </Card>
   );
 });
 
 const Dashboard = () => {
+  const theme = Theme;
   const { t } = useTranslation();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [loading, setLoading] = useState(true);
   const user = useUser();
@@ -120,170 +97,108 @@ const Dashboard = () => {
   const exportToPDF = () => {
   };
 
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
-    <>
-    {loading ? (
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress sx={{ marginTop: '200px' }} />
-      </Box>
-    ) : (
-    <Box sx={{ p: 3 }}>
+    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
       <Helmet>
         <title>{t('Dashboard.Dashboard')}</title>
         <meta name="description" content={t('Dashboard.DashboardDescription')} />
       </Helmet>
-      <Stack spacing={3}>
-        {/* Filters */}
-        <Stack 
-          direction={{ xs: 'column', sm: 'row' }} 
-          spacing={2} 
-          justifyContent={user.role === 'ADMIN' ? "space-between" : "center"}
-          alignItems="center"
-          sx={{ mb: 2 }}
-        >
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2, 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            flexWrap: { xs: 'wrap', sm: 'nowrap' },
-            width: { xs: '100%', sm: 'auto' }
-          }}>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                label={t('Dashboard.SelectDate')}
-                value={selectedDate}
-                onChange={(newDate) => setSelectedDate(newDate)}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-            
-            {PERIODS.map((period) => (
-              <Button
-                key={period}
-                variant={selectedPeriod === period ? 'contained' : 'outlined'}
-                onClick={() => setSelectedPeriod(period)}
-                sx={{ 
-                  textTransform: 'capitalize',
-                  minWidth: { xs: '80px', sm: 'auto' }
-                }}
-              >
-                {t(`Dashboard.${period}`)}
-              </Button>
-            ))}
-          </Box>
-          {user.role === 'ADMIN' && (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              marginBottom: { xs: '20px', sm: 0 },
-              width: { xs: '100%', sm: 'auto' }
-            }}>  
-              <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={exportToPDF} 
-                sx={{ 
-                  width: { xs: '180px', sm: '200px' },
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center' 
-                }}
-              >
-                {t('Dashboard.DashboardReport')}
-              </Button>
-            </Box>
-          )}
-        </Stack>
 
-        {/* Stats Cards Row */}
-        <Grid container spacing={3} sx={{ 
-          width: '100%', 
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
+      <Content style={{ padding: '24px' }}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          {/* Filters Section */}
+          <Row justify={user.role === 'ADMIN' ? "space-between" : "center"} align="middle" gutter={[16, 16]}>
+            <Col>
+              <Space wrap>
+                <DatePicker
+                  color='primary'
+                  value={dayjs(selectedDate)}
+                  onChange={setSelectedDate}
+                  format="DD/MM/YYYY"
+                  placeholder={t('Dashboard.SelectDate')}
+                />
+                <Select
+                  value={selectedPeriod}
+                  onChange={setSelectedPeriod}
+                  style={{ width: 120 }}
+                >
+                  {PERIODS.map(period => (
+                    <Select.Option key={period} value={period}>
+                      {t(`Dashboard.${period}`)}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Space>
+            </Col>
             {user.role === 'ADMIN' && (
-            <>
-              <Grid item xs={12} sm={6} md={3} sx={{ 
-                width: { xs: '100%', sm: '220px' },
-                maxWidth: { xs: '300px', sm: '220px' },
-                height: '100px',
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center' 
-              }}>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<AreaChartOutlined />}
+                  onClick={exportToPDF}
+                  style={{backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText}}
+                >
+                  {t('Dashboard.DashboardReport')}
+                </Button>
+              </Col>
+            )}
+          </Row>
+
+          {/* Stats Cards */}
+          {user.role === 'ADMIN' && (
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12} lg={6}>
                 <StatCard
-                  icon={PeopleIcon}
+                  icon={UserOutlined}
                   title={t('Dashboard.TotalCustomers')}
                   value={dashboardData.customersCount.toLocaleString()}
-                  color="primary"
+                  color="#1890ff"
                 />
-              </Grid>
-          <Grid item xs={12} sm={6} md={3} sx={{ 
-            width: { xs: '100%', sm: '220px' },
-            maxWidth: { xs: '300px', sm: '220px' },
-            height: '100px',
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center' 
-          }}>
-            <StatCard
-              icon={PointsIcon}
-              title={t('Dashboard.TotalPoints')}
-              value={dashboardData.totalPoints.toLocaleString()}
-              color="primary"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} sx={{ 
-            width: { xs: '100%', sm: '220px' },
-            maxWidth: { xs: '300px', sm: '220px' },
-            height: '100px',
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center' 
-          }}>
-            <StatCard
-              icon={AssessmentIcon}
-              title={t('Dashboard.AvgPoints')}
-              value={dashboardData.avgPoints.toLocaleString()}
-              color="warning"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} sx={{ 
-            width: { xs: '100%', sm: '220px' },
-            maxWidth: { xs: '300px', sm: '220px' },
-            height: '100px',
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center' 
-          }}>
-            <StatCard
-              icon={CompareIcon}
-              title={t('Dashboard.TransactionsCount')}
-              value={dashboardData.transactionsCount.toLocaleString()}
-              color="info"
-            />
-          </Grid>
-        
-        
-            </>
+              </Col>
+              <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                  icon={GiftOutlined}
+                  title={t('Dashboard.TotalPoints')}
+                  value={dashboardData.totalPoints.toLocaleString()}
+                  color="#52c41a"
+                />
+              </Col>
+              <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                  icon={BarChartOutlined}
+                  title={t('Dashboard.AvgPoints')}
+                  value={dashboardData.avgPoints.toLocaleString()}
+                  color="#faad14"
+                />
+              </Col>
+              <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                  icon={SwapOutlined}
+                  title={t('Dashboard.TransactionsCount')}
+                  value={dashboardData.transactionsCount.toLocaleString()}
+                  color="#13c2c2"
+                />
+              </Col>
+            </Row>
           )}
-        </Grid>
 
-        {/* Charts Section */}
-        <Suspense fallback={
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress />
-          </Box>
-        }>
-          <DashboardCharts dashboardData={dashboardData} />
-        </Suspense>
-      </Stack>
-    </Box>
-    )}
-    </>
+          {/* Charts Section */}
+          <Card>
+            <Suspense fallback={<div style={{ textAlign: 'center', padding: '40px' }}><Spin /></div>}>
+              <DashboardCharts dashboardData={dashboardData} />
+            </Suspense>
+          </Card>
+        </Space>
+      </Content>
+    </Layout>
   );
 };
 

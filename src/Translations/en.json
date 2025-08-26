@@ -50,8 +50,8 @@
     "Dashboard": "Dashboard",
     "TotalCustomers": "Total Customers",
     "TotalPoints": "Total Points",
-    "TotalEarnPoints": "Total Earn Points",
-    "TotalRedeemPoints": "Total Redeem Points",
+    "TotalEarnPoints": "Total Earn",
+    "TotalRedeemPoints": "Total Redeem",
     "TotalTransactions": "Total Transactions",
     "TotalRewards": "Total Rewards",
     "CustomersCount": "Customers Count",
@@ -82,7 +82,8 @@
     "DashboardDescription": "A comprehensive loyalty system for cafes and restaurants that allows you to track customer activity, analyze sales, manage rewards, and track point usage in real-time. With detailed reports on loyalty program performance and customer behavior to drive your business growth",
     "RecentUsers": "Recent Users",
     "User": "User",
-    "JoinDate": "Join Date"
+    "JoinDate": "Join Date",
+    "RememberMe": "Remember Me"
   },
   "Profile": {
     "Title": "Profile",

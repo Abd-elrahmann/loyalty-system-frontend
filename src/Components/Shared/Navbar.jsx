@@ -12,7 +12,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useUser, updateUserProfile } from '../../utilities/user.jsx';
 import Api from '../../Config/Api';
-
 const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -68,7 +67,6 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('profile');
-    updateUserProfile(); 
     navigate('/login');
   };
 

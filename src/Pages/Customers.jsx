@@ -14,6 +14,7 @@ import {
 import Spinner from '../utilities/Spinner';
 import { Helmet } from 'react-helmet-async';
 import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button } from '@mui/material';
+import { Spin } from "antd";
 const AddCustomer = lazy(() => import("../Components/Modals/AddCustomer"));
 const DeleteModal = lazy(() => import("../Components/Modals/DeleteModal"));
 const AddPointsModal = lazy(() => import("../Components/Modals/AddPointsModal")); 
@@ -321,7 +322,7 @@ const Customers = () => {
               {isLoading ? (
                 <StyledTableRow>
                   <StyledTableCell colSpan={10} align="center">
-                    <Spinner />
+                    <Spin size="large" />
                   </StyledTableCell>
                 </StyledTableRow>
               ) : !customers || customers.length === 0 ? (

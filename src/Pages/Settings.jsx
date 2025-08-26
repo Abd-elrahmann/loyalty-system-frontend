@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Divider, Button, TextField, CircularProgress, Container, Autocomplete } from '@mui/material';
+import { Box, Typography, Paper, Divider, Button, TextField, Container, Autocomplete } from '@mui/material';
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
 import { useUser } from '../utilities/user';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-
+import { Spin } from "antd";
 const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -101,7 +101,7 @@ const Settings = () => {
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
+        <Spin size="large" />
       </Box>
     );
   }
@@ -191,10 +191,10 @@ const Settings = () => {
           onClick={handleSave}
           disabled={saving}
           size="small"
-          startIcon={saving ? <CircularProgress size={20} /> : null}
+          startIcon={saving ? <Spin size="large" /> : null}
           sx={{ px: 4 }}
         >
-          {saving ? t('Settings.Saving') : t('Settings.Save')}
+          {saving ? <Spin size="large" /> : t('Settings.Save')}
         </Button>
       </Box>
     </Container>

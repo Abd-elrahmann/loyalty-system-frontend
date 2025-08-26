@@ -26,7 +26,6 @@ import {
 import { FaCheck, FaTimes, FaSearch, FaSync, FaTrash } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import RewardsSearchModal from "../Components/Modals/RewardsSearchModal";
-import Spinner from "../utilities/Spinner";
 import * as xlsx from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -35,6 +34,7 @@ import { FaQrcode } from "react-icons/fa";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
 import { useUser, updateUserProfile } from "../utilities/user.jsx";
+import { Spin } from "antd";
 
 const Rewards = () => {
   const { t, i18n } = useTranslation();
@@ -690,7 +690,7 @@ const Rewards = () => {
                   align="center"
                   justifyContent="center"
                 >
-                  <Spinner />
+                  <Spin size="large" />
                 </StyledTableCell>
               </StyledTableRow>
             ) : filteredRewards.length === 0 ? (
