@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Box, Tabs, Tab, Button, Card, CardContent, CardMedia, Typography, Grid, TextField, InputAdornment, IconButton, Pagination, useMediaQuery } from '@mui/material';
 import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
@@ -13,16 +13,24 @@ import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash.debounce';
+
 
 const Products = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('cafe');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchFilters, setSearchFilters] = useState({
+    enName: '',
+    arName: ''
+  });
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [productId, setProductId] = useState(null);
   const [productToEdit, setProductToEdit] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchValue, setSearchValue] = useState('');
+  // eslint-disable-next-line no-unused-vars
+  const [scannedProduct, setScannedProduct] = useState('');
   const isMobile = useMediaQuery('(max-width: 400px)');
   const profile = useUser();
   const queryClient = useQueryClient();
@@ -47,8 +55,8 @@ const Products = () => {
   const totalItems = data?.totalItems || 0;
 
   const filteredProducts = products.filter(product => 
-    product.enName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.arName.toLowerCase().includes(searchTerm.toLowerCase())
+    product.enName.toLowerCase().includes(searchFilters.enName.toLowerCase()) ||
+    product.arName.toLowerCase().includes(searchFilters.arName.toLowerCase())
   );
 
   const addProductMutation = useMutation({
@@ -130,7 +138,10 @@ const Products = () => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
-    setSearchTerm('');
+    setSearchFilters({
+      enName: '',
+      arName: '',
+    });
     setCurrentPage(1);
   };
 
@@ -157,9 +168,26 @@ const Products = () => {
     deleteProductMutation.mutate(id);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (e) => {
+    debouncedSearch(e.target.value);
+    setSearchValue(e.target.value);
   };
+
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(debounce((value) => {
+      setSearchFilters((prev) => ({
+      ...prev,
+      enName: value,
+    }));
+      setSearchFilters((prev) => ({
+      ...prev,
+      arName: value,
+    }));  
+    setScannedProduct("");
+    setCurrentPage(1);
+  }, 800), []);
+
 
   const handleRedeemProduct = (productId) => {
     redeemProductMutation.mutate(productId);
@@ -195,8 +223,8 @@ const Products = () => {
           variant="outlined"
           size="small"
           placeholder={t('Products.Search')}
-          value={searchTerm}
-          onChange={handleSearchChange}
+          value={searchValue} 
+          onChange={handleSearch}
           sx={{
             flexGrow: 1,
             maxWidth: isMobile ? '60%' : '250px',

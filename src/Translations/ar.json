@@ -146,6 +146,8 @@
     "Cancel": "إلغاء",
     "Customer": "عميل",
     "AddPoints": "إضافة نقاط",
+    "CurrentPage": "الصفحة الحالية",
+    "AllPages": "جميع الصفحات",
 
     "invalidQRCode": "كود الاستجابة السريعة غير صالح",
     "qrScanError": "خطأ في قراءة كود الاستجابة السريعة",
@@ -269,7 +271,9 @@
     "TransactionUpdated": "تم تحديث التحويل بنجاح",
     "TransactionNotAdded": "فشل إضافة التحويل",
     "TransactionAdded": "تم إضافة التحويل بنجاح",
-    "TransactionsDescription": "إدارة المعاملات في المقهى والمطعم"
+    "TransactionsDescription": "إدارة المعاملات في المقهى والمطعم",
+    "CurrentPage": "الصفحة الحالية",
+    "AllPages": "جميع الصفحات"
 
   },
   "Settings": {

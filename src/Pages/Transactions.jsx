@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import dayjs from 'dayjs';
-import { Box, Button, Stack, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper } from '@mui/material';
+import { Box, Button, Stack, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Menu, MenuItem } from '@mui/material';
 
 import {
   StyledTableCell,
@@ -24,13 +24,14 @@ import { useUser } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";  
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
+  const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
+  const [excelAnchorEl, setExcelAnchorEl] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const [filters, setFilters] = useState({
@@ -53,6 +54,31 @@ const Transactions = () => {
 
     const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
     return response.data;
+  };
+
+  const fetchAllTransactions = async () => {
+    const response = await Api.get(`/api/transactions/all-transactions`);
+    return response.data;
+  };
+
+  const handlePdfClick = (event) => {
+    // Get the button element that was clicked
+    const buttonElement = event.currentTarget;
+    setPdfAnchorEl(buttonElement);
+  };
+
+  const handleExcelClick = (event) => {
+    // Get the button element that was clicked
+    const buttonElement = event.currentTarget;
+    setExcelAnchorEl(buttonElement);
+  };
+
+  const handlePdfClose = () => {
+    setPdfAnchorEl(null);
+  };
+
+  const handleExcelClose = () => {
+    setExcelAnchorEl(null);
   };
 
   const { data, isLoading } = useQuery({
@@ -104,29 +130,52 @@ const Transactions = () => {
     return transaction.user.enName;
   };
 
-  const exportToCSV = () => {
+  const exportToCSV = async (exportAll = false) => {
     try {
-      const exportData = transactions.map(transaction => ({
-        ID: transaction.id,
-        'Name': getArabicName(transaction),
-        Points: transaction.points,
-        Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
-        Type: transaction.type,
-        Date: transaction.formattedDate
-      }));
-
+      let exportData;
+      const date = dayjs(transactions.date).format('YYYY-MM-DD');
+      if (exportAll) {
+        const allTransactions = await fetchAllTransactions();
+        exportData = allTransactions.map(transaction => ({
+          ID: transaction.id,
+          'Name': getArabicName(transaction),
+          Points: transaction.points,
+          Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+          Type: transaction.type,
+          Date: date
+        }));
+      } else {
+        exportData = transactions.map(transaction => ({
+          ID: transaction.id,
+          'Name': getArabicName(transaction),
+          Points: transaction.points,
+          Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+          Type: transaction.type,
+          Date: date
+        }));
+      }
+  
       const workbook = xlsx.utils.book_new();
       const worksheet = xlsx.utils.json_to_sheet(exportData);
       xlsx.utils.book_append_sheet(workbook, worksheet, 'Transactions');
       xlsx.writeFile(workbook, 'transactions_report.xlsx');
+      handleExcelClose();
     } catch (error) {
       console.log(error);
       notifyError(t("Errors.generalError"));
     }
   };
-
-  const exportToPDF = () => {
-    try {
+  
+  const exportToPDF = async (exportAll = false) => {
+    try { 
+      let dataToExport;
+      
+      if (exportAll) {
+        dataToExport = await fetchAllTransactions();
+      } else {
+        dataToExport = transactions;
+      }
+      
       const doc = new jsPDF();
       
       doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
@@ -143,23 +192,16 @@ const Transactions = () => {
         'Type',
         'Date'
       ];
-
-      const getCurrency = (transaction) => {
-        if (i18n.language === "ar") {
-          return String(transaction.currency.arCurrency).normalize("NFC");
-        }
-        return transaction.currency.enCurrency;
-      };
-
-      const rows = transactions.map(transaction => [
+  
+      const rows = dataToExport.map(transaction => [
         transaction.id,
         getArabicName(transaction),
         transaction.points,
-        getCurrency(transaction),
+        i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
         transaction.type,
-        transaction.formattedDate
+        dayjs(transaction.date).format('YYYY-MM-DD')
       ]);
-
+  
       autoTable(doc, {
         startY: 25,
         head: [columns],
@@ -173,27 +215,20 @@ const Transactions = () => {
             fontStyle: "bold",
             halign: 'center',
             cellWidth: 30,
-            direction: 'rtl'
+            direction: i18n.language === 'ar' ? 'rtl' : 'ltr'
           },
           3: {
             font: "Amiri",
             fontStyle: "bold",
             halign: 'center',
             cellWidth: 30,
-            direction: 'rtl'
-          }
-        },
-        didDrawCell: function(data) {
-          if (data.column.index === 3 && data.cell.section === 'body') {
-            const text = data.cell.text[0];
-            if (text && /[\u0600-\u06FF]/.test(text)) {
-              data.cell.text = [text];
-            }
+            direction: i18n.language === 'ar' ? 'rtl' : 'ltr'
           }
         }
       });
-
+  
       doc.save('transactions_report.pdf');
+      handlePdfClose();
     } catch (error) {
       console.log(error);
       notifyError(t("Errors.generalError")); 
@@ -292,7 +327,7 @@ const Transactions = () => {
             <Button
               variant="outlined"
               startIcon={<FileExcelOutlined />}
-              onClick={() => exportToCSV()}
+              onClick={handleExcelClick}
               sx={{
                 "&:hover": {
                   backgroundColor: "primary.main",
@@ -302,10 +337,52 @@ const Transactions = () => {
             >
               {t("Transactions.ExportCSV")}
             </Button>
+            <Menu
+              anchorEl={excelAnchorEl}
+              open={Boolean(excelAnchorEl)}
+              onClose={handleExcelClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              sx={{
+                '& .MuiPaper-root': {
+                  minWidth: '200px',
+                }
+              }}
+            >
+              <MenuItem onClick={() => exportToCSV(false)}>{t("Transactions.CurrentPage")}</MenuItem>
+              <MenuItem onClick={() => exportToCSV(true)}>{t("Transactions.AllPages")}</MenuItem>
+            </Menu>
+            <Menu
+              anchorEl={pdfAnchorEl}
+              open={Boolean(pdfAnchorEl)}
+              onClose={handlePdfClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              sx={{
+                '& .MuiPaper-root': {
+                  minWidth: '200px',
+                }
+              }}
+            >
+              <MenuItem onClick={() => exportToPDF(false)}>{t("Transactions.CurrentPage")}</MenuItem>
+              <MenuItem onClick={() => exportToPDF(true)}>{t("Transactions.AllPages")}</MenuItem>
+            </Menu>
             <Button
               variant="outlined"
               startIcon={<FilePdfOutlined />}
-              onClick={() => exportToPDF()}
+              onClick={handlePdfClick}
               sx={{
                 "&:hover": {
                   backgroundColor: "primary.main",
@@ -388,7 +465,7 @@ const Transactions = () => {
                     </span>
                   </StyledTableCell>
                   <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    {transaction.formattedDate}
+                    {dayjs(transaction.date).format('DD/MM/YYYY hh:mm')}
                   </StyledTableCell>
                   <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
                     <IconButton 

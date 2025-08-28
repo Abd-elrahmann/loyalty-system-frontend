@@ -1,9 +1,9 @@
 import React from "react";
-import { useState} from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import { useTranslation } from "react-i18next";
-import { SearchOutlined, FilePdfOutlined,FileExcelOutlined } from "@ant-design/icons";
+import { SearchOutlined, FilePdfOutlined, FileExcelOutlined } from "@ant-design/icons";
 import AddIcon from "@mui/icons-material/Add";
 import { DeleteOutlined, EditOutlined, PlusOutlined, QrcodeOutlined, EyeOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
@@ -12,13 +12,15 @@ import {
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
 import { Helmet } from 'react-helmet-async';
-import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button } from '@mui/material';
+import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button, Menu, MenuItem, Link } from '@mui/material';
 import { Spin } from "antd";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
 import ScanQRModal from "../Components/Modals/ScanQRModal";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import debounce from "lodash.debounce";
 
 const Customers = () => {
   const { t, i18n } = useTranslation();
@@ -42,6 +44,41 @@ const Customers = () => {
   const [customerToAddPoints, setCustomerToAddPoints] = useState(null);
   const [openScanQR, setOpenScanQR] = useState(false);
   const [scannedEmail, setScannedEmail] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+
+  const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
+  const [excelAnchorEl, setExcelAnchorEl] = useState(null);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      setSearchFilters((prev) => ({
+        ...prev,
+        email: value,
+      }));
+      setScannedEmail("");
+      setPage(1);
+    }, 800),
+    []
+  );
+
+  const handlePdfClick = (event) => {
+    const buttonElement = event.currentTarget;
+    setPdfAnchorEl(buttonElement);
+  };
+
+  const handleExcelClick = (event) => {
+    const buttonElement = event.currentTarget;
+    setExcelAnchorEl(buttonElement);
+  };
+
+  const handlePdfClose = () => {
+    setPdfAnchorEl(null);
+  };
+
+  const handleExcelClose = () => {
+    setExcelAnchorEl(null);
+  };
 
   const fetchCustomers = async () => {
     const queryParams = new URLSearchParams();
@@ -53,6 +90,11 @@ const Customers = () => {
 
     const response = await Api.get(`/api/users/${page}?${queryParams}`);
     return response.data;
+  };
+
+  const fetchAllCustomers = async () => {
+    const response = await Api.get(`/api/users/all-users`);
+    return response.data.users || [];
   };
 
   const { data, isLoading } = useQuery({
@@ -78,8 +120,9 @@ const Customers = () => {
     }
   });
 
-  const handleSearch = () => {
-    setPage(1);
+  const handleSearch = (e) => {
+    debouncedSearch(e.target.value);
+    setSearchValue(e.target.value);
   };
 
   const handleDelete = async () => {
@@ -101,9 +144,9 @@ const Customers = () => {
     setPage(1);
     notifySuccess(t("Customers.qrScanSuccess") + `: ${email}`);
   };
-
-  const exportToPDF = async () => {
-    try {
+  const exportToPDF = async (exportAll = false) => {
+    try { 
+      const allCustomers = await fetchAllCustomers();
       const [jsPDFModule, autoTableModule] = await Promise.all([
         import('jspdf'),
         import('jspdf-autotable')
@@ -125,7 +168,15 @@ const Customers = () => {
       };
 
       const columns = ['ID', i18n.language === 'ar' ? 'Arabic Name' : 'English Name', 'Role', 'Email', 'Phone', 'Points', 'Created At'];
-      const rows = customers.map(customer => [
+      
+      let dataToExport = [];
+      if (exportAll && Array.isArray(allCustomers)) {
+        dataToExport = allCustomers;
+      } else if (!exportAll && Array.isArray(customers)) {
+        dataToExport = customers.slice(0, rowsPerPage);
+      }
+
+      const rows = dataToExport.map(customer => [
         customer.id,
         getArabicName(customer),
         customer.role,
@@ -161,17 +212,19 @@ const Customers = () => {
       });
 
       doc.save('customers_report.pdf');
+      handlePdfClose();
     } catch (error) {
       console.error(error);
       notifyError(t("Errors.generalError"));
     }
   };
 
-  const exportToCSV = async () => {
+  const exportToCSV = async (exportAll = false) => {
     try {
       const xlsxModule = await import('xlsx');
-  
-      const rows = customers.map(customer => ({
+      const allCustomers = await fetchAllCustomers();
+      const dataToExport = exportAll ? allCustomers : customers.slice(0, rowsPerPage);
+      const rows = dataToExport.map(customer => ({  
         ID: customer.id,
         [i18n.language === 'ar' ? 'الاسم' : 'Name']: 
           i18n.language === 'ar' ? customer.arName : customer.enName,
@@ -186,12 +239,12 @@ const Customers = () => {
       const workbook = xlsxModule.utils.book_new();
       xlsxModule.utils.book_append_sheet(workbook, worksheet, 'Customers');
       xlsxModule.writeFile(workbook, 'customers_report.xlsx');
+      handleExcelClose();
     } catch (error) {
       console.error(error);
       notifyError(t("Errors.generalError"));
     }
   };
-
 
   return (
       <Box sx={{ p: 3, mt: 1 }}>
@@ -211,15 +264,8 @@ const Customers = () => {
           >
             <Stack direction={"row"} spacing={1}>
               <InputBase
-                value={searchFilters.email}
-                onChange={(e) => {
-                  setSearchFilters((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                  })); 
-                  setScannedEmail("");
-                  setPage(1);
-                }}
+                value={searchValue}
+                onChange={handleSearch}
                 placeholder={t("Customers.SearchEmail")}
                 sx={{
                   color: "text.primary",
@@ -265,7 +311,7 @@ const Customers = () => {
               <Button
                 variant="outlined"
                 startIcon={<FileExcelOutlined />}
-                onClick={exportToCSV}
+                onClick={handleExcelClick}
                 sx={{
                   "&:hover": {
                     backgroundColor: "primary.main",
@@ -275,10 +321,32 @@ const Customers = () => {
               >
                 {t("Customers.ExportCSV")}
               </Button>
+              <Menu
+                anchorEl={excelAnchorEl}
+                open={Boolean(excelAnchorEl)}
+                onClose={handleExcelClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                sx={{
+                  '& .MuiPaper-root': {
+                    minWidth: '200px',
+                  }
+                }}
+              >
+                <MenuItem onClick={() => exportToCSV(false)}>{t("Customers.CurrentPage")}</MenuItem>
+                <MenuItem onClick={() => exportToCSV(true)}>{t("Customers.AllPages")}</MenuItem>
+              </Menu>
+
               <Button
                 variant="outlined"
                 startIcon={<FilePdfOutlined />}
-                onClick={exportToPDF}
+                onClick={handlePdfClick}
                 sx={{
                   "&:hover": {
                     backgroundColor: "primary.main",
@@ -288,6 +356,27 @@ const Customers = () => {
               >
                 {t("Customers.ExportPDF")}
               </Button>
+              <Menu
+                anchorEl={pdfAnchorEl}
+                open={Boolean(pdfAnchorEl)}
+                onClose={handlePdfClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                sx={{
+                  '& .MuiPaper-root': {
+                    minWidth: '200px',
+                  }
+                }}
+              >
+                <MenuItem onClick={() => exportToPDF(false)}>{t("Customers.CurrentPage")}</MenuItem>
+                <MenuItem onClick={() => exportToPDF(true)}>{t("Customers.AllPages")}</MenuItem>
+              </Menu>
             </Stack>
 
             <Button
@@ -353,11 +442,13 @@ const Customers = () => {
                       </Box>
                     </StyledTableCell>
                     <StyledTableCell align="center" sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {customer.email}
+                      <Link href={`mailto:${customer.email}`} underline="hover" color="black" sx={{ cursor: 'pointer' }}>
+                        {customer.email}
+                      </Link>
                     </StyledTableCell>
                     <StyledTableCell align="center">{customer.phone}</StyledTableCell>
                     <StyledTableCell align="center">{customer.points}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.createdAt}</StyledTableCell>
+                    <StyledTableCell align="center">{dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}</StyledTableCell>
                     <StyledTableCell align="center">
                       <IconButton
                         size="small"

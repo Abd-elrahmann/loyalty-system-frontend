@@ -148,6 +148,8 @@
     "User": "User",
     "Customer": "Customer",
     "AddPoints": "Add Points",
+    "CurrentPage": "Current Page",
+    "AllPages": "All Pages",
     "invalidQRCode": "Invalid QR code",
     "qrScanError": "QR code scan error",
     "UploadQRCodeHint": "Upload QR code from image",
@@ -269,7 +271,9 @@
     "TransactionUpdated": "Transaction updated successfully",
     "TransactionNotAdded": "Transaction not added",
     "TransactionAdded": "Transaction added successfully",
-    "TransactionsDescription": "Manage transactions in the cafe and restaurant"
+    "TransactionsDescription": "Manage transactions in the cafe and restaurant",
+    "CurrentPage": "Current Page",
+    "AllPages": "All Pages"
   },
   "Settings": {
     "Settings": "Settings",

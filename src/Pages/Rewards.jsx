@@ -36,7 +36,7 @@ import { Spin } from "antd";
 import { DeleteOutlined,CheckCircleOutlined, CloseOutlined, SearchOutlined, QrcodeOutlined,SelectOutlined,DoubleLeftOutlined,FileExcelOutlined,FilePdfOutlined } from "@ant-design/icons";
 import { PrinterOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import dayjs from "dayjs";
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -776,7 +776,7 @@ const Rewards = () => {
                     />
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {reward.formattedDate}
+                    {dayjs(reward.date).format('DD/MM/YYYY hh:mm')}
                   </StyledTableCell>
                   {tabValue === 0 && !isAllChecked && (
                     <StyledTableCell align="center">

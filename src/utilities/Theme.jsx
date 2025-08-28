@@ -3,19 +3,19 @@
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#800080',     // موف رئيسي
-      light: '#a64ca6',    // موف للهوفر أو تأثيرات فاتحة
-      dark: '#4b004b',     // موف داكن (للـ:active مثلاً)
+      main: '#800080',       // purple
+      light: '#a64ca6',    // purple light
+      dark: '#4b004b',     // purple dark
       contrastText: '#ffffff'
     },
     secondary: {
-      main: '#f0f0f0',     // رمادي فاتح كدعم للثيم
+      main: '#f0f0f0',     // gray
       light: '#ffffff',
       dark: '#cccccc',
       contrastText: '#2a2a2a'
     },
     error: {
-      main: '#D91656',     // نفس اللون القديم للخطاء
+      main: '#D91656',     // red
       light: '#e44479',
       dark: '#970f3c',
       contrastText: '#ffffff'
