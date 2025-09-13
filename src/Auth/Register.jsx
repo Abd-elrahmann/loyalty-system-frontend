@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import React from 'react';
-import { Box, TextField, Button, Typography, Container, Paper, IconButton, InputAdornment } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Paper, IconButton, InputAdornment, LinearProgress } from '@mui/material';
 import { useState } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
@@ -10,7 +10,7 @@ import Api from '../Config/Api';
 import { useTranslation } from 'react-i18next';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { PhoneOutlined } from '@ant-design/icons';
+import { PhoneOutlined,UserOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet-async';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { FaUserPlus } from 'react-icons/fa';
@@ -22,6 +22,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -29,6 +30,35 @@ const Register = () => {
 
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const checkPasswordStrength = (password) => {
+    let score = 0;
+    if (!password) return score;
+
+    // Length check
+    if (password.length >= 8) score += 20;
+    if (password.length >= 12) score += 10;
+
+    // Character variety checks
+    if (/[0-9]/.test(password)) score += 20;
+    if (/[a-z]/.test(password)) score += 20;
+    if (/[A-Z]/.test(password)) score += 20;
+    if (/[^A-Za-z0-9]/.test(password)) score += 10;
+
+    return score;
+  };
+
+  const getPasswordStrengthColor = (strength) => {
+    if (strength < 40) return 'error';
+    if (strength < 70) return 'warning';
+    return 'success';
+  };
+
+  const getPasswordStrengthLabel = (strength) => {
+    if (strength < 40) return t('Register.weakPassword');
+    if (strength < 70) return t('Register.mediumPassword');
+    return t('Register.strongPassword');
   };
 
   const validate = values => {
@@ -88,12 +118,25 @@ const Register = () => {
     onSubmit: async (values) => {
       try {
         setLoading(true);
-        await Api.post('/api/auth/register', values);
-        localStorage.setItem('profile', JSON.stringify(values));
-        notifySuccess('Account created successfully');
-        navigate('/login');
+        const response = await Api.post('/api/auth/register', values);
+        
+        if (response.data.token) {
+          // If registration returns a token, user is logged in
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('profile', JSON.stringify(response.data.user));
+          notifySuccess('Account created successfully');
+          setTimeout(() => {
+            navigate('/dashboard', { replace: true });
+          }, 1000);
+        } else {
+          // If registration is successful but no token (needs login)
+          notifySuccess('Account created successfully! Please login.');
+          setTimeout(() => {
+            navigate('/login', { replace: true });
+          }, 1000);
+        }
       } catch (error) {
-        notifyError(error.response.data.message);
+        notifyError(error.response?.data?.message || 'Registration failed');
       } finally {
         setLoading(false);
       }
@@ -134,7 +177,7 @@ const Register = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <MailOutlined style={{color: '#800080'}} />
+                    <UserOutlined style={{color: '#800080'}} />
                   </InputAdornment>
                 )
               }}
@@ -150,7 +193,7 @@ const Register = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <MailOutlined style={{color: '#800080'}} />
+                    <UserOutlined style={{color: '#800080'}} />
                   </InputAdornment>
                 )
               }}
@@ -197,6 +240,7 @@ const Register = () => {
           <TextField
             fullWidth
             name="password"
+            sx={{ mb: 1 }}
             label={t('Register.password')}
             type={showPassword ? 'text' : 'password'}
             InputProps={{
@@ -211,19 +255,35 @@ const Register = () => {
                 </IconButton>
               )
             }}
-            sx={{ mb: 2 }}
             value={formik.values.password}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              formik.handleChange(e);
+              setPasswordStrength(checkPasswordStrength(e.target.value));
+            }}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
-         
           />
+
+          {formik.values.password && (
+            <Box sx={{ mb: 2 }}>
+              <LinearProgress 
+                variant="determinate" 
+                value={passwordStrength} 
+                color={getPasswordStrengthColor(passwordStrength)}
+                sx={{ height: 8, borderRadius: 5 }}
+              />
+              <Typography variant="caption" color={getPasswordStrengthColor(passwordStrength)}>
+                {getPasswordStrengthLabel(passwordStrength)}
+              </Typography>
+            </Box>
+          )}
 
           <TextField
             fullWidth
             name="confirmPassword"
             label={t('Register.confirmPassword')}
             type={showConfirmPassword ? 'text' : 'password'}
+            sx={{ mb: 2 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -236,12 +296,10 @@ const Register = () => {
                 </IconButton>
               )
             }}
-            sx={{ mb: 3 }}
             value={formik.values.confirmPassword}
             onChange={formik.handleChange}
             error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
             helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-           
           />
 
           <Button

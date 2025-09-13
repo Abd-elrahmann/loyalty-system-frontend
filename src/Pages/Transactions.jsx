@@ -2,8 +2,24 @@ import React from "react";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
-import dayjs from 'dayjs';
-import { Box, Button, Stack, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Menu, MenuItem } from '@mui/material';
+import dayjs from "dayjs";
+import {
+  Box,
+  Button,
+  Stack,
+  IconButton,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Paper,
+  Menu,
+  MenuItem,
+  Chip,
+  useMediaQuery,
+} from "@mui/material";
 
 import {
   StyledTableCell,
@@ -13,17 +29,17 @@ import { useTranslation } from "react-i18next";
 import { DeleteOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
-
+import { RestartAltOutlined } from "@mui/icons-material";
 import TransactionSearchModal from "../Components/Modals/TransactionSearchModal";
 import { SearchOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { FileExcelOutlined, FilePdfOutlined } from "@ant-design/icons";
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as xlsx from 'xlsx';
-import { useUser } from '../utilities/user';
-import { Helmet } from 'react-helmet-async';
-import { Spin } from "antd";  
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as xlsx from "xlsx";
+import { useUser } from "../utilities/user";
+import { Helmet } from "react-helmet-async";
+import { Spin } from "antd";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -42,12 +58,17 @@ const Transactions = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
   const profile = useUser();
-
+  const isMobile = useMediaQuery('(max-width: 400px)');
   const fetchTransactions = async () => {
     const queryParams = new URLSearchParams();
     if (filters.type) queryParams.append("type", filters.type);
-    if (filters.fromDate) queryParams.append("fromDate", dayjs(filters.fromDate).format('YYYY-MM-DD'));
-    if (filters.toDate) queryParams.append("toDate", dayjs(filters.toDate).format('YYYY-MM-DD'));
+    if (filters.fromDate)
+      queryParams.append(
+        "fromDate",
+        dayjs(filters.fromDate).format("YYYY-MM-DD")
+      );
+    if (filters.toDate)
+      queryParams.append("toDate", dayjs(filters.toDate).format("YYYY-MM-DD"));
     if (customerId) queryParams.append("userId", customerId);
     queryParams.append("limit", rowsPerPage);
     queryParams.append("page", page);
@@ -82,7 +103,7 @@ const Transactions = () => {
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['transactions', page, filters, customerId, rowsPerPage],
+    queryKey: ["transactions", page, filters, customerId, rowsPerPage],
     queryFn: fetchTransactions,
     keepPreviousData: true,
     staleTime: 30000,
@@ -90,22 +111,32 @@ const Transactions = () => {
 
   const transactions = data?.transactions || [];
   const totalItems = data?.total || 0;
-  const customerInfo = customerId && transactions.length > 0 ? transactions[0].user : null;
-  const totalPoints = customerId && transactions.length > 0 ? 
-    transactions.reduce((sum, transaction) => 
-      sum + (transaction.type === 'earn' ? transaction.points : -transaction.points), 0) : 0;
+  const customerInfo =
+    customerId && transactions.length > 0 ? transactions[0].user : null;
+  const totalPoints =
+    customerId && transactions.length > 0
+      ? transactions.reduce(
+          (sum, transaction) =>
+            sum +
+            (transaction.type === "earn"
+              ? transaction.points
+              : -transaction.points),
+          0
+        )
+      : 0;
 
   const deleteMutation = useMutation({
-    mutationFn: (transactionId) => Api.delete(`/api/transactions/${transactionId}`),
+    mutationFn: (transactionId) =>
+      Api.delete(`/api/transactions/${transactionId}`),
     onSuccess: () => {
       notifySuccess(t("Transactions.TransactionDeleted"));
-      queryClient.invalidateQueries(['transactions']);
+      queryClient.invalidateQueries(["transactions"]);
       setOpenDeleteModal(false);
       setTransactionToDelete(null);
     },
     onError: (error) => {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
-    }
+    },
   });
 
   const handleSearch = (searchFilters) => {
@@ -133,105 +164,117 @@ const Transactions = () => {
   const exportToCSV = async (exportAll = false) => {
     try {
       let exportData;
-      const date = dayjs(transactions.date).format('YYYY-MM-DD');
+      const date = dayjs(transactions.date).format("YYYY-MM-DD");
       if (exportAll) {
         const allTransactions = await fetchAllTransactions();
-        exportData = allTransactions.map(transaction => ({
+        exportData = allTransactions.map((transaction) => ({
           ID: transaction.id,
-          'Name': getArabicName(transaction),
+          Name: getArabicName(transaction),
           Points: transaction.points,
-          Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+          Currency:
+            i18n.language === "ar"
+              ? transaction.currency.arCurrency
+              : transaction.currency.enCurrency,
           Type: transaction.type,
-          Date: date
+          Date: date,
         }));
       } else {
-        exportData = transactions.map(transaction => ({
+        exportData = transactions.map((transaction) => ({
           ID: transaction.id,
-          'Name': getArabicName(transaction),
+          Name: getArabicName(transaction),
           Points: transaction.points,
-          Currency: i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+          Currency:
+            i18n.language === "ar"
+              ? transaction.currency.arCurrency
+              : transaction.currency.enCurrency,
           Type: transaction.type,
-          Date: date
+          Date: date,
         }));
       }
-  
+
       const workbook = xlsx.utils.book_new();
       const worksheet = xlsx.utils.json_to_sheet(exportData);
-      xlsx.utils.book_append_sheet(workbook, worksheet, 'Transactions');
-      xlsx.writeFile(workbook, 'transactions_report.xlsx');
+      xlsx.utils.book_append_sheet(workbook, worksheet, "Transactions");
+      xlsx.writeFile(workbook, "transactions_report.xlsx");
       handleExcelClose();
     } catch (error) {
       console.log(error);
       notifyError(t("Errors.generalError"));
     }
   };
-  
+
   const exportToPDF = async (exportAll = false) => {
-    try { 
+    try {
       let dataToExport;
-      
+
       if (exportAll) {
         dataToExport = await fetchAllTransactions();
       } else {
         dataToExport = transactions;
       }
-      
+
       const doc = new jsPDF();
-      
+
       doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
       doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
       doc.setFont("Amiri");
       doc.setFontSize(16);
-      doc.text('Transactions Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
-      
+      doc.text(
+        "Transactions Report | Report Date: " + new Date().toLocaleDateString(),
+        14,
+        15
+      );
+
       const columns = [
-        'ID',
-        i18n.language === 'ar' ? 'Arabic Name' : 'English Name', 
-        'Points',
-        'Currency',
-        'Type',
-        'Date'
+        "ID",
+        i18n.language === "ar" ? "Arabic Name" : "English Name",
+        "Points",
+        "Currency",
+        "Type",
+        "Date",
       ];
-  
-      const rows = dataToExport.map(transaction => [
+
+      const rows = dataToExport.map((transaction) => [
         transaction.id,
         getArabicName(transaction),
         transaction.points,
-        i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency,
+        i18n.language === "ar"
+          ? transaction.currency.arCurrency
+          : transaction.currency.enCurrency,
         transaction.type,
-        dayjs(transaction.date).format('YYYY-MM-DD')
+        dayjs(transaction.date).format("YYYY-MM-DD"),
       ]);
-  
+
       autoTable(doc, {
         startY: 25,
         head: [columns],
         body: rows,
-        theme: 'grid',
+        theme: "grid",
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [128, 0, 128] }, 
+        headStyles: { fillColor: [128, 0, 128] },
         columnStyles: {
-          1: { 
+          1: {
             font: "Amiri",
             fontStyle: "bold",
-            halign: 'center',
+            halign: "center",
             cellWidth: 30,
-            direction: i18n.language === 'ar' ? 'rtl' : 'ltr'
+            direction: i18n.language === "ar" ? "rtl" : "ltr",
           },
           3: {
             font: "Amiri",
             fontStyle: "bold",
-            halign: 'center',
+            halign: "center",
             cellWidth: 30,
-            direction: i18n.language === 'ar' ? 'rtl' : 'ltr'
-          }
-        }
+            direction: i18n.language === "ar" ? "rtl" : "ltr",
+          },
+        },
       });
-  
-      doc.save('transactions_report.pdf');
+
+      doc.save("transactions_report.pdf");
       handlePdfClose();
     } catch (error) {
       console.log(error);
-      notifyError(t("Errors.generalError")); 
+      notifyError(t("Errors.generalError"));
     }
   };
 
@@ -239,39 +282,54 @@ const Transactions = () => {
     <Box sx={{ p: 3 }}>
       <Helmet>
         <title>{t("Transactions.Transactions")}</title>
-        <meta name="description" content={t("Transactions.TransactionsDescription")} />
+        <meta
+          name="description"
+          content={t("Transactions.TransactionsDescription")}
+        />
       </Helmet>
       {/* Back button and customer info for customer-specific view */}
       {customerId && (
-        <Box sx={{ mb: 3 , display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+          sx={{
+            mb: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Button
             variant="outlined"
             startIcon={<ArrowLeftOutlined />}
-            onClick={() => navigate('/customers')}
+            onClick={() => navigate("/customers")}
             sx={{ mb: 2 }}
           >
             {t("Transactions.BackToCustomers")}
           </Button>
           {customerInfo && (
-            <Box sx={{ 
-              p: 2, 
-              bgcolor: 'background.paper', 
-              borderRadius: 1, 
-              mr: 3,
-              border: '1px solid',
-              borderColor: 'divider'
-            }}>
-              <h3 style={{ margin: '0 0 10px 0' }}>
-                {t("Customers.Customer")}: {i18n.language === 'ar' ? customerInfo.arName : customerInfo.enName} 
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "background.paper",
+                borderRadius: 1,
+                mr: 3,
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <h3 style={{ margin: "0 0 10px 0" }}>
+                {t("Customers.Customer")}:{" "}
+                {i18n.language === "ar"
+                  ? customerInfo.arName
+                  : customerInfo.enName}
               </h3>
-              <p style={{ margin: 0, color: '#666' }}>
+              <p style={{ margin: 0, color: "#666" }}>
                 {t("Customers.Points")}: {totalPoints}
               </p>
             </Box>
           )}
         </Box>
       )}
-      
+
       <Box sx={{ p: 2, mb: 2 }}>
         <Box
           sx={{
@@ -292,14 +350,16 @@ const Transactions = () => {
                     color: "#800080",
                     textAlign: "center",
                     fontSize: "14px",
-                    width: "120px",
+                    width: isMobile ? "120px" : "auto",
+                    height: "40px",
                     "&:hover": {
                       backgroundColor: "primary.main",
                       color: "white",
                     },
-                  }}>
-                    <SearchOutlined sx={{ fontSize: "25px", ml: 4 }} />
-                    {t("Transactions.Search")}
+                  }}
+                >
+                  <SearchOutlined sx={{ fontSize: "25px", ml: 4 }} />
+                  {t("Transactions.Search")}
                 </Button>
                 {(filters.type || filters.fromDate || filters.toDate) && (
                   <Button
@@ -312,10 +372,14 @@ const Transactions = () => {
                       });
                       setPage(1);
                     }}
-                    sx={{
+                    sx={{ 
+                      width:isMobile ? "150px" : "auto",
+                      height: isMobile ? "50px" : "40px",
+                      fontSize: "12px",
                       textAlign: "center",
-                      fontSize: "14px",
-                    }}>
+                    }}
+                  >
+                    <RestartAltOutlined />
                     {t("Transactions.Reset")}
                   </Button>
                 )}
@@ -323,12 +387,15 @@ const Transactions = () => {
             )}
           </Stack>
 
-          <Stack direction="row" spacing={2}>
+          <Stack direction="row" spacing={2} sx={{display:profile.role === "ADMIN" ? "" : "none"}}>
             <Button
               variant="outlined"
               startIcon={<FileExcelOutlined />}
               onClick={handleExcelClick}
               sx={{
+                width:isMobile ? "140px" : "auto",
+                height: "40px", 
+                fontSize: "12px",
                 "&:hover": {
                   backgroundColor: "primary.main",
                   color: "white",
@@ -342,48 +409,65 @@ const Transactions = () => {
               open={Boolean(excelAnchorEl)}
               onClose={handleExcelClose}
               anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
+                vertical: "bottom",
+                horizontal: "right",
               }}
               transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
               }}
               sx={{
-                '& .MuiPaper-root': {
-                  minWidth: '200px',
-                }
+                width:isMobile ? "140px" : "auto",
+                height: isMobile ? "50px" : "40px",
+                fontSize: "12px",
+                "& .MuiPaper-root": {
+                  minWidth: "200px",
+                },
               }}
             >
-              <MenuItem onClick={() => exportToCSV(false)}>{t("Transactions.CurrentPage")}</MenuItem>
-              <MenuItem onClick={() => exportToCSV(true)}>{t("Transactions.AllPages")}</MenuItem>
+              <MenuItem onClick={() => exportToCSV(false)}>
+                {t("Transactions.CurrentPage")}
+              </MenuItem>
+              <MenuItem onClick={() => exportToCSV(true)}>
+                {t("Transactions.AllPages")}
+              </MenuItem>
             </Menu>
             <Menu
               anchorEl={pdfAnchorEl}
               open={Boolean(pdfAnchorEl)}
               onClose={handlePdfClose}
               anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
+                vertical: "bottom",
+                horizontal: "right",
               }}
               transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+                vertical: "top",
+                horizontal: "right",
               }}
               sx={{
-                '& .MuiPaper-root': {
-                  minWidth: '200px',
-                }
+                width:isMobile ? "140px" : "auto",
+                height: isMobile ? "50px" : "40px",
+                fontSize: "12px",
+                "& .MuiPaper-root": {
+                  minWidth: "200px",
+                },
               }}
             >
-              <MenuItem onClick={() => exportToPDF(false)}>{t("Transactions.CurrentPage")}</MenuItem>
-              <MenuItem onClick={() => exportToPDF(true)}>{t("Transactions.AllPages")}</MenuItem>
+              <MenuItem onClick={() => exportToPDF(false)}>
+                {t("Transactions.CurrentPage")}
+              </MenuItem>
+              <MenuItem onClick={() => exportToPDF(true)}>
+                {t("Transactions.AllPages")}
+              </MenuItem>
             </Menu>
             <Button
               variant="outlined"
               startIcon={<FilePdfOutlined />}
               onClick={handlePdfClick}
               sx={{
+                width:isMobile ? "140px" : "auto",
+                height: "40px",
+                fontSize: "12px",
                 "&:hover": {
                   backgroundColor: "primary.main",
                   color: "white",
@@ -396,29 +480,35 @@ const Transactions = () => {
         </Box>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 650 ,width: '100%' }}>
+      <TableContainer component={Paper} sx={{ maxHeight: 650, width: "100%" }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                 {t("Transactions.ID")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                 {t("Transactions.CustomerName")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                 {t("Transactions.Points")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                 {t("Transactions.Currency")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                 {t("Transactions.Type")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                 {t("Transactions.Date")}
               </StyledTableCell>
-              <StyledTableCell align="center" sx={{ display: profile.role === 'ADMIN' ? '' : 'none' ,whiteSpace: 'nowrap'}}>
+              <StyledTableCell
+                align="center"
+                sx={{
+                  display: profile.role === "ADMIN" ? "" : "none",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {t("Transactions.Delete")}
               </StyledTableCell>
             </TableRow>
@@ -439,40 +529,47 @@ const Transactions = () => {
             ) : (
               transactions.map((transaction) => (
                 <StyledTableRow key={transaction.id}>
-                    <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                     {transaction.id}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    {i18n.language === 'ar' ? transaction.user?.arName : transaction.user?.enName}
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                    {i18n.language === "ar"
+                      ? transaction.user?.arName
+                      : transaction.user?.enName}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                     {transaction.points}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    <span style={{ 
-                      color: '#1976d2',
-                      fontWeight: 'bold'
-                    }}>
-                      {i18n.language === 'ar' ? transaction.currency.arCurrency : transaction.currency.enCurrency}
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                    <span
+                      style={{
+                        color: "#1976d2",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {i18n.language === "ar"
+                        ? transaction.currency.arCurrency
+                        : transaction.currency.enCurrency}
                     </span>
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    <span style={{ 
-                      color: transaction.type === 'earn' ? 'green' : 
-                             transaction.type === 'redeem' ? '#FFB800' : 'inherit'
-                    }}>
-                      {transaction.type}
-                    </span>
+                    <Chip
+                      label={t(`Transactions.${transaction.type}`)}
+                      color={
+                        transaction.type === "earn" ? "success" : "warning"
+                      }
+                      size="small"
+                    />
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    {dayjs(transaction.date).format('DD/MM/YYYY hh:mm')}
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                    {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{whiteSpace: 'nowrap'}}>
-                    <IconButton 
-                      size="small" 
-                      color="error" 
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                    <IconButton
+                      size="small"
+                      color="error"
                       sx={{
-                        display: profile.role === 'ADMIN' ? '' : 'none',
+                        display: profile.role === "ADMIN" ? "" : "none",
                       }}
                       onClick={() => {
                         setOpenDeleteModal(true);
@@ -488,14 +585,14 @@ const Transactions = () => {
           </TableBody>
         </Table>
         <TablePagination
-           component="div"
-           count={totalItems}
-           page={page - 1}
-           onPageChange={(e, newPage) => setPage(newPage + 1)}
-           rowsPerPage={rowsPerPage}
-           rowsPerPageOptions={[5, 10, 20]}
-           onRowsPerPageChange={handleChangeRowsPerPage}
-           labelRowsPerPage={t("Transactions.RowsPerPage")}
+          component="div"
+          count={totalItems}
+          page={page - 1} 
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[10, 20, 50]}
+          onPageChange={(e, newPage) => setPage(newPage + 1)}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t("Transactions.RowsPerPage")}
         />
       </TableContainer>
 
@@ -503,7 +600,7 @@ const Transactions = () => {
         <TransactionSearchModal
           open={openSearchModal}
           onClose={() => setOpenSearchModal(false)}
-          onSearch={handleSearch} 
+          onSearch={handleSearch}
         />
       )}
 

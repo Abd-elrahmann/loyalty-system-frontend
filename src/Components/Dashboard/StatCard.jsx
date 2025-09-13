@@ -39,7 +39,7 @@ const StatCard = ({ icon: Icon, title, value, trend, color = 'primary' }) => {
           {title}
         </Typography>
         <Typography variant="h5" sx={{ color: theme.palette[color].main, fontWeight: 600 }}>
-          {value}
+          {typeof value === 'number' ? value.toLocaleString() : value}
         </Typography>
         {trend && (
           <Typography 

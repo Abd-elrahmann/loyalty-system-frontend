@@ -434,7 +434,7 @@ const Rewards = () => {
         <Stack
           direction={isMobile ? "column" : "row"}
           spacing={2}
-          sx={{ mt: isMobile ? 2 : 0 }}
+          sx={{ mt: isMobile ? 2 : 0,display:profile.role === "ADMIN" ? "" : "none"}}
           alignItems="center"
         >
           <Button variant="outlined" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
@@ -702,7 +702,7 @@ const Rewards = () => {
                   align="center"
                   justifyContent="center"
                 >
-                  <Spin size="large" style={{left:'130px'}} />
+                  <Spin size="large" style={{right:'50px'}} />
                 </StyledTableCell>
               </StyledTableRow>
             ) : filteredRewards.length === 0 ? (

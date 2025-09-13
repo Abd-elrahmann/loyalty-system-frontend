@@ -52,7 +52,7 @@ const Products = () => {
   });
 
   const products = data?.products || [];
-  const totalItems = data?.totalItems || 0;
+  const totalItems = data?.totalPages || 0;
 
   const filteredProducts = products.filter(product => 
     product.enName.toLowerCase().includes(searchFilters.enName.toLowerCase()) ||
@@ -165,7 +165,6 @@ const Products = () => {
   const handleDeleteProduct = (id) => {
     setProductId(id);
     setOpenDeleteModal(true);
-    deleteProductMutation.mutate(id);
   };
 
   const handleSearch = (e) => {
@@ -176,14 +175,10 @@ const Products = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(debounce((value) => {
-      setSearchFilters((prev) => ({
-      ...prev,
-      enName: value,
-    }));
-      setSearchFilters((prev) => ({
-      ...prev,
-      arName: value,
-    }));  
+      setSearchFilters(() => ({
+        enName: value,
+        arName: value
+      }));
     setScannedProduct("");
     setCurrentPage(1);
   }, 800), []);
@@ -265,6 +260,7 @@ const Products = () => {
             "&:hover": {
               backgroundColor: "primary.main",
               color: "white",
+              
             },
           }}
         >
@@ -282,6 +278,7 @@ const Products = () => {
         <>
           <Grid container spacing={4} sx={{
             justifyContent: 'center',
+            mt: isMobile ? 2 : 0,
           }}>
             {filteredProducts.map((product) => (
               <Grid item key={product.id}>
@@ -409,10 +406,10 @@ const Products = () => {
       />
       <DeleteModal
         open={openDeleteModal}
-        onClose={() => setOpenDeleteModal(false)}
+        onClose={() => setOpenDeleteModal(false)} 
+        onConfirm={() => handleDeleteProduct(productId)}
         title={t('Products.DeleteProduct')}
         message={t('Products.DeleteProductMessage')}
-        onConfirm={() => handleDeleteProduct(productId)}
         isLoading={deleteProductMutation.isLoading}
       />
     </Box>

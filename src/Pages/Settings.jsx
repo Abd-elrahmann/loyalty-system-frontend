@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Divider, Button, TextField, Container, Autocomplete } from '@mui/material';
+import { Box, Typography, TextField, Container, Autocomplete, Tabs, Tab } from '@mui/material';
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
@@ -9,12 +9,15 @@ import { Helmet } from 'react-helmet-async';
 import { Spin } from "antd";
 import { SaveOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Button from '@mui/material/Button';
 
 const Settings = () => {
   const queryClient = useQueryClient();
   const user = useUser();
   const timezones = moment.tz.names();
   const { t, i18n } = useTranslation();
+  const [tabIndex, setTabIndex] = useState(0);
+
   const currencies = [
     { enValue: 'IQD', arValue: 'الدينار العراقي' },
     { enValue: 'USD', arValue: 'الدولار الأمريكي' }
@@ -35,7 +38,7 @@ const Settings = () => {
       return response.data;
     },
     staleTime: 30000,
-    cacheTime: Infinity,
+    gcTime: 30000,
     refetchOnWindowFocus: false,
     refetchOnMount: true
   });
@@ -71,7 +74,7 @@ const Settings = () => {
     const { name, value } = e.target;
     setSettings(prev => ({
       ...prev,
-      [name]: parseInt(value) || null
+      [name]: value === "" ? 0 : parseInt(value)
     }));
   };
 
@@ -87,9 +90,7 @@ const Settings = () => {
         timezone: settings.timezone
       };
     } else {
-      settingsToSave = {
-        timezone: settings.timezone
-      };
+      settingsToSave = { timezone: settings.timezone };
     }
 
     settingsMutation.mutate(settingsToSave);
@@ -105,96 +106,114 @@ const Settings = () => {
 
   return (
     <>
-    <Helmet>
-      <title>{t('Settings.Settings')}</title>
-      <meta name="description" content={t('Settings.SettingsDescription')} />
-    </Helmet>
-    <Container maxWidth="sm" sx={{ py: 4, mt: 6 }}>
-      {user.role === 'ADMIN' && (
-        <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            {t('Settings.CurrencySettings')}
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
+      <Helmet>
+        <title>{t('Settings.Settings')}</title>
+        <meta name="description" content={t('Settings.SettingsDescription')} />
+      </Helmet>
 
-          <Autocomplete
-            fullWidth
-            name="currency"
-            value={currencies.find(c => c.enValue === settings.enCurrency) || null}
-            onChange={(event, newValue) => {
-              setSettings(prev => ({
-                ...prev,
-                enCurrency: newValue ? newValue.enValue : null,
-                arCurrency: newValue ? newValue.arValue : null
-              }));
-            }}
-            options={currencies}
-            getOptionLabel={(option) => {
-              if (typeof option === 'string') {
-                return option;
-              }
-              return i18n.language === 'ar' ? option.arValue : option.enValue;
-            }}
-            renderInput={(params) => <TextField {...params} label={t('Settings.ChooseCurrency')} />}
-            noOptionsText={t('Settings.NoCurrencies')}
-          />
-          
-          {settings.enCurrency && (
-            <TextField
-              fullWidth
-              size="small"
-              type="number"
-              name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
-              label={t(`Settings.EnterPointsPer`) + " " + (i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency)}
-              value={settings.enCurrency === 'USD' ? settings.pointsPerDollar : settings.pointsPerIQD}
-              onChange={handleChange}
-              inputProps={{ min: 1 }}
-              sx={{ mt: 2 }}
-            />
-          )}
-        </Paper>
-      )}
-
-      <Paper elevation={1} sx={{ p: 2, mb: 2, mt: user.role === 'ADMIN' ? 0 : 12 }}>
-        <Typography variant="subtitle1" gutterBottom>
-          {t('Settings.TimezoneSettings')}
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-
-        <Autocomplete
-          fullWidth
-          name="timezone"
-          value={settings.timezone}
-          onChange={(event, newValue) => {
-            setSettings(prev => ({
-              ...prev,
-              timezone: newValue || 'Asia/Baghdad'
-            }));
-          }}
-          options={timezones}
-          getOptionLabel={(option) => option.replace(/_/g, ' ')}
-          renderOption={(props, option) => (
-            <li {...props}>
-              {option.replace(/_/g, ' ')} (UTC{moment.tz(option).format('Z')})
-            </li>
-          )}
-          renderInput={(params) => <TextField {...params} label={t('Settings.Timezone')} />}
-        />
-      </Paper>
-
-      <Box display="flex" justifyContent="center">
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          disabled={settingsMutation.isPending}
-          size="small"
-          startIcon={settingsMutation.isPending ? <Spin size="large" /> : <SaveOutlined />}
-          sx={{ px: 4,fontSize: "12px" }}
+      <Container maxWidth="sm" sx={{ py: 4, mt: 6 }}>
+        <Tabs
+          value={tabIndex}
+          onChange={(e, newValue) => setTabIndex(newValue)}
+          centered
+          sx={{ mb: 3 }}
         >
-          {settingsMutation.isPending ? <Spin size="large" /> : t('Settings.Save')}
-        </Button>
-      </Box>
-    </Container>
+          {user.role === 'ADMIN' && <Tab label={t('Settings.CurrencySettings')} />}
+          <Tab label={t('Settings.TimezoneSettings')} />
+        </Tabs>
+
+        {/* Currency Tab */}
+        {user.role === 'ADMIN' && tabIndex === 0 && (
+          <Box sx={{ p: 2 }}>
+            <Autocomplete
+              fullWidth
+              name="currency"
+              value={currencies.find(c => c.enValue === settings.enCurrency) || null}
+              onChange={(event, newValue) => {
+                setSettings(prev => ({
+                  ...prev,
+                  enCurrency: newValue ? newValue.enValue : null,
+                  arCurrency: newValue ? newValue.arValue : null
+                }));
+              }}
+              options={currencies}
+              getOptionLabel={(option) =>
+                typeof option === 'string'
+                  ? option
+                  : i18n.language === 'ar'
+                  ? option.arValue
+                  : option.enValue
+              }
+              renderInput={(params) => (
+                <TextField {...params} label={t('Settings.ChooseCurrency')} />
+              )}
+              noOptionsText={t('Settings.NoCurrencies')}
+            />
+
+            {settings.enCurrency && (
+              <TextField
+                fullWidth
+                size="small"
+                type="number"
+                name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
+                label={
+                  t(`Settings.EnterPointsPer`) +
+                  " " +
+                  (i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency)
+                }
+                value={
+                  settings.enCurrency === 'USD'
+                    ? settings.pointsPerDollar
+                    : settings.pointsPerIQD
+                }
+                onChange={handleChange}
+                inputProps={{ min: 1 }}
+                sx={{ mt: 2 }}
+              />
+            )}
+          </Box>
+        )}
+
+        {/* Timezone Tab */}
+        {(user.role === 'ADMIN' ? tabIndex === 1 : tabIndex === 0) && (
+          <Box sx={{ p: 2 }}>
+            <Autocomplete
+              fullWidth
+              name="timezone"
+              value={settings.timezone || null}
+              onChange={(event, newValue) => {
+                setSettings(prev => ({
+                  ...prev,
+                  timezone: newValue || 'Asia/Baghdad'
+                }));
+              }}
+              options={timezones}
+              getOptionLabel={(option) => option.replace(/_/g, ' ')}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  {option.replace(/_/g, ' ')} (UTC{moment.tz(option).format('Z')})
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField {...params} label={t('Settings.Timezone')} />
+              )}
+            />
+          </Box>
+        )}
+
+        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={settingsMutation.isPending}
+            size="small"
+            startIcon={<SaveOutlined />}
+            sx={{ px: 4, fontSize: "12px" }}
+          >
+            {settingsMutation.isPending ? t('General.Saving') : t('Settings.Save')}
+          </Button>
+        </Box>
+      </Container>
     </>
   );
 };

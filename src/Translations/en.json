@@ -27,7 +27,11 @@
     "alreadyHaveAccount": "Already have an account?",
     "signUp": "Sign Up",
     "login": "Login",
-    "registerDescription": "Create a new account in the loyalty system"
+    "registerDescription": "Create a new account in the loyalty system",
+    "weakPassword": "Weak Password",
+    "mediumPassword": "Medium Password",
+    "strongPassword": "Strong Password",
+    "register": "Register"
   },
   "ForgetPassword": {
     "enterEmail": "Enter your email address and we'll send you a link to reset your password.",
@@ -150,6 +154,7 @@
     "AddPoints": "Add Points",
     "CurrentPage": "Current Page",
     "AllPages": "All Pages",
+    "AdvancedSearch": "Advanced Search",
     "invalidQRCode": "Invalid QR code",
     "qrScanError": "QR code scan error",
     "UploadQRCodeHint": "Upload QR code from image",
@@ -254,6 +259,8 @@
     "SearchTransactions": "Search Transactions",
     "Earn": "earn",
     "Redeem": "redeem",
+    "earn": "earn",
+    "redeem": "redeem",
     "DeleteTransaction": "Delete Transaction",
     "DeleteTransactionMessage": "Are you sure you want to delete the transaction?",
     "DeleteTransactionSuccess": "Transaction deleted successfully",

@@ -12,7 +12,7 @@ import {
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
 import { Helmet } from 'react-helmet-async';
-import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button, Menu, MenuItem, Link } from '@mui/material';
+import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button, Menu, MenuItem, Link, Chip } from '@mui/material';
 import { Spin } from "antd";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
@@ -21,13 +21,14 @@ import ScanQRModal from "../Components/Modals/ScanQRModal";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import debounce from "lodash.debounce";
+import { useMediaQuery } from "@mui/material";
 
 const Customers = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [searchFilters, setSearchFilters] = useState({
     id: "",
     enName: "", 
@@ -48,7 +49,7 @@ const Customers = () => {
 
   const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
   const [excelAnchorEl, setExcelAnchorEl] = useState(null);
-
+  const isMobile = useMediaQuery('(max-width: 400px)');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -105,7 +106,6 @@ const Customers = () => {
   });
 
   const customers = data?.users || [];
-  const totalPages = data?.totalPages || 0;
 
   const deleteMutation = useMutation({
     mutationFn: (customerId) => Api.delete(`/api/users/${customerId}`),
@@ -299,6 +299,7 @@ const Customers = () => {
                       setPage(1);
                     }}
                     sx={{
+                      width: isMobile ? "100px" : "auto",
                       fontSize: "12px",
                     }}
                   >
@@ -313,6 +314,9 @@ const Customers = () => {
                 startIcon={<FileExcelOutlined />}
                 onClick={handleExcelClick}
                 sx={{
+                  width:isMobile ? "150px" : "auto",
+                  height: isMobile ? "50px" : "40px",
+                  fontSize: "12px",
                   "&:hover": {
                     backgroundColor: "primary.main",
                     color: "white",
@@ -348,6 +352,9 @@ const Customers = () => {
                 startIcon={<FilePdfOutlined />}
                 onClick={handlePdfClick}
                 sx={{
+                  width:isMobile ? "150px" : "auto",
+                  height: isMobile ? "50px" : "40px",
+                  fontSize: "12px",
                   "&:hover": {
                     backgroundColor: "primary.main",
                     color: "white",
@@ -387,6 +394,9 @@ const Customers = () => {
                 setCustomer(null);
               }}
               sx={{ ml: 2,
+                width:isMobile ? "150px" : "auto",
+                height: isMobile ? "50px" : "40px",
+                fontSize: "12px",
                 "&:hover": {
                   backgroundColor: "primary.main",
                   color: "white",
@@ -398,7 +408,7 @@ const Customers = () => {
           </Box>
         </Box>
 
-        <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
+        <TableContainer  component={Paper} sx={{ maxHeight: 650 }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
@@ -434,12 +444,17 @@ const Customers = () => {
                     <StyledTableCell align="center">{customer.id}</StyledTableCell>
                     <StyledTableCell align="center">{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
                     <StyledTableCell align="center">
-                      <Box sx={{ 
-                        color: customer.role === 'ADMIN' ? '#1976d2' : 'inherit',
-                        fontWeight: customer.role === 'ADMIN' ? 'bold' : 'normal'
-                      }}>
-                        {customer.role}
-                      </Box>
+                        <Chip
+                          label={customer.role}
+                          variant="outlined"
+                          sx={{
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            textTransform: 'uppercase',
+                            color:'white',
+                            backgroundColor: customer.role === 'ADMIN' ? '#1677FF' : 'green'  
+                          }}
+                        />
                     </StyledTableCell>
                     <StyledTableCell align="center" sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       <Link href={`mailto:${customer.email}`} underline="hover" color="black" sx={{ cursor: 'pointer' }}>
@@ -501,7 +516,7 @@ const Customers = () => {
           </Table>
           <TablePagination
             component="div"
-            count={totalPages * rowsPerPage}
+            count={ rowsPerPage}
             page={page - 1}
             onPageChange={(e, newPage) => setPage(newPage + 1)}
             rowsPerPage={rowsPerPage}

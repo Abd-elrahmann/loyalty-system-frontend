@@ -113,7 +113,7 @@ const DashboardCharts = memo(({ dashboardData }) => {
                   <Space direction="vertical" align="center" style={{width: '100%'}}>
                     <Text type="secondary">{t('Dashboard.TotalEarnPoints')}</Text>
                     <Title level={3} style={{margin: 0}}>
-                      {dashboardData.totalEarnPoints}
+                      {typeof dashboardData.totalEarnPoints === 'number' ? dashboardData.totalEarnPoints.toLocaleString() : dashboardData.totalEarnPoints}
                     </Title>
                   </Space>
                 </Card>
@@ -123,7 +123,7 @@ const DashboardCharts = memo(({ dashboardData }) => {
                   <Space direction="vertical" align="center" style={{width: '100%'}}>
                     <Text type="secondary">{t('Dashboard.TotalRedeemPoints')}</Text>
                     <Title level={3} style={{margin: 0}}>
-                      {dashboardData.totalRedeemPoints}
+                      {typeof dashboardData.totalRedeemPoints === 'number' ? dashboardData.totalRedeemPoints.toLocaleString() : dashboardData.totalRedeemPoints}
                     </Title>
                   </Space>
                 </Card>
@@ -165,7 +165,7 @@ const DashboardCharts = memo(({ dashboardData }) => {
                       description={
                         <Space>
                           <Tag color="purple">
-                            {earner.points.toLocaleString()} {t('Dashboard.Points')}
+                            {typeof earner.points === 'number' ? earner.points.toLocaleString() : earner.points} {t('Dashboard.Points')}
                           </Tag>
                         </Space>
                       }

@@ -31,7 +31,7 @@ const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary
   const [displayValue, setDisplayValue] = useState(0);
 
   React.useEffect(() => {
-    const numericValue = parseInt(value.replace(/,/g, ''));
+    const numericValue = parseInt(value);
     const controls = animate(0, numericValue, {
       duration: 2,
       ease: [0.43, 0.13, 0.23, 0.96],
@@ -74,12 +74,19 @@ const Dashboard = () => {
     queryKey: ['dashboard', selectedDate.format('YYYY-MM-DD'), selectedPeriod],
     queryFn: async () => {
       const response = await Api.get('/api/dashboard');
+      
+      // Get analytics data based on filters
+      const analyticsResponse = await Api.get(`/api/dashboard/analytics?period=${selectedPeriod}&date=${selectedDate.format('YYYY-MM-DD')}`);
+      
       return {
         totalPoints: 0,
-        transactionsCount: 0,
-        totalEarnPoints: 0,
-        totalRedeemPoints: 0,
+        transactionsCount: analyticsResponse.data.transactions.count,
+        totalEarnPoints: analyticsResponse.data.earn.totalPoints,
+        totalRedeemPoints: analyticsResponse.data.redeem.totalPoints,
         mostUsedProducts: [],
+        period: analyticsResponse.data.period,
+        from: analyticsResponse.data.from,
+        to: analyticsResponse.data.to,
         ...(user.role === 'ADMIN' && {
           customersCount: 0,
           avgPoints: 0,
@@ -90,8 +97,8 @@ const Dashboard = () => {
         ...response.data
       };
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 30 * 60 * 1000 // 30 minutes
+    staleTime: 5 * 1000, // 5 seconds
+    cacheTime: 5 * 1000 // 5 seconds
   });
 
   const exportToPDF = async () => {
@@ -224,7 +231,7 @@ const Dashboard = () => {
                 <StatCard
                   icon={UserOutlined}
                   title={t('Dashboard.TotalCustomers')}
-                  value={dashboardData.customersCount.toLocaleString()}
+                  value={dashboardData.customersCount}
                   color="#1890ff"
                 />
               </Col>
@@ -232,7 +239,7 @@ const Dashboard = () => {
                 <StatCard
                   icon={GiftOutlined}
                   title={t('Dashboard.TotalPoints')}
-                  value={dashboardData.totalPoints.toLocaleString()}
+                  value={dashboardData.totalPoints}
                   color="#52c41a"
                 />
               </Col>
@@ -240,7 +247,7 @@ const Dashboard = () => {
                 <StatCard
                   icon={BarChartOutlined}
                   title={t('Dashboard.AvgPoints')}
-                  value={dashboardData.avgPoints.toLocaleString()}
+                  value={dashboardData.avgPoints}
                   color="#faad14"
                 />
               </Col>
@@ -248,7 +255,7 @@ const Dashboard = () => {
                 <StatCard
                   icon={SwapOutlined}
                   title={t('Dashboard.TransactionsCount')}
-                  value={dashboardData.transactionsCount.toLocaleString()}
+                  value={dashboardData.transactionsCount}
                   color="#13c2c2"
                 />
               </Col>

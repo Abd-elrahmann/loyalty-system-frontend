@@ -167,6 +167,7 @@ const TableLayout = ({
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage={t('Customers.RowsPerPage')}
+        
       />
     </Paper>
   );

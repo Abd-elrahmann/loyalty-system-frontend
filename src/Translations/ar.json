@@ -27,7 +27,11 @@
     "alreadyHaveAccount": "لديك حساب؟",
     "signUp": "إنشاء حساب",
     "login": "تسجيل الدخول",
-    "registerDescription": "إنشاء حساب جديد في نظام النقاط والولاء الخاص بك"
+    "registerDescription": "إنشاء حساب جديد في نظام النقاط والولاء الخاص بك",
+    "weakPassword": "كلمة المرور ضعيفة",
+    "mediumPassword": "كلمة المرور متوسطة",
+    "strongPassword": "كلمة المرور قوية",
+    "register": "إنشاء حساب"
   },
   "ForgetPassword": {
     "enterEmail": "أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور.",
@@ -148,7 +152,7 @@
     "AddPoints": "إضافة نقاط",
     "CurrentPage": "الصفحة الحالية",
     "AllPages": "جميع الصفحات",
-
+    "AdvancedSearch": "بحث متقدم",
     "invalidQRCode": "كود الاستجابة السريعة غير صالح",
     "qrScanError": "خطأ في قراءة كود الاستجابة السريعة",
     "UploadQRCodeHint": "رفع كود الاستجابة السريعة من الصورة",
@@ -254,6 +258,8 @@
     "SearchTransactions": "بحث عن تحويلات",
     "Earn": "كسب",
     "Redeem": "استرجاع",
+    "earn": "ربح",
+    "redeem": "مستبدل",
     "DeleteTransaction": "حذف التحويل",
     "DeleteTransactionMessage": "هل أنت متأكد من حذف التحويل ؟",
     "DeleteTransactionSuccess": "تم حذف التحويل بنجاح",
