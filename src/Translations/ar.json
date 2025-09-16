@@ -441,6 +441,7 @@
     "type": "النوع",
     "cafe": "مقهى",
     "restaurant": "مطعم",
-    "NoInvoicesFound": "لم يتم العثور على فواتير"
+    "NoInvoicesFound": "لم يتم العثور على فواتير",
+    "description": "إدارة الفواتير في المقهى والمطعم"
   }
 }

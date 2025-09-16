@@ -112,7 +112,12 @@ const Cart = ({
       ) : (
         <>
           {/* Cart Items Summary */}
-          <Box sx={{ mb: 3, maxHeight: '30vh', overflow: 'auto' }}>
+          <Box sx={{ 
+            mb: 3, 
+            maxHeight: { xs: '40vh', sm: '30vh' }, 
+            overflow: 'auto',
+            px: { xs: 1, sm: 0 }
+          }}>
             {cart.map((item) => (
               <Box 
                 key={`${item.id}-${item.category}`}

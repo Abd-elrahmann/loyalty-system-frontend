@@ -1,13 +1,13 @@
 import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter } from 'react-router-dom';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import React from 'react';
+import React, { useMemo } from 'react';
 import Register from './Auth/Register';
 import Login from './Auth/Login';
 import Profile from './Components/Shared/Profile';
 import { useTranslation } from 'react-i18next';
 import './App.css';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import ForgetPassword from './Auth/ForgetPassword';
 import createCache from '@emotion/cache';
 import rtlPlugin from 'stylis-plugin-rtl';
@@ -26,47 +26,24 @@ const Settings = React.lazy(() => import('./Pages/Settings'));
 const Rewards = React.lazy(() => import('./Pages/Rewards'));
 const Layout = React.lazy(() => import('./Layout'));
 import MainRoutes from './Config/routes';
-import PointOfSale from './Pages/PointOfSale';
-import Invoice from './Pages/Invoice';
+const PointOfSale = React.lazy(() => import('./Pages/PointOfSale'));
+const Invoice = React.lazy(() => import('./Pages/Invoice'));
 
 const queryClient = new QueryClient();
-
-
-const routeComponents = {
-  '/dashboard': Dashboard,
-  '/customers': Customers,
-  '/transactions': Transactions,
-  '/products': Products,
-  '/settings': Settings,
-  '/rewards': Rewards,
-  '/point-of-sale': PointOfSale,
-  '/invoice': Invoice,
-};
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-};
-
-
-const PublicRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
 
 function App() {
   const { i18n } = useTranslation();
 
+  const routeComponents = useMemo(() => ({
+    '/dashboard': Dashboard,
+    '/customers': Customers,
+    '/transactions': Transactions,
+    '/products': Products,
+    '/settings': Settings,
+    '/rewards': Rewards,
+    '/point-of-sale': PointOfSale,
+    '/invoice': Invoice,
+  }), []);
 
   useEffect(() => {
     document.dir = i18n.dir();
@@ -151,5 +128,25 @@ function App() {
     </QueryClientProvider>
   );
 }
+
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('token');
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const PublicRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('token');
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
 
 export default App

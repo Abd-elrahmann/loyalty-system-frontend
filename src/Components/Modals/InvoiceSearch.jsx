@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Pagination, Stack, Table, TableBody, TableHead, TableRow, TextField, Typography, Autocomplete } from '@mui/material'
+import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Pagination, Stack, Table, TableBody, TableHead, TableRow, TextField, Typography, Autocomplete, useTheme, useMediaQuery } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { StyledTableCell, StyledTableRow } from '../Shared/tableLayout'
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,10 @@ import dayjs from 'dayjs';
 import debounce from 'lodash.debounce'
 import { Spin } from 'antd';
 import { DatePicker } from '@mui/x-date-pickers';
+import InvoiceCard from './InvoiceCard';
 const InvoiceSearch = ({ onViewInvoice }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(1);
     const { t } = useTranslation();
@@ -185,6 +188,27 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                                 }}>
                                     <Spin size="large" />
                                 </Box>
+                            ) : !data || data.length === 0 ? (
+                                <Box sx={{ 
+                                    position: "absolute", 
+                                    top: "50%", 
+                                    left: "50%", 
+                                    transform: "translate(-50%, -50%)",
+                                    textAlign: "center"
+                                }}>
+                                    {t("Invoice.NoInvoicesFound")}
+                                </Box>
+                            ) : isMobile ? (
+                                <Box sx={{ p: 1 }}>
+                                    {data.map((invoice) => (
+                                        <InvoiceCard
+                                            key={invoice.id}
+                                            invoice={invoice}
+                                            onViewInvoice={handleViewInvoice}
+                                            t={t}
+                                        />
+                                    ))}
+                                </Box>
                             ) : (
                                 <Table>
                                     <TableHead>
@@ -200,42 +224,34 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {!data || data.length === 0 ? (
-                                            <StyledTableRow>
-                                                <StyledTableCell colSpan={8} align="center">
-                                                    {t("Invoice.NoInvoicesFound")}
+                                        {data.map((invoice) => (
+                                            <StyledTableRow key={invoice.id}>
+                                                <StyledTableCell align="center">{invoice.id}</StyledTableCell>
+                                                <StyledTableCell align="center">
+                                                    {invoice.user ? 
+                                                        (localStorage.getItem('i18nextLng') === 'ar' ? 
+                                                            invoice.user.arName : invoice.user.enName) 
+                                                        : t('Invoice.guest')}
+                                                </StyledTableCell>
+                                                <StyledTableCell align="center">{invoice.phone || '-'}</StyledTableCell>
+                                                <StyledTableCell align="center">{invoice.email || '-'}</StyledTableCell>
+                                                <StyledTableCell align="center">${invoice.totalPrice}</StyledTableCell>
+                                                <StyledTableCell align="center">{invoice.points}</StyledTableCell>
+                                                <StyledTableCell align="center">
+                                                    {dayjs(invoice.createdAt).format('DD/MM/YYYY HH:mm')}
+                                                </StyledTableCell>
+                                                <StyledTableCell align="center">
+                                                    <Button 
+                                                        onClick={() => handleViewInvoice(invoice.id)}
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<Visibility />}
+                                                    >
+                                                        {t("Invoice.ViewInvoice")}
+                                                    </Button>
                                                 </StyledTableCell>
                                             </StyledTableRow>
-                                        ) : (
-                                            data.map((invoice) => (
-                                                <StyledTableRow key={invoice.id}>
-                                                    <StyledTableCell align="center">{invoice.id}</StyledTableCell>
-                                                    <StyledTableCell align="center">
-                                                        {invoice.user ? 
-                                                            (localStorage.getItem('i18nextLng') === 'ar' ? 
-                                                                invoice.user.arName : invoice.user.enName) 
-                                                            : t('Invoice.guest')}
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="center">{invoice.phone || '-'}</StyledTableCell>
-                                                    <StyledTableCell align="center">{invoice.email || '-'}</StyledTableCell>
-                                                    <StyledTableCell align="center">${invoice.totalPrice}</StyledTableCell>
-                                                    <StyledTableCell align="center">{invoice.points}</StyledTableCell>
-                                                    <StyledTableCell align="center">
-                                                        {dayjs(invoice.createdAt).format('DD/MM/YYYY HH:mm')}
-                                                    </StyledTableCell>
-                                                    <StyledTableCell align="center">
-                                                        <Button 
-                                                            onClick={() => handleViewInvoice(invoice.id)}
-                                                            variant="outlined"
-                                                            size="small"
-                                                            startIcon={<Visibility />}
-                                                        >
-                                                            {t("Invoice.ViewInvoice")}
-                                                        </Button>
-                                                    </StyledTableCell>
-                                                </StyledTableRow>
-                                            ))
-                                        )}
+                                        ))}
                                     </TableBody>
                                 </Table>
                             )}

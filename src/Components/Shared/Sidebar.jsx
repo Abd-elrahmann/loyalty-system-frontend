@@ -108,33 +108,6 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
           );
         })}
       </List>
-
-      <Box sx={{ 
-        borderTop: '1px solid',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        py: 1,
-        px: 2,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2
-      }}>
-        <SupportIcon sx={{ color: 'primary.main' }} />
-        <Typography 
-          component="a"
-          href="/helper"
-          sx={{
-            color: 'primary.main',
-            textDecoration: 'none',
-            '&:hover': {
-              textDecoration: 'underline'
-            }
-          }}
-        >
-          {isRTL ? 'المساعد' : 'Helper'}
-        </Typography>
-      </Box>
-
       <Box sx={{ p: 2 }}>
         <Button 
           variant="contained" 

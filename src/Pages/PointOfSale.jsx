@@ -260,22 +260,28 @@ const PointOfSale = () => {
       backgroundColor: 'background.default',
       display: 'flex',
       width: '100%',
-      p: 0
+      flexDirection: { xs: 'column', md: 'row' },
+      alignItems: { xs: 'stretch', md: 'flex-start' },
+      justifyContent: { xs: 'flex-start', md: 'space-between' },
+      gap: { xs: 2, md: 0 },
+      p: { xs: 2, md: 0 }
     }}>
       {/* Left Side - Checkout Information */}
       <Box sx={{ 
         flex: 1,
-        p: 3
+        p: { xs: 0, md: 3 },
+        width: { xs: '100%', md: '67%' }
       }}>
         <Paper 
           elevation={0}
           sx={{ 
-            p: 4, 
+            p: { xs: 2, sm: 3, md: 4 }, 
             backgroundColor: 'white',
             borderRadius: 2,
             border: '1px solid #e0e0e0',
-            height:'100%',
-            overflow: 'auto'
+            height: '100%',
+            overflow: 'auto',
+            width: '100%'
           }}
         >
           <Typography 
@@ -317,18 +323,21 @@ const PointOfSale = () => {
 
       {/* Right Side - Order Summary */}
       <Box sx={{ 
-        width: '33%',
-        p: 3
+        width: { xs: '100%', md: '33%' },
+        p: { xs: 0, md: 3 },
+        alignItems: { xs: 'stretch', md: 'flex-start' },
+        justifyContent: { xs: 'flex-start', md: 'space-between' },
       }}>
         <Paper 
           elevation={0}
           sx={{ 
-            p: 4, 
+            p: { xs: 2, sm: 3, md: 4 }, 
             backgroundColor: 'white',
             borderRadius: 2,
             border: '1px solid #e0e0e0',
             height: '100%',
-            overflow: 'auto'
+            overflow: 'auto',
+            width: '100%'
           }}
         >
           <Cart

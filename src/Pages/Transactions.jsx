@@ -19,6 +19,9 @@ import {
   MenuItem,
   Chip,
   useMediaQuery,
+  Typography,
+  Card,
+  CardContent,
 } from "@mui/material";
 
 import {
@@ -40,6 +43,7 @@ import { useUser } from "../utilities/user";
 import { Helmet } from "react-helmet-async";
 import { Spin } from "antd";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
 const Transactions = () => {
   const { t, i18n } = useTranslation();
   const { customerId } = useParams();
@@ -58,7 +62,9 @@ const Transactions = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
   const profile = useUser();
-  const isMobile = useMediaQuery('(max-width: 400px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  
+  
   const fetchTransactions = async () => {
     const queryParams = new URLSearchParams();
     if (filters.type) queryParams.append("type", filters.type);
@@ -83,13 +89,11 @@ const Transactions = () => {
   };
 
   const handlePdfClick = (event) => {
-    // Get the button element that was clicked
     const buttonElement = event.currentTarget;
     setPdfAnchorEl(buttonElement);
   };
 
   const handleExcelClick = (event) => {
-    // Get the button element that was clicked
     const buttonElement = event.currentTarget;
     setExcelAnchorEl(buttonElement);
   };
@@ -278,8 +282,91 @@ const Transactions = () => {
     }
   };
 
+  // دالة لعرض بيانات المعاملة في شكل بطاقة للشاشات الصغيرة
+  const renderTransactionCard = (transaction) => (
+    <Card key={transaction.id} sx={{ mb: 2, p: 2 }}>
+      <CardContent>
+        <Stack spacing={1}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Transactions.ID")}:
+            </Typography>
+            <Typography variant="body2">{transaction.id}</Typography>
+          </Box>
+          
+          {!customerId && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="subtitle2" fontWeight="bold">
+                {t("Transactions.CustomerName")}:
+              </Typography>
+              <Typography variant="body2">
+                {i18n.language === "ar"
+                  ? transaction.user?.arName
+                  : transaction.user?.enName}
+              </Typography>
+            </Box>
+          )}
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Transactions.Points")}:
+            </Typography>
+            <Typography variant="body2">{transaction.points}</Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Transactions.Currency")}:
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#1976d2", fontWeight: "bold" }}>
+              {i18n.language === "ar"
+                ? transaction.currency.arCurrency
+                : transaction.currency.enCurrency}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Transactions.Type")}:
+            </Typography>
+            <Chip
+              label={t(`Transactions.${transaction.type}`)}
+              color={transaction.type === "earn" ? "success" : "warning"}
+              size="small"
+            />
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Transactions.Date")}:
+            </Typography>
+            <Typography variant="body2">
+              {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
+            </Typography>
+          </Box>
+          
+          {profile.role === "ADMIN" && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => {
+                  setOpenDeleteModal(true);
+                  setTransactionToDelete(transaction);
+                }}
+                title={t("Transactions.Delete")}
+              >
+                <DeleteOutlined />
+              </IconButton>
+            </Box>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1, sm: 3 } }}>
       <Helmet>
         <title>{t("Transactions.Transactions")}</title>
         <meta
@@ -287,6 +374,7 @@ const Transactions = () => {
           content={t("Transactions.TransactionsDescription")}
         />
       </Helmet>
+      
       {/* Back button and customer info for customer-specific view */}
       {customerId && (
         <Box
@@ -295,13 +383,15 @@ const Transactions = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: { xs: 2, sm: 0 }
           }}
         >
           <Button
             variant="outlined"
             startIcon={<ArrowLeftOutlined />}
             onClick={() => navigate("/customers")}
-            sx={{ mb: 2 }}
+            sx={{ mb: { xs: 1, sm: 2 } }}
           >
             {t("Transactions.BackToCustomers")}
           </Button>
@@ -311,26 +401,27 @@ const Transactions = () => {
                 p: 2,
                 bgcolor: "background.paper",
                 borderRadius: 1,
-                mr: 3,
+                mr: { xs: 0, sm: 3 },
                 border: "1px solid",
                 borderColor: "divider",
+                width: { xs: "100%", sm: "auto" }
               }}
             >
-              <h3 style={{ margin: "0 0 10px 0" }}>
+              <Typography variant="h6" sx={{ margin: "0 0 10px 0", fontSize: { xs: "1rem", sm: "1.25rem" } }}>
                 {t("Customers.Customer")}:{" "}
                 {i18n.language === "ar"
                   ? customerInfo.arName
                   : customerInfo.enName}
-              </h3>
-              <p style={{ margin: 0, color: "#666" }}>
+              </Typography>
+              <Typography variant="body2" sx={{ margin: 0, color: "#666" }}>
                 {t("Customers.Points")}: {totalPoints}
-              </p>
+              </Typography>
             </Box>
           )}
         </Box>
       )}
 
-      <Box sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ p: { xs: 1, sm: 2 }, mb: 2 }}>
         <Box
           sx={{
             display: "flex",
@@ -340,7 +431,7 @@ const Transactions = () => {
             flexDirection: { xs: "column", sm: "row" },
           }}
         >
-          <Stack direction={"row"} spacing={1}>
+          <Stack direction={"row"} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
             {!customerId && (
               <>
                 <Button
@@ -349,8 +440,8 @@ const Transactions = () => {
                   sx={{
                     color: "#800080",
                     textAlign: "center",
-                    fontSize: "14px",
-                    width: isMobile ? "120px" : "auto",
+                    fontSize: { xs: "12px", sm: "14px" },
+                    width: { xs: "100%", sm: "auto" },
                     height: "40px",
                     "&:hover": {
                       backgroundColor: "primary.main",
@@ -358,7 +449,7 @@ const Transactions = () => {
                     },
                   }}
                 >
-                  <SearchOutlined sx={{ fontSize: "25px", ml: 4 }} />
+                  <SearchOutlined sx={{ fontSize: "20px", mr: 1 }} />
                   {t("Transactions.Search")}
                 </Button>
                 {(filters.type || filters.fromDate || filters.toDate) && (
@@ -373,13 +464,13 @@ const Transactions = () => {
                       setPage(1);
                     }}
                     sx={{ 
-                      width:isMobile ? "150px" : "auto",
-                      height: isMobile ? "50px" : "40px",
-                      fontSize: "12px",
+                      width: { xs: "100%", sm: "auto" },
+                      height: "40px",
+                      fontSize: { xs: "12px", sm: "14px" },
                       textAlign: "center",
                     }}
                   >
-                    <RestartAltOutlined />
+                    <RestartAltOutlined sx={{ mr: 1 }} />
                     {t("Transactions.Reset")}
                   </Button>
                 )}
@@ -387,19 +478,26 @@ const Transactions = () => {
             )}
           </Stack>
 
-          <Stack direction="row" spacing={2} sx={{display:profile.role === "ADMIN" ? "" : "none"}}>
+          <Stack direction="row" spacing={1} sx={{ 
+            mt: { xs: 2, sm: 0 },
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 1,
+            width: { xs: "100%", sm: "auto" }
+          }}>
             <Button
               variant="outlined"
               startIcon={<FileExcelOutlined />}
               onClick={handleExcelClick}
               sx={{
-                width:isMobile ? "140px" : "auto",
+                width: { xs: "100%", sm: "auto" },
                 height: "40px", 
                 fontSize: "12px",
                 "&:hover": {
                   backgroundColor: "primary.main",
                   color: "white",
                 },
+                display: profile.role === "ADMIN" ? "" : "none"
               }}
             >
               {t("Transactions.ExportCSV")}
@@ -417,10 +515,7 @@ const Transactions = () => {
                 horizontal: "right",
               }}
               sx={{
-                width:isMobile ? "140px" : "auto",
-                height: isMobile ? "50px" : "40px",
-                fontSize: "12px",
-                "& .MuiPaper-root": {
+                '& .MuiPaper-root': {
                   minWidth: "200px",
                 },
               }}
@@ -432,6 +527,24 @@ const Transactions = () => {
                 {t("Transactions.AllPages")}
               </MenuItem>
             </Menu>
+
+            <Button
+              variant="outlined"
+              startIcon={<FilePdfOutlined />}
+              onClick={handlePdfClick}
+              sx={{
+                width: { xs: "100%", sm: "auto" },
+                height: "40px",
+                fontSize: "12px",
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+                display: profile.role === "ADMIN" ? "" : "none"
+              }}
+            >
+              {t("Transactions.ExportPDF")}
+            </Button>
             <Menu
               anchorEl={pdfAnchorEl}
               open={Boolean(pdfAnchorEl)}
@@ -445,10 +558,7 @@ const Transactions = () => {
                 horizontal: "right",
               }}
               sx={{
-                width:isMobile ? "140px" : "auto",
-                height: isMobile ? "50px" : "40px",
-                fontSize: "12px",
-                "& .MuiPaper-root": {
+                '& .MuiPaper-root': {
                   minWidth: "200px",
                 },
               }}
@@ -460,141 +570,166 @@ const Transactions = () => {
                 {t("Transactions.AllPages")}
               </MenuItem>
             </Menu>
-            <Button
-              variant="outlined"
-              startIcon={<FilePdfOutlined />}
-              onClick={handlePdfClick}
-              sx={{
-                width:isMobile ? "140px" : "auto",
-                height: "40px",
-                fontSize: "12px",
-                "&:hover": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-              }}
-            >
-              {t("Transactions.ExportPDF")}
-            </Button>
           </Stack>
         </Box>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 650, width: "100%" }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                {t("Transactions.ID")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                {t("Transactions.CustomerName")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                {t("Transactions.Points")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                {t("Transactions.Currency")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                {t("Transactions.Type")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                {t("Transactions.Date")}
-              </StyledTableCell>
-              <StyledTableCell
-                align="center"
-                sx={{
-                  display: profile.role === "ADMIN" ? "" : "none",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {t("Transactions.Delete")}
-              </StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <StyledTableRow>
-                <StyledTableCell colSpan={8} align="center">
-                  <Spin size="large" />
+      {/* عرض الجدول للشاشات الكبيرة والبطاقات للشاشات الصغيرة */}
+      {!isMobile ? (
+        <TableContainer component={Paper} sx={{ maxHeight: 650, width: "100%" }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                  {t("Transactions.ID")}
                 </StyledTableCell>
-              </StyledTableRow>
-            ) : !transactions || transactions.length === 0 ? (
-              <StyledTableRow>
-                <StyledTableCell colSpan={8} align="center">
-                  {t("Transactions.NoTransactions")}
+                {!customerId && (
+                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                    {t("Transactions.CustomerName")}
+                  </StyledTableCell>
+                )}
+                <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                  {t("Transactions.Points")}
                 </StyledTableCell>
-              </StyledTableRow>
-            ) : (
-              transactions.map((transaction) => (
-                <StyledTableRow key={transaction.id}>
-                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    {transaction.id}
-                  </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    {i18n.language === "ar"
-                      ? transaction.user?.arName
-                      : transaction.user?.enName}
-                  </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    {transaction.points}
-                  </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    <span
-                      style={{
-                        color: "#1976d2",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {i18n.language === "ar"
-                        ? transaction.currency.arCurrency
-                        : transaction.currency.enCurrency}
-                    </span>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Chip
-                      label={t(`Transactions.${transaction.type}`)}
-                      color={
-                        transaction.type === "earn" ? "success" : "warning"
-                      }
-                      size="small"
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
-                  </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      sx={{
-                        display: profile.role === "ADMIN" ? "" : "none",
-                      }}
-                      onClick={() => {
-                        setOpenDeleteModal(true);
-                        setTransactionToDelete(transaction);
-                      }}
-                    >
-                      <DeleteOutlined />
-                    </IconButton>
+                <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                  {t("Transactions.Currency")}
+                </StyledTableCell>
+                <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                  {t("Transactions.Type")}
+                </StyledTableCell>
+                <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                  {t("Transactions.Date")}
+                </StyledTableCell>
+                <StyledTableCell
+                  align="center"
+                  sx={{
+                    display: profile.role === "ADMIN" ? "" : "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {t("Transactions.Delete")}
+                </StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isLoading ? (
+                <StyledTableRow>
+                  <StyledTableCell colSpan={customerId ? 7 : 8} align="center">
+                    <Spin size="large" />
                   </StyledTableCell>
                 </StyledTableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={totalItems}
-          page={page - 1} 
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[10, 20, 50]}
-          onPageChange={(e, newPage) => setPage(newPage + 1)}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={t("Transactions.RowsPerPage")}
-        />
-      </TableContainer>
+              ) : !transactions || transactions.length === 0 ? (
+                <StyledTableRow>
+                  <StyledTableCell colSpan={customerId ? 7 : 8} align="center">
+                    {t("Transactions.NoTransactions")}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ) : (
+                transactions.map((transaction) => (
+                  <StyledTableRow key={transaction.id}>
+                    <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                      {transaction.id}
+                    </StyledTableCell>
+                    {!customerId && (
+                      <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                        {i18n.language === "ar"
+                          ? transaction.user?.arName
+                          : transaction.user?.enName}
+                      </StyledTableCell>
+                    )}
+                    <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                      {transaction.points}
+                    </StyledTableCell>
+                    <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                      <span
+                        style={{
+                          color: "#1976d2",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {i18n.language === "ar"
+                          ? transaction.currency.arCurrency
+                          : transaction.currency.enCurrency}
+                      </span>
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      <Chip
+                        label={t(`Transactions.${transaction.type}`)}
+                        color={
+                          transaction.type === "earn" ? "success" : "warning"
+                        }
+                        size="small"
+                      />
+                    </StyledTableCell>
+                    <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                      {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
+                    </StyledTableCell>
+                    <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        sx={{
+                          display: profile.role === "ADMIN" ? "" : "none",
+                        }}
+                        onClick={() => {
+                          setOpenDeleteModal(true);
+                          setTransactionToDelete(transaction);
+                        }}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            count={totalItems}
+            page={page - 1} 
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[10, 20, 50]}
+            onPageChange={(e, newPage) => setPage(newPage + 1)}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage={t("Transactions.RowsPerPage")}
+          />
+        </TableContainer>
+      ) : (
+        <Box>
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <Spin size="large" />
+            </Box>
+          ) : !transactions || transactions.length === 0 ? (
+            <Typography variant="body1" align="center" sx={{ p: 3 }}>
+              {t("Transactions.NoTransactions")}
+            </Typography>
+          ) : (
+            <Stack spacing={2}>
+              {transactions.map((transaction) => renderTransactionCard(transaction))}
+            </Stack>
+          )}
+          
+          <TablePagination
+            component="div"
+            count={totalItems}
+            page={page - 1}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[10, 20, 50]}
+            onPageChange={(e, newPage) => setPage(newPage + 1)}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage={t("Transactions.RowsPerPage")}
+            sx={{ 
+              overflow: 'auto',
+              '& .MuiTablePagination-toolbar': {
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+              }
+            }}
+          />
+        </Box>
+      )}
 
       {!customerId && (
         <TransactionSearchModal

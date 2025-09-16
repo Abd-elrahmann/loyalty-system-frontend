@@ -441,6 +441,7 @@
     "type": "Type",
     "cafe": "Cafe",
     "restaurant": "Restaurant",
-    "NoInvoicesFound": "No invoices found"
+    "NoInvoicesFound": "No invoices found",
+    "description": "Manage invoices in the cafe and restaurant"
   }
 }

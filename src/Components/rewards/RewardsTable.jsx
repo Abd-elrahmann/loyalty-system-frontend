@@ -11,6 +11,9 @@ import {
   Stack,
   Chip,
   Checkbox,
+  Box,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   StyledTableCell,
@@ -20,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
 import { CheckCircleOutlined, CloseOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import RewardCard from './RewardCard';
 
 const RewardsTable = ({
   tabValue,
@@ -47,6 +51,57 @@ const RewardsTable = ({
     APPROVED: { label: "APPROVED", color: "success" },
     REJECTED: { label: "REJECTED", color: "error" },
   };
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  if (isMobile) {
+    return (
+      <Box sx={{ maxHeight: 650, overflow: 'auto' }}>
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+            <Spin size="large" />
+          </Box>
+        ) : filteredRewards.length === 0 ? (
+          <Box sx={{ textAlign: 'center', p: 3 }}>
+            {t("Rewards.NoRewards")}
+          </Box>
+        ) : (
+          <>
+            <Stack spacing={2} sx={{ mb: 2 }}>
+              {filteredRewards.map((reward) => (
+                <RewardCard
+                  key={reward.id}
+                  reward={reward}
+                  tabValue={tabValue}
+                  isAllChecked={isAllChecked}
+                  selectedRewards={selectedRewards}
+                  handleSelectReward={handleSelectReward}
+                  handleApprove={handleApprove}
+                  setRewardToReject={setRewardToReject}
+                  setOpenRejectDialog={setOpenRejectDialog}
+                  setRewardToDelete={setRewardToDelete}
+                  setOpenDeleteDialog={setOpenDeleteDialog}
+                  profile={profile}
+                  i18n={i18n}
+                  t={t}
+                />
+              ))}
+            </Stack>
+            <TablePagination
+              component="div"
+              count={totalPages * 10}
+              page={page - 1}
+              onPageChange={(e, newPage) => setPage(newPage + 1)}
+              rowsPerPage={10}
+              rowsPerPageOptions={[10]}
+              labelRowsPerPage={t("Rewards.RowsPerPage")}
+            />
+          </>
+        )}
+      </Box>
+    );
+  }
 
   return (
     <TableContainer component={Paper} sx={{ maxHeight: 650 }}>

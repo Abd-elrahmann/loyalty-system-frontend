@@ -14,7 +14,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  
   const validateForm = () => {
     const newErrors = {};
     if (!formik.values.enName) newErrors.enName = t('Validation.required');

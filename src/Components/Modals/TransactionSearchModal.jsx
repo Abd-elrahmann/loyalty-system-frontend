@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Stack, TextField, Typography, MenuItem, Modal } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography, MenuItem, Modal, useMediaQuery } from '@mui/material';
 import { DatePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
 import { Spin } from "antd";
@@ -7,6 +7,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { SearchOutlined } from '@ant-design/icons';
 const TransactionSearchModal = ({ open, onClose, onSearch }) => {
   const { t } = useTranslation();
+  const isMobile = useMediaQuery('(max-width: 600px)');
   const [loading, setLoading] = React.useState(false);
   const [filters, setFilters] = React.useState({
     type: "",
@@ -48,7 +49,7 @@ const TransactionSearchModal = ({ open, onClose, onSearch }) => {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: isMobile ? '90%' : 400,
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,

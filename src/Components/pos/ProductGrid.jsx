@@ -7,7 +7,8 @@ import {
   Typography,
   Box,
   Tabs,
-  Tab
+  Tab,
+  useMediaQuery
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -19,7 +20,7 @@ const ProductGrid = ({
   onAddToCart 
 }) => {
   const { t, i18n } = useTranslation();
-
+  const isMobile = useMediaQuery('(max-width: 600px)');
   return (
     <Box sx={{ mb: 4 }}>
       <Tabs 
@@ -50,11 +51,31 @@ const ProductGrid = ({
       <Box sx={{ 
         height:'100%', 
         overflow: 'auto',
-        pr: 1
+        px: { xs: 1, sm: 2 },
+        width: '100%'
       }}>
-        <Grid container spacing={2}>
+        <Grid 
+          container 
+          spacing={2} 
+          justifyContent={isMobile ? 'center' : 'flex-start'}
+          sx={{
+            width: '100%',
+            margin: '0 auto'
+          }}
+        >
           {(activeTab === 0 ? cafeProducts : restaurantProducts).map((product) => (
-            <Grid item xs={12} sm={6} md={4} key={product.id}>
+            <Grid 
+              item 
+              xs={12} 
+              sm={6} 
+              md={4} 
+              lg={3} 
+              key={product.id}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+            >
               <Card 
                 sx={{ 
                   transition: 'all 0.2s ease',
@@ -66,10 +87,12 @@ const ProductGrid = ({
                     borderColor: 'primary.main',
                     cursor: 'pointer'
                   },
-                  height: '150px',
-                  width: '150px',
+                  height: { xs: '160px', sm: '200px', md: '150px' },
+                  width: { xs: '100%', sm: '300px', md: '150px' },
+                  maxWidth: { xs: '100%', sm: '300px', md: '400px' },
                   display: 'flex',
-                  flexDirection: 'column'
+                  flexDirection: 'column',
+                  margin: '0 auto'
                 }}
                 onClick={() => onAddToCart(product)}
               >

@@ -12,7 +12,7 @@ import {
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
 import { Helmet } from 'react-helmet-async';
-import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button, Menu, MenuItem, Link, Chip } from '@mui/material';
+import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button, Menu, MenuItem, Link, Chip, Typography, Card, CardContent } from '@mui/material';
 import { Spin } from "antd";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
@@ -49,7 +49,9 @@ const Customers = () => {
 
   const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
   const [excelAnchorEl, setExcelAnchorEl] = useState(null);
-  const isMobile = useMediaQuery('(max-width: 400px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isSmallMobile = useMediaQuery('(max-width: 400px)');
+  
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -144,6 +146,7 @@ const Customers = () => {
     setPage(1);
     notifySuccess(t("Customers.qrScanSuccess") + `: ${email}`);
   };
+  
   const exportToPDF = async (exportAll = false) => {
     try { 
       const allCustomers = await fetchAllCustomers();
@@ -246,145 +249,275 @@ const Customers = () => {
     }
   };
 
+  // دالة لعرض بيانات العميل في شكل بطاقة للشاشات الصغيرة
+  const renderCustomerCard = (customer) => (
+    <Card key={customer.id} sx={{ mb: 2, p: 2 }}>
+      <CardContent>
+        <Stack spacing={1}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.ID")}:
+            </Typography>
+            <Typography variant="body2">{customer.id}</Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.Name")}:
+            </Typography>
+            <Typography variant="body2">
+              {i18n.language === 'ar' ? customer.arName : customer.enName}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.Role")}:
+            </Typography>
+            <Chip
+              label={customer.role}
+              size="small"
+              sx={{
+                fontSize: '10px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                color: 'white',
+                backgroundColor: customer.role === 'ADMIN' ? '#1677FF' : 'green',
+                height: '24px'
+              }}
+            />
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.Email")}:
+            </Typography>
+            <Link href={`mailto:${customer.email}`} underline="hover" color="black" sx={{ cursor: 'pointer', fontSize: '12px' }}>
+              {customer.email}
+            </Link>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.Phone")}:
+            </Typography>
+            <Typography variant="body2">{customer.phone}</Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.Points")}:
+            </Typography>
+            <Typography variant="body2">{customer.points}</Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.CreatedAt")}:
+            </Typography>
+            <Typography variant="body2">
+              {dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 1 }}>
+            <IconButton
+              size="small"
+              color="success"
+              onClick={() => {
+                setOpenAddPointsModal(true);
+                setCustomerToAddPoints(customer);
+              }}
+              title={t("Customers.AddPoints")}
+            >
+              <PlusOutlined />
+            </IconButton>
+            
+            <IconButton
+              size="small"
+              color="info"
+              onClick={() => navigate(`/transactions/${customer.id}`)}
+              title={t("Customers.ViewTransactions")}
+            >
+              <EyeOutlined />
+            </IconButton>
+            
+            <IconButton
+              size="small"
+              color="warning"
+              onClick={() => {
+                setOpenAddCustomer(true);
+                setCustomer(customer);
+              }}
+              title={t("Customers.Update")}
+            >
+              <EditOutlined />
+            </IconButton>
+            
+            <IconButton 
+              size="small" 
+              color="error" 
+              onClick={() => {
+                setOpenDeleteModal(true);
+                setCustomerToDelete(customer);
+              }}
+              title={t("Customers.Delete")}
+            >
+              <DeleteOutlined />
+            </IconButton>
+          </Box>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+
   return (
-      <Box sx={{ p: 3, mt: 1 }}>
-        <Helmet>
-          <title>{t("Customers.Customers")}</title>
-          <meta name="description" content={t("Customers.CustomersDescription")} />
-        </Helmet>
-        <Box sx={{ p: 2, mb: 2 }}>
-          <Box
-            sx={{
-              display: "flex", 
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 2,
-              flexDirection: { xs: "column", sm: "row" },
-            }}
-          >
-            <Stack direction={"row"} spacing={1}>
-              <InputBase
-                value={searchValue}
-                onChange={handleSearch}
-                placeholder={t("Customers.SearchEmail")}
-                sx={{
-                  color: "text.primary",
-                  textAlign: "center",
-                  width: "200px",
-                }}
-              />
+    <Box sx={{ p: { xs: 1, sm: 3 }, mt: 1 }}>
+      <Helmet>
+        <title>{t("Customers.Customers")}</title>
+        <meta name="description" content={t("Customers.CustomersDescription")} />
+      </Helmet>
+      
+      <Box sx={{ p: { xs: 1, sm: 2 }, mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex", 
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+            flexDirection: { xs: "column", sm: "row" },
+          }}
+        >
+          <Stack direction={"row"} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
+            <InputBase
+              value={searchValue}
+              onChange={handleSearch}
+              placeholder={t("Customers.SearchEmail")}
+              sx={{
+                color: "text.primary",
+                textAlign: "center",
+                width: { xs: "100%", sm: "200px" },
+                borderRadius: 1,
+                px: 1,
+              }}
+            />
+            <IconButton
+              sx={{ color: "primary.main", padding: 0 }}
+              onClick={handleSearch}
+            >
+              <SearchOutlined  />
+            </IconButton>
+            <Stack direction="row" spacing={1}>
               <IconButton
                 sx={{ color: "primary.main", padding: 0 }}
-                onClick={handleSearch}
+                onClick={() => {
+                  setScannedEmail("");
+                  setPage(1);
+                  setOpenScanQR(true);
+                }}
+                title={t("Customers.ScanQR")}
               >
-                <SearchOutlined  />
+                <QrcodeOutlined />
               </IconButton>
-              <Stack direction="row" spacing={1}>
-                <IconButton
-                  sx={{ color: "primary.main", padding: 0 }}
+              {scannedEmail && (
+                <Button
+                  variant="text"
                   onClick={() => {
                     setScannedEmail("");
                     setPage(1);
-                    setOpenScanQR(true);
                   }}
-                  title={t("Customers.ScanQR")}
+                  sx={{
+                    width: isSmallMobile ? "100px" : "auto",
+                    fontSize: "12px",
+                  }}
                 >
-                  <QrcodeOutlined />
-                </IconButton>
-                {scannedEmail && (
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      setScannedEmail("");
-                      setPage(1);
-                    }}
-                    sx={{
-                      width: isMobile ? "100px" : "auto",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {t("Customers.ClearFilter")}
-                  </Button>
-                )}
-              </Stack>
+                  {t("Customers.ClearFilter")}
+                </Button>
+              )}
             </Stack>
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="outlined"
-                startIcon={<FileExcelOutlined />}
-                onClick={handleExcelClick}
-                sx={{
-                  width:isMobile ? "150px" : "auto",
-                  height: isMobile ? "50px" : "40px",
-                  fontSize: "12px",
-                  "&:hover": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                  },
-                }}
-              >
-                {t("Customers.ExportCSV")}
-              </Button>
-              <Menu
-                anchorEl={excelAnchorEl}
-                open={Boolean(excelAnchorEl)}
-                onClose={handleExcelClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                sx={{
-                  '& .MuiPaper-root': {
-                    minWidth: '200px',
-                  }
-                }}
-              >
-                <MenuItem onClick={() => exportToCSV(false)}>{t("Customers.CurrentPage")}</MenuItem>
-                <MenuItem onClick={() => exportToCSV(true)}>{t("Customers.AllPages")}</MenuItem>
-              </Menu>
+          </Stack>
+          
+          <Stack direction="row" spacing={1} sx={{ 
+            mt: { xs: 2, sm: 0 },
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 1
+          }}>
+            <Button
+              variant="outlined"
+              startIcon={<FileExcelOutlined />}
+              onClick={handleExcelClick}
+              sx={{
+                width: { xs: "100%", sm: "auto" },
+                height: { xs: "40px", sm: "40px" },
+                fontSize: "12px",
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+              }}
+            >
+              {t("Customers.ExportCSV")}
+            </Button>
+            <Menu
+              anchorEl={excelAnchorEl}
+              open={Boolean(excelAnchorEl)}
+              onClose={handleExcelClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              sx={{
+                '& .MuiPaper-root': {
+                  minWidth: '200px',
+                }
+              }}
+            >
+              <MenuItem onClick={() => exportToCSV(false)}>{t("Customers.CurrentPage")}</MenuItem>
+              <MenuItem onClick={() => exportToCSV(true)}>{t("Customers.AllPages")}</MenuItem>
+            </Menu>
 
-              <Button
-                variant="outlined"
-                startIcon={<FilePdfOutlined />}
-                onClick={handlePdfClick}
-                sx={{
-                  width:isMobile ? "150px" : "auto",
-                  height: isMobile ? "50px" : "40px",
-                  fontSize: "12px",
-                  "&:hover": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                  },
-                }}
-              >
-                {t("Customers.ExportPDF")}
-              </Button>
-              <Menu
-                anchorEl={pdfAnchorEl}
-                open={Boolean(pdfAnchorEl)}
-                onClose={handlePdfClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                sx={{
-                  '& .MuiPaper-root': {
-                    minWidth: '200px',
-                  }
-                }}
-              >
-                <MenuItem onClick={() => exportToPDF(false)}>{t("Customers.CurrentPage")}</MenuItem>
-                <MenuItem onClick={() => exportToPDF(true)}>{t("Customers.AllPages")}</MenuItem>
-              </Menu>
-            </Stack>
+            <Button
+              variant="outlined"
+              startIcon={<FilePdfOutlined />}
+              onClick={handlePdfClick}
+              sx={{
+                width: { xs: "100%", sm: "auto" },
+                height: { xs: "40px", sm: "40px" },
+                fontSize: "12px",
+                "&:hover": {
+                  backgroundColor: "primary.main",
+                  color: "white",
+                },
+              }}
+            >
+              {t("Customers.ExportPDF")}
+            </Button>
+            <Menu
+              anchorEl={pdfAnchorEl}
+              open={Boolean(pdfAnchorEl)}
+              onClose={handlePdfClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              sx={{
+                '& .MuiPaper-root': {
+                  minWidth: '200px',
+                }
+              }}
+            >
+              <MenuItem onClick={() => exportToPDF(false)}>{t("Customers.CurrentPage")}</MenuItem>
+              <MenuItem onClick={() => exportToPDF(true)}>{t("Customers.AllPages")}</MenuItem>
+            </Menu>
 
             <Button
               variant="outlined"
@@ -393,9 +526,9 @@ const Customers = () => {
                 setOpenAddCustomer(true);
                 setCustomer(null);
               }}
-              sx={{ ml: 2,
-                width:isMobile ? "150px" : "auto",
-                height: isMobile ? "50px" : "40px",
+              sx={{
+                width: { xs: "100%", sm: "auto" },
+                height: { xs: "40px", sm: "40px" },
                 fontSize: "12px",
                 "&:hover": {
                   backgroundColor: "primary.main",
@@ -405,10 +538,12 @@ const Customers = () => {
             >
               {t("Customers.AddCustomer")}
             </Button>
-          </Box>
+          </Stack>
         </Box>
+      </Box>
 
-        <TableContainer  component={Paper} sx={{ maxHeight: 650 }}>
+      {!isMobile ? (
+        <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
@@ -428,13 +563,13 @@ const Customers = () => {
             <TableBody>
               {isLoading ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={10} align="center">
+                  <StyledTableCell colSpan={11} align="center">
                     <Spin size="large" />
                   </StyledTableCell>
                 </StyledTableRow>
               ) : !customers || customers.length === 0 ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={10} align="center">
+                  <StyledTableCell colSpan={11} align="center">
                     {t("Customers.NoCustomers")}
                   </StyledTableCell>
                 </StyledTableRow>
@@ -516,58 +651,93 @@ const Customers = () => {
           </Table>
           <TablePagination
             component="div"
-            count={ rowsPerPage}
+            count={data?.totalCount || 0}
             page={page - 1}
             onPageChange={(e, newPage) => setPage(newPage + 1)}
             rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[5, 10, 20]}
+            rowsPerPageOptions={[5, 10, 20, 50]}
             onRowsPerPageChange={handleChangeRowsPerPage}
             labelRowsPerPage={t("Customers.RowsPerPage")}
           />
         </TableContainer>
+      ) : (
+        <Box>
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <Spin size="large" />
+            </Box>
+          ) : !customers || customers.length === 0 ? (
+            <Typography variant="body1" align="center" sx={{ p: 3 }}>
+              {t("Customers.NoCustomers")}
+            </Typography>
+          ) : (
+            <Stack spacing={2}>
+              {customers.slice(0, rowsPerPage).map((customer) => renderCustomerCard(customer))}
+            </Stack>
+          )}
+          
+          <TablePagination
+            component="div"
+            count={data?.totalCount || 0}
+            page={page - 1}
+            onPageChange={(e, newPage) => setPage(newPage + 1)}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 20, 50]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage={t("Customers.RowsPerPage")}
+            sx={{ 
+              overflow: 'auto',
+              '& .MuiTablePagination-toolbar': {
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+              }
+            }}
+          />
+        </Box>
+      )}
 
-          {openAddCustomer && (
-            <AddCustomer
-              open={openAddCustomer}
-              onClose={() => setOpenAddCustomer(false)}
-              isLoading={isLoadingAddCustomer}
-              setIsLoading={setIsLoadingAddCustomer}
-              fetchCustomers={fetchCustomers}
-              customer={customer}
-            />
-          )}
-          {openDeleteModal && (
-            <DeleteModal
-              open={openDeleteModal}
-              onClose={() => {
-                setOpenDeleteModal(false);
-                setCustomerToDelete(null);
-              }}
-              message={t("Customers.DeleteCustomerMessage")}
-              title={t("Customers.DeleteCustomer")}
-              onConfirm={handleDelete}
-              isLoading={deleteMutation.isLoading}
-            />
-          )}
-          {openAddPointsModal && (
-            <AddPointsModal
-              open={openAddPointsModal}
-              onClose={() => setOpenAddPointsModal(false)}
-              customer={customerToAddPoints}
-              fetchCustomers={fetchCustomers}
-            />
-          )}
-          {openScanQR && (
-            <ScanQRModal
-              open={openScanQR}
-              onClose={() => {
-                setOpenScanQR(false);
-                setScannedEmail("");
-              }}
-              onScanSuccess={handleScanSuccess}
-            />
-          )}
-      </Box>
+      {openAddCustomer && (
+        <AddCustomer
+          open={openAddCustomer}
+          onClose={() => setOpenAddCustomer(false)}
+          isLoading={isLoadingAddCustomer}
+          setIsLoading={setIsLoadingAddCustomer}
+          fetchCustomers={fetchCustomers}
+          customer={customer}
+        />
+      )}
+      {openDeleteModal && (
+        <DeleteModal
+          open={openDeleteModal}
+          onClose={() => {
+            setOpenDeleteModal(false);
+            setCustomerToDelete(null);
+          }}
+          message={t("Customers.DeleteCustomerMessage")}
+          title={t("Customers.DeleteCustomer")}
+          onConfirm={handleDelete}
+          isLoading={deleteMutation.isLoading}
+        />
+      )}
+      {openAddPointsModal && (
+        <AddPointsModal
+          open={openAddPointsModal}
+          onClose={() => setOpenAddPointsModal(false)}
+          customer={customerToAddPoints}
+          fetchCustomers={fetchCustomers}
+        />
+      )}
+      {openScanQR && (
+        <ScanQRModal
+          open={openScanQR}
+          onClose={() => {
+            setOpenScanQR(false);
+            setScannedEmail("");
+          }}
+          onScanSuccess={handleScanSuccess}
+        />
+      )}
+    </Box>
   );
 };
 

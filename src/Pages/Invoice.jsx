@@ -14,23 +14,37 @@ import {
   alpha,
   useTheme,
   Grid,
-  IconButton
+  IconButton,
+  useMediaQuery,
+  Stack
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { StyledTableCell, StyledTableRow } from '../Components/Shared/tableLayout';
 import InvoiceSearch from '../Components/Modals/InvoiceSearch';
-import {RestartAltOutlined} from '@mui/icons-material';
+import {
+  RestartAltOutlined,
+  ReceiptLongOutlined,
+  PersonOutlined,
+  PhoneOutlined,
+  EmailOutlined,
+  ReceiptOutlined,
+  CalendarTodayOutlined,
+  PaidOutlined,
+  LocalOfferOutlined,
+  StarsOutlined
+} from '@mui/icons-material';
+
 const Invoice = () => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceItems, setInvoiceItems] = useState([]);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleViewInvoice = (invoiceData) => {
     setSelectedInvoice(invoiceData);
     
-    // If the invoice data contains items, use that
     if (invoiceData.items) {
       setInvoiceItems(invoiceData.items);
     }
@@ -54,485 +68,350 @@ const Invoice = () => {
       >
         <Box sx={{ 
           display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          mb: 3,
-          flexWrap: 'wrap',
-          gap: 2
+          flexDirection: 'column',
+          alignItems: 'center',
+          mb: 4,
+          textAlign: 'center'
         }}>
+          <ReceiptLongOutlined 
+            sx={{ 
+              fontSize: 48, 
+              color: theme.palette.primary.main,
+              mb: 2 
+            }} 
+          />
           <Typography 
-            variant="h4" 
+            variant="h3" 
             sx={{ 
               fontWeight: 700, 
               color: theme.palette.primary.main,
-              fontSize: { xs: '1.5rem', sm: '2rem' }
+              fontSize: { xs: '2rem', sm: '2.5rem' },
+              mb: 1
             }}
           >
             {t('Invoice.title')}
           </Typography>
-          
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 2,
-            flexWrap: 'wrap'
-          }}>
-            <InvoiceSearch onViewInvoice={handleViewInvoice} />
-            {selectedInvoice && (
-              <IconButton 
-                variant="outlined" 
-                onClick={handleClearInvoice}
-                sx={{
-                  borderWidth: 2,
-                  '&:hover': {
-                    borderWidth: 2
-                  }
-                }}
-              >
-                <RestartAltOutlined sx={{color: theme.palette.primary.main}} />
-              </IconButton>
-            )}
-          </Box>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              color: theme.palette.text.secondary,
+              maxWidth: 600,
+              mx: 'auto'
+            }}
+          >
+            {t('Invoice.description')}
+          </Typography>
         </Box>
 
-        <Divider sx={{ 
-          mb: 3,
-          opacity: 0.5
-        }} />
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center',
+          gap: 2,
+          mb: 4
+        }}>
+          <InvoiceSearch onViewInvoice={handleViewInvoice} />
+          {selectedInvoice && (
+            <IconButton 
+              onClick={handleClearInvoice}
+              sx={{
+                border: `2px solid ${theme.palette.primary.main}`,
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1)
+                }
+              }}
+            >
+              <RestartAltOutlined sx={{color: theme.palette.primary.main}} />
+            </IconButton>
+          )}
+        </Box>
 
         {selectedInvoice ? (
           <Box>
-            {/* Invoice Header */}
-            <Card 
-              sx={{ 
-                mb: 3, 
-                background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                borderRadius: 2,
-                boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)'
-              }}
-            >
-              <CardContent>
-                <Grid container spacing={4} sx={{ justifyContent: 'space-around' }}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        fontWeight: 600, 
-                        mb: 3,
-                        color: theme.palette.primary.main,
-                        borderBottom: `2px solid ${theme.palette.primary.light}`,
-                        paddingBottom: 1
-                      }}
-                    >
-                      {t('Invoice.customerInfo')}
-                    </Typography>
+            <Grid container spacing={3} sx={{justifyContent:isMobile ? 'center' : 'space-around'}}>
+              <Grid item xs={12} md={6}>
+                <Card 
+                  elevation={2}
+                  sx={{ 
+                    height: '100%',
+                    background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                    borderRadius: 2
+                  }}
+                >
+                  <CardContent>
                     <Box sx={{ 
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 2
+                      display: 'flex', 
+                      alignItems: 'center',
+                      mb: 3,
+                      gap: 1
                     }}>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '100px'
-                          }}
-                        >
-                          {t('Invoice.name')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1"
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.primary
-                          }}
-                        >
-                          {selectedInvoice.user ? 
-                            (i18n.language === 'ar' ? selectedInvoice.user.arName : selectedInvoice.user.enName) 
-                            : t('Invoice.guest')}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '100px'
-                          }}
-                        >
-                          {t('Invoice.phone')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1"
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.primary
-                          }}
-                        >
-                          {selectedInvoice.phone || t('Invoice.notProvided')}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '100px'
-                          }}
-                        >
-                          {t('Invoice.email')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1"
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.primary
-                          }}
-                        >
-                          {selectedInvoice.email || t('Invoice.notProvided')}
-                        </Typography>
-                      </Box>
+                      <PersonOutlined sx={{ color: theme.palette.primary.main }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {t('Invoice.customerInfo')}
+                      </Typography>
                     </Box>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        fontWeight: 600, 
-                        mb: 3,
-                        color: theme.palette.primary.main,
-                        borderBottom: `2px solid ${theme.palette.primary.light}`,
-                        paddingBottom: 1
-                      }}
-                    >
-                      {t('Invoice.invoiceDetails')}
-                    </Typography>
-                    <Box sx={{ 
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 2
-                    }}>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '120px'
-                          }}
-                        >
-                          {t('Invoice.invoiceNumber')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1"
-                          sx={{ 
-                            fontWeight: 600,
-                            color: theme.palette.primary.main
-                          }}
-                        >
-                          #{selectedInvoice.id}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '120px'
-                          }}
-                        >
-                          {t('Invoice.date')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1"
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.primary
-                          }}
-                        >
-                          {dayjs(selectedInvoice.createdAt).format('DD/MM/YYYY HH:mm')}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '120px'
-                          }}
-                        >
-                          {t('Invoice.totalPrice')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1" 
-                          sx={{ 
-                            fontWeight: 700,
-                            color: theme.palette.primary.main,
-                            fontSize: '1.1rem'
-                          }}
-                        >
-                          ${selectedInvoice.totalPrice}
-                        </Typography>
-                      </Box>
-                      {selectedInvoice.discount > 0 && (
-                        <Box sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center',
-                          gap: 1
-                        }}>
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              fontWeight: 500,
-                              color: theme.palette.text.secondary,
-                              minWidth: '120px'
-                            }}
-                          >
-                            {t('Invoice.discount')}:
+                    
+                    <Stack spacing={2}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <PersonOutlined sx={{ color: theme.palette.text.secondary }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.name')}
                           </Typography>
-                          <Typography 
-                            variant="body1" 
-                            sx={{ 
-                              fontWeight: 700,
-                              color: 'error.main',
-                              fontSize: '1.1rem'
-                            }}
-                          >
-                            {selectedInvoice.discount}%
+                          <Typography variant="body1" fontWeight={500}>
+                            {selectedInvoice.user ? 
+                              (i18n.language === 'ar' ? selectedInvoice.user.arName : selectedInvoice.user.enName) 
+                              : t('Invoice.guest')}
                           </Typography>
                         </Box>
-                      )}
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 1
-                      }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 500,
-                            color: theme.palette.text.secondary,
-                            minWidth: '120px'
-                          }}
-                        >
-                          {t('Invoice.pointsEarned')}:
-                        </Typography>
-                        <Typography 
-                          variant="body1" 
-                          sx={{ 
-                            fontWeight: 700,
-                            color: 'success.main',
-                            fontSize: '1.1rem'
-                          }}
-                        >
-                          {selectedInvoice.points} {t('Invoice.points')}
-                        </Typography>
                       </Box>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
 
-            {/* Invoice Items */}
-            <Box sx={{ mb: 3 }}>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 600, 
-                  mb: 3,
-                  color: theme.palette.primary.main,
-                  paddingBottom: 1
-                }}
-              >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <PhoneOutlined sx={{ color: theme.palette.text.secondary }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.phone')}
+                          </Typography>
+                          <Typography variant="body1" fontWeight={500}>
+                            {selectedInvoice.phone || t('Invoice.notProvided')}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <EmailOutlined sx={{ color: theme.palette.text.secondary }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.email')}
+                          </Typography>
+                          <Typography variant="body1" fontWeight={500}>
+                            {selectedInvoice.email || t('Invoice.notProvided')}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card 
+                  elevation={3}
+                  sx={{ 
+                    height: '100%',                   
+                    background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                    borderRadius: 2
+                  }}
+                >
+                  <CardContent>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      mb: 3,
+                      gap: 1
+                    }}>
+                      <ReceiptOutlined sx={{ color: theme.palette.primary.main }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {t('Invoice.invoiceDetails')}
+                      </Typography>
+                    </Box>
+
+                    <Stack spacing={2}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <ReceiptOutlined sx={{ color: theme.palette.text.secondary }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.invoiceNumber')}
+                          </Typography>
+                          <Typography variant="body1" fontWeight={600} color="primary.main">
+                            #{selectedInvoice.id}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <CalendarTodayOutlined sx={{ color: theme.palette.text.secondary }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.date')}
+                          </Typography>
+                          <Typography variant="body1" fontWeight={500}>
+                            {dayjs(selectedInvoice.createdAt).format('DD/MM/YYYY HH:mm')}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <PaidOutlined sx={{ color: theme.palette.text.secondary }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.totalPrice')}
+                          </Typography>
+                          <Typography variant="h6" fontWeight={700} color="primary.main">
+                            ${selectedInvoice.totalPrice}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {selectedInvoice.discount > 0 && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <LocalOfferOutlined sx={{ color: theme.palette.error.main }} />
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              {t('Invoice.discount')}
+                            </Typography>
+                            <Typography variant="body1" fontWeight={700} color="error.main">
+                              {selectedInvoice.discount}%
+                            </Typography>
+                          </Box>
+                        </Box>
+                      )}
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <StarsOutlined sx={{ color: theme.palette.success.main }} />
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('Invoice.pointsEarned')}
+                          </Typography>
+                          <Typography variant="body1" fontWeight={700} color="success.main">
+                            {selectedInvoice.points} {t('Invoice.points')}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <ReceiptLongOutlined sx={{ color: theme.palette.primary.main }} />
                 {t('Invoice.items')}
               </Typography>
               
               {invoiceItems.length > 0 ? (
-                <TableContainer 
-                  component={Paper}
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <Table>
-                    <TableHead>
-                      <StyledTableRow sx={{ 
-                        background: 'linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%)'
-                      }}>
-                        <StyledTableCell 
-                          sx={{ 
-                            fontWeight: 600,
-                            color: theme.palette.primary.main,
-                            fontSize: '0.95rem',
-                            borderBottom: `2px solid ${theme.palette.primary.light}`
-                          }}
-                        >
-                          {t('Invoice.product')}
-                        </StyledTableCell>
-                        <StyledTableCell 
-                          align="center"
-                          sx={{ 
-                            fontWeight: 600,
-                            color: theme.palette.primary.main,
-                            fontSize: '0.95rem',
-                            borderBottom: `2px solid ${theme.palette.primary.light}`
-                          }}
-                        >
-                          {t('Invoice.type')}
-                        </StyledTableCell>
-                        <StyledTableCell 
-                          align="center"
-                          sx={{ 
-                            fontWeight: 600,
-                            color: theme.palette.primary.main,
-                            fontSize: '0.95rem',
-                            borderBottom: `2px solid ${theme.palette.primary.light}`
-                          }}
-                        >
-                          {t('Invoice.price')}
-                        </StyledTableCell>
-                        <StyledTableCell 
-                          align="center"
-                          sx={{ 
-                            fontWeight: 600,
-                            color: theme.palette.primary.main,
-                            fontSize: '0.95rem',
-                            borderBottom: `2px solid ${theme.palette.primary.light}`
-                          }}
-                        >
-                          {t('Invoice.quantity')}
-                        </StyledTableCell>
-                        <StyledTableCell 
-                          align="center"
-                          sx={{ 
-                            fontWeight: 600,
-                            color: theme.palette.primary.main,
-                            fontSize: '0.95rem',
-                            borderBottom: `2px solid ${theme.palette.primary.light}`
-                          }}
-                        >
-                          {t('Invoice.total')}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    </TableHead>
-                    <TableBody>
-                      {invoiceItems.map((item, index) => {
-                        // Get product info from either cafeProduct or restaurantProduct
-                        const product = item.cafeProduct || item.restaurantProduct;
-                        const productType = item.cafeProduct ? 'Cafe' : 'Restaurant';
-                        
-                        return (
-                          <StyledTableRow 
-                            key={index}
-                            sx={{
-                              '&:nth-of-type(odd)': {
-                                backgroundColor: alpha(theme.palette.primary.light, 0.05)
-                              },
-                              '&:hover': {
-                                backgroundColor: alpha(theme.palette.primary.light, 0.1)
-                              }
-                            }}
-                          >
-                            <StyledTableCell
-                              sx={{
-                                fontWeight: 500,
-                                color: theme.palette.text.primary
-                              }}
-                            >
+                isMobile ? (
+                  <Stack spacing={2}>
+                    {invoiceItems.map((item, index) => {
+                      const product = item.cafeProduct || item.restaurantProduct;
+                      const productType = item.cafeProduct ? 'Cafe' : 'Restaurant';
+                      
+                      return (
+                        <Card key={index} sx={{ p: 2 }}>
+                          <Stack spacing={1}>
+                            <Typography variant="subtitle1" fontWeight={600}>
                               {product ? (i18n.language === 'ar' ? product.arName : product.enName) : 'N/A'}
-                            </StyledTableCell>
-                            <StyledTableCell 
-                              align="center"
+                            </Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <Typography color="text.secondary">{t('Invoice.type')}:</Typography>
+                              <Typography>{t(`Invoice.${productType.toLowerCase()}`)}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <Typography color="text.secondary">{t('Invoice.price')}:</Typography>
+                              <Typography>${item.price}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <Typography color="text.secondary">{t('Invoice.quantity')}:</Typography>
+                              <Typography>{item.quantity}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <Typography color="text.secondary">{t('Invoice.total')}:</Typography>
+                              <Typography color="primary.main" fontWeight={600}>${item.total}</Typography>
+                            </Box>
+                          </Stack>
+                        </Card>
+                      );
+                    })}
+                  </Stack>
+                ) : (
+                  <TableContainer 
+                    component={Paper}
+                    sx={{
+                      borderRadius: 2,
+                      boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <Table stickyHeader>
+                      <TableHead>
+                        <StyledTableRow>
+                          <StyledTableCell sx={{ fontWeight: 600 }}>
+                            {t('Invoice.product')}
+                          </StyledTableCell>
+                          <StyledTableCell align="center" sx={{ fontWeight: 600 }}>
+                            {t('Invoice.type')}
+                          </StyledTableCell>
+                          <StyledTableCell align="center" sx={{ fontWeight: 600 }}>
+                            {t('Invoice.price')}
+                          </StyledTableCell>
+                          <StyledTableCell align="center" sx={{ fontWeight: 600 }}>
+                            {t('Invoice.quantity')}
+                          </StyledTableCell>
+                          <StyledTableCell align="center" sx={{ fontWeight: 600 }}>
+                            {t('Invoice.total')}
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      </TableHead>
+                      <TableBody>
+                        {invoiceItems.map((item, index) => {
+                          const product = item.cafeProduct || item.restaurantProduct;
+                          const productType = item.cafeProduct ? 'Cafe' : 'Restaurant';
+                          
+                          return (
+                            <StyledTableRow 
+                              key={index}
                               sx={{
-                                fontWeight: 500,
-                                color: theme.palette.text.primary
+                                '&:nth-of-type(odd)': {
+                                  backgroundColor: alpha(theme.palette.primary.light, 0.05)
+                                },
+                                '&:hover': {
+                                  backgroundColor: alpha(theme.palette.primary.light, 0.1)
+                                }
                               }}
                             >
-                              <Box
+                              <StyledTableCell>
+                                {product ? (i18n.language === 'ar' ? product.arName : product.enName) : 'N/A'}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                <Box
+                                  sx={{
+                                    display: 'inline-block',
+                                    px: 2,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    backgroundColor: item.cafeProduct ? 
+                                      alpha(theme.palette.info.main, 0.1) : 
+                                      alpha(theme.palette.warning.main, 0.1),
+                                    color: item.cafeProduct ? 
+                                      theme.palette.info.main : 
+                                      theme.palette.warning.main
+                                  }}
+                                >
+                                  {t(`Invoice.${productType.toLowerCase()}`)}
+                                </Box>
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                ${item.price}
+                              </StyledTableCell>
+                              <StyledTableCell align="center">
+                                {item.quantity}
+                              </StyledTableCell>
+                              <StyledTableCell 
+                                align="center"
                                 sx={{
-                                  display: 'inline-block',
-                                  px: 1.5,
-                                  py: 0.5,
-                                  borderRadius: 1,
-                                  backgroundColor: item.cafeProduct ? 
-                                    alpha(theme.palette.info.main, 0.1) : 
-                                    alpha(theme.palette.warning.main, 0.1),
-                                  color: item.cafeProduct ? 
-                                    theme.palette.info.main : 
-                                    theme.palette.warning.main,
-                                  fontSize: '0.85rem',
-                                  fontWeight: 600
+                                  fontWeight: 600,
+                                  color: item.total > 100 ? 'error.main' : 'primary.main'
                                 }}
                               >
-                                {t(`Invoice.${productType.toLowerCase()}`)}
-                              </Box>
-                            </StyledTableCell>
-                            <StyledTableCell 
-                              align="center"
-                              sx={{
-                                fontWeight: 500,
-                                color: theme.palette.text.primary
-                              }}
-                            >
-                              ${item.price}
-                            </StyledTableCell>
-                            <StyledTableCell 
-                              align="center"
-                              sx={{
-                                fontWeight: 500,
-                                color: theme.palette.text.primary
-                              }}
-                            >
-                              {item.quantity}
-                            </StyledTableCell>
-                            <StyledTableCell 
-                              align="center"
-                              sx={{
-                                fontWeight: 600,
-                                color: theme.palette.primary.main
-                              }}
-                            >
-                              ${item.total}
-                            </StyledTableCell>
-                          </StyledTableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                                ${item.total}
+                              </StyledTableCell>
+                            </StyledTableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )
               ) : (
                 <Paper
                   sx={{ 
@@ -543,13 +422,7 @@ const Invoice = () => {
                     border: `1px dashed ${theme.palette.primary.light}`
                   }}
                 >
-                  <Typography 
-                    variant="body1" 
-                    sx={{ 
-                      color: theme.palette.text.secondary,
-                      fontWeight: 500
-                    }}
-                  >
+                  <Typography variant="body1" color="text.secondary">
                     {t('Invoice.noItemsAvailable')}
                   </Typography>
                 </Paper>
@@ -557,18 +430,21 @@ const Invoice = () => {
             </Box>
           </Box>
         ) : (
-          <Paper
+          <Box
             sx={{ 
               textAlign: 'center', 
-              py: 8,
-              px: 3,
-              borderRadius: 2,
-              backgroundColor: alpha(theme.palette.primary.light, 0.05),
-              border: `1px dashed ${theme.palette.primary.light}`
+              py: 8
             }}
           >
+            <ReceiptLongOutlined 
+              sx={{ 
+                fontSize: 80, 
+                color: alpha(theme.palette.primary.main, 0.3),
+                mb: 3
+              }} 
+            />
             <Typography 
-              variant="h6" 
+              variant="h5" 
               sx={{ 
                 mb: 2,
                 color: theme.palette.primary.main,
@@ -587,7 +463,7 @@ const Invoice = () => {
             >
               {t('Invoice.searchHint')}
             </Typography>
-          </Paper>
+          </Box>
         )}
       </Paper>
     </Box>
