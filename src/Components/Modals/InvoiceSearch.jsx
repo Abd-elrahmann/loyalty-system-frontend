@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import Api from '../../Config/Api';
 import dayjs from 'dayjs';
 // eslint-disable-next-line no-unused-vars
-import { debounce } from 'lodash'
+import debounce from 'lodash.debounce'
 import { Spin } from 'antd';
 import { DatePicker } from '@mui/x-date-pickers';
 const InvoiceSearch = ({ onViewInvoice }) => {

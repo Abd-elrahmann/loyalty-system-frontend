@@ -16,10 +16,7 @@ import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
 import Dashboard from './Pages/Dashboard';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const ToastContainer = React.lazy(() =>
-  import('react-toastify').then(m => ({ default: m.ToastContainer }))
-); 
+import { ToastContainer } from 'react-toastify'; 
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 
 const Customers = React.lazy(() => import('./Pages/Customers'));
