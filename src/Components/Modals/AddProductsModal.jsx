@@ -7,7 +7,9 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormik } from 'formik';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Spin } from "antd";
-import { FaCoins,FaProductHunt, FaLink, FaFile } from 'react-icons/fa';
+import { FaCoins,FaProductHunt, FaLink, FaFile, FaDollarSign } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
+import Api from '../../Config/Api';
 
 const style = {
   position: "absolute",
@@ -30,6 +32,28 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
   const [imageUploadType, setImageUploadType] = useState('file');
   const isMobile = useMediaQuery('(max-width: 400px)');
   const fileInputRef = useRef(null);
+
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      const response = await Api.get('/api/settings');
+      return response.data;
+    },
+    staleTime: 30000,
+    gcTime: 30000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true
+  });
+
+  const calculatePoints = (price) => {
+    if (!settings || !price) return 0;
+    if (settings.enCurrency === 'USD') {
+      return Math.floor(price * settings.pointsPerDollar);
+    } else {
+      return Math.floor(price * settings.pointsPerIQD); 
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       image: null,
@@ -44,7 +68,8 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       try {
         const submitData = {
           ...values,
-          image: values.imageUrl || values.imagePreview, // Changed order to prioritize imageUrl
+          image: values.imageUrl || values.imagePreview,
+          points: calculatePoints(values.price)
         };
         if (handleUpdateProduct) {
           await handleUpdateProduct(submitData);
@@ -78,6 +103,12 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productToEdit, open]);
+
+  useEffect(() => {
+    const points = calculatePoints(formik.values.price);
+    formik.setFieldValue('points', points);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formik.values.price, settings]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -137,7 +168,8 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
     try {
       const submitData = {
         ...formik.values,
-        image: formik.values.imageUrl || formik.values.imagePreview, // Changed order to prioritize imageUrl
+        image: formik.values.imageUrl || formik.values.imagePreview,
+        points: calculatePoints(formik.values.price)
       };
       if (handleUpdateProduct && productToEdit) {
         await handleUpdateProduct(submitData);
@@ -233,12 +265,29 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
+                label={t("Products.Price")}
+                name="price"
+                type="number"
+                value={formik.values.price}
+                onChange={handleChange}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FaDollarSign style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
                 label={t("Products.Points")}
                 name="points"
                 type="number"
                 value={formik.values.points}
-                onChange={handleChange}
-                required
+                disabled
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -248,136 +297,162 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', width: '100%' }}>
+              <Box sx={{ 
+                mb: 2, 
+                display: 'flex', 
+                justifyContent: 'center',
+                width: '100%',
+                gap: 2
+              }}>
                 <Button
                   variant={imageUploadType === 'file' ? 'contained' : 'outlined'}
                   onClick={() => setImageUploadType('file')}
-                  sx={{ mr: 1 }}
+                  sx={{ 
+                    flex: 1,
+                    maxWidth: '200px'
+                  }}
                 >
-                  <FaFile style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />
+                  <FaFile style={{marginRight: '8px', fontSize: '18px', color: imageUploadType === 'file' ? 'white' : '#800080'}} />
                   {t("Products.ImageUploadTypeFile")}
                 </Button>
                 <Button
                   variant={imageUploadType === 'link' ? 'contained' : 'outlined'}
-                  startIcon={<FaLink style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />}
-                  onClick={() => setImageUploadType('link')
-                     
-                  }
+                  onClick={() => setImageUploadType('link')}
+                  sx={{
+                    flex: 1, 
+                    maxWidth: '200px'
+                  }}
                 >
+                  <FaLink style={{marginRight: '8px', fontSize: '18px', color: imageUploadType === 'link' ? 'white' : '#800080'}} />
                   {t("Products.ImageUploadTypeLink")}
                 </Button>
               </Box>
 
-              {imageUploadType === 'link' ? (
-                <TextField
-                  fullWidth
-                  label={t("Products.ImageUploadType")}
-                  name="imageUrl"
-                  value={formik.values.imageUrl}
-                  onChange={(e) => {
-                    const url = e.target.value;
-                    formik.setFieldValue('imageUrl', url);
-                    formik.setFieldValue('imagePreview', ''); // Clear imagePreview when using URL
-                    if (url) {
-                      handleImageUrlChange(url);
-                    }
-                  }}
-                  placeholder="https://example.com/image.jpg"
-                  sx={{ mb: 2 }}
-                  error={imageError}
-                  helperText={imageError ? t("Products.InvalidImageUrl") : ""}
-                />
-              ) : (
-                <Box
-                  sx={{
-                    border: "2px dashed",
-                    borderColor: "primary.main",
-                    borderRadius: 2,
-                    p: 2,
-                    textAlign: "center",
-                    cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "rgba(0, 0, 0, 0.04)",
-                    },
-                  }}
-                  onClick={triggerFileInput}
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                    id="product-image-upload"
-                    ref={fileInputRef}
+              <Box sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                {imageUploadType === 'link' ? (
+                  <TextField
+                    fullWidth
+                    label={t("Products.ImageUploadType")}
+                    name="imageUrl"
+                    value={formik.values.imageUrl}
+                    onChange={(e) => {
+                      const url = e.target.value;
+                      formik.setFieldValue('imageUrl', url);
+                      formik.setFieldValue('imagePreview', '');
+                      if (url) {
+                        handleImageUrlChange(url);
+                      }
+                    }}
+                    placeholder="https://example.com/image.jpg"
+                    sx={{ mb: 2, maxWidth: '400px' }}
+                    error={imageError}
+                    helperText={imageError ? t("Products.InvalidImageUrl") : ""}
                   />
-                  {formik.values.imagePreview ? (
-                    <Box sx={{ position: "relative" }}>
-                      <img
-                        src={formik.values.imagePreview}
-                        alt="Product Preview"
-                        style={{
-                          width: "100%",
-                          height: "200px",
-                          objectFit: "contain",
-                          borderRadius: "8px",
-                        }}
-                      />
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          top: 8,
-                          right: 8,
-                          backgroundColor: "rgba(0,0,0,0.5)",
-                          borderRadius: "50%",
-                          padding: "4px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                          "&:hover": {
-                            backgroundColor: "rgba(0,0,0,0.7)",
-                          },
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          formik.setValues((prev) => ({
-                            ...prev,
-                            image: null,
-                            imagePreview: "",
-                          }));
-                          if (fileInputRef.current) {
-                            fileInputRef.current.value = "";
-                          }
-                        }}
-                      >
-                        <CloseIcon sx={{ color: "white", fontSize: "16px" }} />
+                ) : (
+                  <Box
+                    sx={{
+                      border: "2px dashed",
+                      borderColor: "primary.main",
+                      borderRadius: 2,
+                      p: 2,
+                      textAlign: "center",
+                      cursor: "pointer",
+                      maxWidth: '400px',
+                      width: '100%',
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 0, 0, 0.04)",
+                      },
+                    }}
+                    onClick={triggerFileInput}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                      id="product-image-upload"
+                      ref={fileInputRef}
+                    />
+                    {formik.values.imagePreview ? (
+                      <Box sx={{ position: "relative" }}>
+                        <img
+                          src={formik.values.imagePreview}
+                          alt="Product Preview"
+                          style={{
+                            width: "100%",
+                            height: "200px",
+                            objectFit: "contain",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            backgroundColor: "rgba(0,0,0,0.5)",
+                            borderRadius: "50%",
+                            padding: "4px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(0,0,0,0.7)",
+                            },
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            formik.setValues((prev) => ({
+                              ...prev,
+                              image: null,
+                              imagePreview: "",
+                            }));
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = "";
+                            }
+                          }}
+                        >
+                          <CloseIcon sx={{ color: "white", fontSize: "16px" }} />
+                        </Box>
+                        <Typography
+                          variant="caption"
+                          sx={{ mt: 1, display: "block", color: "text.secondary" }}
+                        >
+                          {t("Products.ClickToChange")}
+                        </Typography>
                       </Box>
-                      <Typography
-                        variant="caption"
-                        sx={{ mt: 1, display: "block", color: "text.secondary" }}
-                      >
-                        {t("Products.ClickToChange")}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Box sx={{ py: 3 }}>
-                      <CloudUploadIcon
-                        sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
-                      />
-                      <Typography variant="body1" sx={{ mb: 1 }}>
-                        {t("Products.DragAndDrop")}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {t("Products.SupportedFormats")}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              )}
+                    ) : (
+                      <Box sx={{ py: 3 }}>
+                        <CloudUploadIcon
+                          sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
+                        />
+                        <Typography variant="body1" sx={{ mb: 1 }}>
+                          {t("Products.DragAndDrop")}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t("Products.SupportedFormats")}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                )}
+              </Box>
 
               {imageUploadType === 'link' && formik.values.imageUrl && (
-                <Box sx={{ mt: 2, textAlign: 'center', position: 'relative' }}>
+                <Box sx={{ 
+                  mt: 2, 
+                  textAlign: 'center', 
+                  position: 'relative',
+                  maxWidth: '400px',
+                  width: '100%'
+                }}>
                   {!imageError ? (
                     <img
                       src={formik.values.imageUrl}
@@ -459,8 +534,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.points || (!formik.values.imagePreview && !formik.values.imageUrl)}
-              startIcon={loading ? <Spin size="large" /> : productToEdit ? <EditOutlined /> : <FaCoins style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+              disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.price || (!formik.values.imagePreview && !formik.values.imageUrl)}
               size="small"
             >
               {loading ? (

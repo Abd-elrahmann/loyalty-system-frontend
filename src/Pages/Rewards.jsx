@@ -6,23 +6,11 @@ import {
   Button,
   Tab,
   Tabs,
-  Table,
-  TableBody,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
   Paper,
   IconButton,
   Stack,
-  Chip,
   useMediaQuery,
-  Checkbox,
 } from "@mui/material";
-import {
-  StyledTableCell,
-  StyledTableRow,
-} from "../Components/Shared/tableLayout";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import RewardsSearchModal from "../Components/Modals/RewardsSearchModal";
 import * as xlsx from "xlsx";
@@ -32,11 +20,12 @@ import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
 import { useUser, updateUserProfile } from "../utilities/user.jsx";
-import { Spin } from "antd";
-import { DeleteOutlined,CheckCircleOutlined, CloseOutlined, SearchOutlined, QrcodeOutlined,SelectOutlined,DoubleLeftOutlined,FileExcelOutlined,FilePdfOutlined } from "@ant-design/icons";
-import { PrinterOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import dayjs from "dayjs";
+import { SearchOutlined, QrcodeOutlined, DoubleLeftOutlined } from "@ant-design/icons";
+import RewardsTable from "../Components/rewards/RewardsTable";
+import RewardsActions from "../Components/rewards/RewardsActions";
+import RewardsExportButtons from "../Components/rewards/RewardsExportButtons";
+
 const Rewards = () => {
   const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -59,12 +48,6 @@ const Rewards = () => {
   const isMobile = useMediaQuery("(max-width: 600px)");
   const profile = useUser();
   const queryClient = useQueryClient();
-
-  const statusMap = {
-    PENDING: { label: "PENDING", color: "warning" },
-    APPROVED: { label: "APPROVED", color: "success" },
-    REJECTED: { label: "REJECTED", color: "error" },
-  };
 
   const fetchRewards = async () => {
     const queryParams = new URLSearchParams();
@@ -197,7 +180,7 @@ const Rewards = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedRewards(filteredRewards.map(reward => reward.id));
+      setSelectedRewards(rewards.map(reward => reward.id));
     } else {
       setSelectedRewards([]);
     }
@@ -402,6 +385,7 @@ const Rewards = () => {
       notifyError(t("Errors.PrintError"));
     }
   };
+
   const handleScanSuccess = (userId) => {
     setFilters(prev => ({
       ...prev,
@@ -410,12 +394,14 @@ const Rewards = () => {
     setPage(1);
     notifySuccess(t("Rewards.ScanQRSuccess"));
   };
+
   return (
     <Box sx={{ p: 3 }}>
       <Helmet>
         <title>{t("Rewards.Rewards")}</title>
         <meta name="description" content={t("Rewards.RewardsDescription")} />
       </Helmet>
+      
       <Box sx={{ 
         borderBottom: 1, 
         borderColor: "divider", 
@@ -431,43 +417,15 @@ const Rewards = () => {
           <Tab label={t("Rewards.Rejected")} sx={{ color: "error.main" }} />
         </Tabs>
 
-        <Stack
-          direction={isMobile ? "column" : "row"}
-          spacing={2}
-          sx={{ mt: isMobile ? 2 : 0,display:profile.role === "ADMIN" ? "" : "none"}}
-          alignItems="center"
-        >
-          <Button variant="outlined" onClick={exportToCSV} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
-            "&:hover": {
-              backgroundColor: "primary.main",
-              color: "white",
-            },
-          }}>
-            <FileExcelOutlined style={{marginRight: '4px'}} />
-            {t("Rewards.ExportExcel")}
-          </Button>
-          <Button variant="outlined" onClick={exportToPDF} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
-            "&:hover": {
-              backgroundColor: "primary.main",
-              color: "white",
-            },
-          }}>
-            <FilePdfOutlined style={{marginRight: '4px'}} />
-            {t("Rewards.ExportPdf")}
-          </Button>
-          <Button variant="outlined" onClick={PrintRewards} sx={{ height: "40px", width: isMobile ? "140px" : "135px",fontSize: "12px",
-            "&:hover": {
-              backgroundColor: "primary.main",
-              color: "white",
-            },
-          }}>
-            <PrinterOutlined style={{marginRight: '4px'}} />
-            {t("Rewards.Print")}
-          </Button>
-        </Stack>
+        <RewardsExportButtons
+          exportToCSV={exportToCSV}
+          exportToPDF={exportToPDF}
+          PrintRewards={PrintRewards}
+          isMobile={isMobile}
+        />
       </Box>
 
-      <Box sx={{ p: isMobile ? 1 : 2, mb: isMobile ? 0 : 2,width:isMobile? "100%":"90%" }}>
+      <Box sx={{ p: isMobile ? 1 : 2, mb: isMobile ? 0 : 2, width: isMobile ? "100%" : "90%" }}>
         <Stack
           direction={isMobile ? "column" : "row"}
           justifyContent={isMobile ? "center" : "space-between"}
@@ -481,7 +439,7 @@ const Rewards = () => {
             alignItems="center"
           >
             <Button
-              sx={{ display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '130px',
+              sx={{ display: profile.role === "ADMIN" ? "" : "none", height: "40px", width: isMobile ? '140px' : '130px',
                 "&:hover": {
                   backgroundColor: "primary.main",
                   color: "white",
@@ -494,107 +452,23 @@ const Rewards = () => {
               {t("Rewards.Search")}
             </Button>
             <IconButton
-              sx={{ color: "primary.main", padding: 0 ,display: profile.role === "ADMIN" ? "" : "none",height: "40px",width:isMobile? '140px' : '50px' }}
+              sx={{ color: "primary.main", padding: 0, display: profile.role === "ADMIN" ? "" : "none", height: "40px", width: isMobile ? '140px' : '50px' }}
               onClick={() => setOpenScanModal(true)}
             >
               <QrcodeOutlined />
             </IconButton>
           </Stack>
 
-          <Stack
-            direction={isMobile ? "column" : "row"}
-            justifyContent={isMobile ? "center" : "flex-end"}
-            spacing={1}
-            alignItems="center"
-          >
-              <Button
-                variant={isAllChecked ? "contained" : "outlined"}
-                color={isAllChecked ? "warning" : "primary"}
-                sx={{
-                  display: profile.role === "ADMIN" ? "flex" : "none",
-                  alignItems: "center",
-                  width:isMobile? "140px":"150px",
-                  height: "40px",
-                  fontSize: "12px",
-                  "&:hover": {
-                    backgroundColor: isAllChecked ? "warning.main" : "primary.main",
-                    color: "white",
-                  },
-                }}
-                onClick={() => {
-                  setIsAllChecked(!isAllChecked);
-                  if (!isAllChecked) setSelectedRewards([]);
-                }}
-              >
-                <SelectOutlined style={{marginRight: '4px'}} />
-                {isAllChecked ? t("Rewards.CancelSelect") : t("Rewards.SelectMultiple")}
-              </Button>
-
-              {isAllChecked && tabValue === 0 && (
-              <>
-                <Button 
-                   sx={{
-                    backgroundColor: "success.main",
-                    display: profile.role === "ADMIN" ? "flex" : "none",
-                    alignItems: "center",
-                    width:isMobile? "140px":"130px",
-                    height: "40px",
-                    fontSize: "12px",
-                  }}
-                  variant="contained" 
-                  color="success"
-                  onClick={handleApproveMany}
-                  disabled={selectedRewards.length === 0}
-                >
-                  <CheckCircleOutlined style={{marginRight: '4px'}} />
-                  {t("Rewards.ApproveSelected", { count: selectedRewards.length })}
-                </Button>
-                <Button 
-                   sx={{
-                    display: profile.role === "ADMIN" ? "flex" : "none",
-                    alignItems: "center",
-                    width:isMobile? "140px":"130px",
-                    height: "40px",
-                    fontSize: "12px",
-                    "&:hover": {
-                      backgroundColor: "error.main",
-                      color: "white",
-                    },
-                  }}
-                  variant="contained" 
-                  color="error"
-                  onClick={() => setOpenRejectDialog(true)}
-                  disabled={selectedRewards.length === 0}
-                >
-                  <CloseOutlined style={{marginRight: '4px'}} />
-                  {t("Rewards.RejectSelected", { count: selectedRewards.length })}
-                </Button>
-              </>
-            )}
-
-            {isAllChecked && (tabValue === 1 || tabValue === 2) && (
-              <Button 
-                sx={{
-                  display: profile.role === "ADMIN" ? "flex" : "none",
-                  alignItems: "center",
-                  width:isMobile? "140px":"190px",
-                  height: "40px",
-                  fontSize: "12px",
-                  "&:hover": {
-                    backgroundColor: "error.main",
-                    color: "white",
-                  },
-                }}
-                variant="contained" 
-                color="error"
-                onClick={() => setOpenDeleteDialog(true)}
-                disabled={selectedRewards.length === 0}
-              >
-                <DeleteOutlined style={{marginRight: '4px'}} />
-                {t("Rewards.DeleteSelected", { count: selectedRewards.length })}
-              </Button>
-            )}
-          </Stack>
+          <RewardsActions
+            isAllChecked={isAllChecked}
+            setIsAllChecked={setIsAllChecked}
+            selectedRewards={selectedRewards}
+            tabValue={tabValue}
+            setOpenRejectDialog={setOpenRejectDialog}
+            handleApproveMany={handleApproveMany}
+            setOpenDeleteDialog={setOpenDeleteDialog}
+            profile={profile}
+          />
 
           <Stack
             direction={isMobile ? "column" : "row"}
@@ -618,7 +492,7 @@ const Rewards = () => {
               sx={{
                 display: profile.role === "ADMIN" ? "" : "none",
                 height: "40px",
-                  visibility:
+                visibility:
                   filters.fromDate ||
                   filters.toDate ||
                   filters.type ||
@@ -634,214 +508,25 @@ const Rewards = () => {
         </Stack>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-            {isAllChecked && (
-                <StyledTableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={
-                      selectedRewards.length > 0 &&
-                      selectedRewards.length < filteredRewards.length
-                    }
-                    checked={
-                      filteredRewards.length > 0 &&
-                      selectedRewards.length === filteredRewards.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </StyledTableCell>
-              )}
-              <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
-                {t("Rewards.ID")}
-              </StyledTableCell>
-              <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
-                {t("Rewards.Customer")}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {t("Rewards.Product")}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {t("Rewards.Image")}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {t("Rewards.Points")}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {t("Rewards.Type")}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {t("Rewards.Status")}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {t("Rewards.Date")}
-              </StyledTableCell>
-              {tabValue === 0 && !isAllChecked && profile.role === "ADMIN" && (
-                <StyledTableCell align="center">
-                  {t("Rewards.Actions")}
-                </StyledTableCell>
-              )}
-              {tabValue === 2 && !isAllChecked && profile.role === "ADMIN" && (
-                <StyledTableCell align="center">
-                  {t("Rewards.RejectionNote")}
-                </StyledTableCell>
-              )}
-              {(tabValue === 1 || tabValue === 2) && !isAllChecked && profile.role === "ADMIN" && (
-                <StyledTableCell align="center">
-                  {t("Rewards.Actions")}
-                </StyledTableCell>
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <StyledTableRow>
-                <StyledTableCell
-                  colSpan={tabValue === 0 ? 7 : 6}
-                  align="center"
-                  justifyContent="center"
-                >
-                  <Spin size="large" style={{right:'50px'}} />
-                </StyledTableCell>
-              </StyledTableRow>
-            ) : filteredRewards.length === 0 ? (
-              <StyledTableRow>
-                <StyledTableCell
-                  colSpan={9}
-                  align="center"
-                >
-                  {t("Rewards.NoRewards")}
-                </StyledTableCell>
-              </StyledTableRow>
-            ) : (
-              filteredRewards.map((reward) => (
-                <StyledTableRow key={reward.id} hover>
-                  {isAllChecked && (
-                    <StyledTableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedRewards.includes(reward.id)}
-                        onChange={() => handleSelectReward(reward.id)}
-                      />
-                    </StyledTableCell>
-                  )}
-                  <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>{reward.id}</StyledTableCell>
-                  <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
-                    {i18n.language === "ar"
-                      ? reward.user?.arName
-                      : reward.user?.enName}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    {reward.cafeProduct
-                      ? `${
-                          i18n.language === "ar"
-                            ? reward.cafeProduct.arName
-                            : reward.cafeProduct.enName
-                        }`
-                      : reward.restaurantProduct
-                      ? `${
-                          i18n.language === "ar"
-                            ? reward.restaurantProduct.arName
-                            : reward.restaurantProduct.enName
-                        }`
-                      : "-"}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <img
-                      src={
-                        reward.cafeProduct?.image ||
-                        reward.restaurantProduct?.image ||
-                        "-"
-                      }
-                      alt="Reward Image"
-                      style={{ width:isMobile? "50px" : "60px", height:isMobile? "50px" : "60px" }}
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    {reward.points}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <span
-                      style={{
-                        color: reward.type === "cafe" ? "#8B4513" : "inherit",
-                      }}
-                    >
-                      {reward.type}
-                    </span>
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    <Chip sx={{fontSize: "12px"}}
-                      label={reward.status}
-                      color={statusMap[reward.status]?.color || "default"}
-                    />
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    {dayjs(reward.date).format('DD/MM/YYYY hh:mm')}
-                  </StyledTableCell>
-                  {tabValue === 0 && !isAllChecked && (
-                    <StyledTableCell align="center">
-                      <Stack
-                        sx={{ display: profile.role === "ADMIN" ? "flex" : "none" }}
-                        direction="row"
-                        spacing={1}
-                        justifyContent="center"
-                      >
-                        <IconButton
-                          size="small"
-                          color="success"
-                          onClick={() => handleApprove(reward.id)}
-                          title={t("Rewards.Approve")}
-                        >
-                          <CheckCircleOutlined />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => {
-                            setRewardToReject(reward.id);
-                            setOpenRejectDialog(true);
-                          }}
-                          title={t("Rewards.Reject")}
-                        >
-                          <CloseOutlined />
-                        </IconButton>
-                      </Stack>
-                    </StyledTableCell>
-                  )}
-                  {tabValue === 2 && !isAllChecked && (
-                    <StyledTableCell align="center">
-                      {reward.note || "-"}
-                    </StyledTableCell>
-                  )}
-                  {(tabValue === 1 || tabValue === 2) && !isAllChecked && profile.role === "ADMIN" && (
-                    <StyledTableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          setRewardToDelete(reward.id);
-                          setOpenDeleteDialog(true);
-                        }}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
-                    </StyledTableCell>
-                  )}
-                </StyledTableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={totalPages * 10}
-          page={page - 1}
-          onPageChange={(e, newPage) => setPage(newPage + 1)}
-          rowsPerPage={10}
-          rowsPerPageOptions={[10]}
-          labelRowsPerPage={t("Rewards.RowsPerPage")}
-        />
-      </TableContainer>
+      <RewardsTable
+        tabValue={tabValue}
+        filteredRewards={filteredRewards}
+        isLoading={isLoading}
+        totalPages={totalPages}
+        page={page}
+        setPage={setPage}
+        isAllChecked={isAllChecked}
+        selectedRewards={selectedRewards}
+        handleSelectReward={handleSelectReward}
+        handleSelectAll={handleSelectAll}
+        handleApprove={handleApprove}
+        setRewardToReject={setRewardToReject}
+        setOpenRejectDialog={setOpenRejectDialog}
+        setRewardToDelete={setRewardToDelete}
+        setOpenDeleteDialog={setOpenDeleteDialog}
+        profile={profile}
+        i18n={i18n}
+      />
 
       <RewardsSearchModal
         open={openSearchModal}
@@ -886,7 +571,6 @@ const Rewards = () => {
         onConfirm={rewardToReject ? handleReject : handleRejectMany}
         isLoading={rejectMutation.isLoading}
       />
-
 
       <RewardsScanModal
         open={openScanModal}

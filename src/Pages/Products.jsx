@@ -4,7 +4,6 @@ import AddProductModal from '../Components/Modals/AddProductsModal';
 import Api, { handleApiError } from '../Config/Api';
 import { useTranslation } from 'react-i18next';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import DeleteModal from '../Components/Modals/DeleteModal';
 import Swal from 'sweetalert2';
@@ -14,6 +13,8 @@ import { Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash.debounce';
+import { FaDollarSign } from 'react-icons/fa';
+import { FaCoins } from 'react-icons/fa';
 
 
 const Products = () => {
@@ -163,10 +164,14 @@ const Products = () => {
   };
 
   const handleDeleteProduct = (id) => {
+    setOpenDeleteModal(true);
     setProductId(id);
     setOpenDeleteModal(true);
   };
-
+  
+  const confirmDeleteProduct = () => {
+    deleteProductMutation.mutate(productId);
+  };
   const handleSearch = (e) => {
     debouncedSearch(e.target.value);
     setSearchValue(e.target.value);
@@ -311,9 +316,13 @@ const Products = () => {
                     </Typography>
     
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-                      <MonetizationOnIcon sx={{ color: 'gold' }} />
+                      <FaCoins style={{ color: '#ED6C02' }} /> 
                       <Typography variant="body1">
                         {t('Products.Points')}: {product.points}
+                      </Typography>
+                      <FaDollarSign style={{ color: '#00A300' }} /> 
+                      <Typography variant="body1">
+                        {t('Products.Price')}: {product.price}
                       </Typography>
                     </Box>
                   </CardContent>
@@ -369,8 +378,7 @@ const Products = () => {
                       size="small"
                       color="error"
                       onClick={() => {
-                        setOpenDeleteModal(true);
-                        setProductId(product.id);
+                        handleDeleteProduct(product.id);
                       }}
                       aria-label="delete"
                       >
@@ -407,8 +415,7 @@ const Products = () => {
       <DeleteModal
         open={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)} 
-        onConfirm={() => handleDeleteProduct(productId)}
-        title={t('Products.DeleteProduct')}
+        onConfirm={confirmDeleteProduct}
         message={t('Products.DeleteProductMessage')}
         isLoading={deleteProductMutation.isLoading}
       />

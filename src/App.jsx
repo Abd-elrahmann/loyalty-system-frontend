@@ -30,6 +30,7 @@ const Rewards = React.lazy(() => import('./Pages/Rewards'));
 const Layout = React.lazy(() => import('./Layout'));
 import MainRoutes from './Config/routes';
 import PointOfSale from './Pages/PointOfSale';
+import Invoice from './Pages/Invoice';
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const routeComponents = {
   '/settings': Settings,
   '/rewards': Rewards,
   '/point-of-sale': PointOfSale,
+  '/invoice': Invoice,
 };
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');

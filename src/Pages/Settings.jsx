@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Container, Autocomplete, Tabs, Tab } from '@mui/material';
+import { Box, Typography, TextField, Container, Autocomplete, Tabs, Tab, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
@@ -28,7 +28,9 @@ const Settings = () => {
     arCurrency: null,
     timezone: 'Asia/Baghdad',
     pointsPerDollar: 0,
-    pointsPerIQD: 0
+    pointsPerIQD: 0,
+    printerType: 'USB',
+    printerIp: null
   });
 
   const { data, isLoading } = useQuery({
@@ -51,7 +53,9 @@ const Settings = () => {
         pointsPerDollar: parseInt(data.pointsPerDollar) || 0,
         pointsPerIQD: parseInt(data.pointsPerIQD) || 0,
         enCurrency: currencyObj?.enValue || null,
-        arCurrency: currencyObj?.arValue || null
+        arCurrency: currencyObj?.arValue || null,
+        printerType: data.printerType || 'USB',
+        printerIp: data.printerIp || null
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,6 +82,15 @@ const Settings = () => {
     }));
   };
 
+  const handlePrinterChange = (e) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({
+      ...prev,
+      [name]: value,
+      printerIp: value === 'USB' ? null : prev.printerIp
+    }));
+  };
+
   const handleSave = () => {
     let settingsToSave;
     if (user.role === 'ADMIN') {
@@ -87,7 +100,9 @@ const Settings = () => {
         pointsPerIQD: parseInt(settings.pointsPerIQD) || 0,
         enCurrency: settings.enCurrency,
         arCurrency: settings.arCurrency,
-        timezone: settings.timezone
+        timezone: settings.timezone,
+        printerType: settings.printerType,
+        printerIp: settings.printerType === 'LAN' ? settings.printerIp : null
       };
     } else {
       settingsToSave = { timezone: settings.timezone };
@@ -98,7 +113,7 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="500px">
         <Spin size="large" />
       </Box>
     );
@@ -120,6 +135,7 @@ const Settings = () => {
         >
           {user.role === 'ADMIN' && <Tab label={t('Settings.CurrencySettings')} />}
           <Tab label={t('Settings.TimezoneSettings')} />
+          {user.role === 'ADMIN' && <Tab label={t('Settings.PrinterSettings')} />}
         </Tabs>
 
         {/* Currency Tab */}
@@ -198,6 +214,38 @@ const Settings = () => {
                 <TextField {...params} label={t('Settings.Timezone')} />
               )}
             />
+          </Box>
+        )}
+
+        {/* Printer Settings Tab */}
+        {user.role === 'ADMIN' && tabIndex === 2 && (
+          <Box sx={{ p: 2 }}>
+            <FormControl fullWidth>
+              <InputLabel>{t('Settings.PrinterType')}</InputLabel>
+              <Select
+                value={settings.printerType}
+                name="printerType"
+                label={t('Settings.PrinterType')}
+                onChange={handlePrinterChange}
+              >
+                <MenuItem value="USB">USB</MenuItem>
+                <MenuItem value="LAN">LAN</MenuItem>
+              </Select>
+            </FormControl>
+
+            {settings.printerType === 'LAN' && (
+              <TextField
+                fullWidth
+                sx={{ mt: 2 }}
+                label={t('Settings.PrinterIP')}
+                name="printerIp"
+                value={settings.printerIp || ''}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  printerIp: e.target.value
+                }))}
+              />
+            )}
           </Box>
         )}
 

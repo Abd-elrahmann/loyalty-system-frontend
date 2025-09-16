@@ -6,6 +6,7 @@ import {
   Settings as SettingsIcon,
   ReceiptLong as ReceiptLongIcon,
   PointOfSale as PointOfSaleIcon,
+  Receipt as InvoiceIcon,
 } from '@mui/icons-material';
 
 const routes = [
@@ -53,6 +54,13 @@ const routes = [
     arName: 'النقطة المباشرة',
     path: '/point-of-sale',
     icon: PointOfSaleIcon,
+    role: ['ADMIN'],
+  },
+  {
+    name: 'Invoice',
+    arName: 'الفواتير',
+    path: '/invoice',
+    icon: ReceiptLongIcon,
     role: ['ADMIN'],
   },
   {
