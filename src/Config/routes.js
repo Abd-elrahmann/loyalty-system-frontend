@@ -5,6 +5,7 @@ import {
   CardGiftcard as RewardsIcon,
   Settings as SettingsIcon,
   ReceiptLong as ReceiptLongIcon,
+  PointOfSale as PointOfSaleIcon,
 } from '@mui/icons-material';
 
 const routes = [
@@ -47,7 +48,13 @@ const routes = [
     role: ['ADMIN', 'USER'],
     
   },
-  
+  {
+    name: 'Point Of Sale',
+    arName: 'النقطة المباشرة',
+    path: '/point-of-sale',
+    icon: PointOfSaleIcon,
+    role: ['ADMIN'],
+  },
   {
     name: 'Settings',
     arName: 'الإعدادات',

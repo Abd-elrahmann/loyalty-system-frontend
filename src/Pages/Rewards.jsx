@@ -708,7 +708,7 @@ const Rewards = () => {
             ) : filteredRewards.length === 0 ? (
               <StyledTableRow>
                 <StyledTableCell
-                  colSpan={tabValue === 0 ? 7 : 6}
+                  colSpan={9}
                   align="center"
                 >
                   {t("Rewards.NoRewards")}
