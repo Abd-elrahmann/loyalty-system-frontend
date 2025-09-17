@@ -35,7 +35,7 @@ export const useRoutePrefetch = () => {
             pages[filePath]();
           }
         });
-      }, 1000);
+      }, 200);
 
       return () => clearTimeout(timer);
     }

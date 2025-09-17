@@ -29,7 +29,7 @@ import {
   StyledTableRow,
 } from "../Components/Shared/tableLayout";
 import { useTranslation } from "react-i18next";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { RestartAltOutlined } from "@mui/icons-material";
@@ -61,6 +61,8 @@ const Transactions = () => {
   });
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
+  const [openCancelModal, setOpenCancelModal] = useState(false); // New state for cancel modal
+  const [transactionToCancel, setTransactionToCancel] = useState(null); // New state for transaction to cancel
   const profile = useUser();
   const isMobile = useMediaQuery('(max-width: 768px)');
   
@@ -143,6 +145,21 @@ const Transactions = () => {
     },
   });
 
+  // New mutation for canceling transactions
+  const cancelMutation = useMutation({
+    mutationFn: (transactionId) =>
+      Api.post(`/api/transactions/${transactionId}/cancel`),
+    onSuccess: () => {
+      notifySuccess(t("Transactions.TransactionCancelled"));
+      queryClient.invalidateQueries(["transactions"]);
+      setOpenCancelModal(false);
+      setTransactionToCancel(null);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    },
+  });
+
   const handleSearch = (searchFilters) => {
     setFilters(searchFilters);
     setPage(1);
@@ -151,6 +168,12 @@ const Transactions = () => {
   const handleDelete = () => {
     if (!transactionToDelete?.id) return;
     deleteMutation.mutate(transactionToDelete.id);
+  };
+
+  // New function to handle transaction cancellation
+  const handleCancel = () => {
+    if (!transactionToCancel?.id) return;
+    cancelMutation.mutate(transactionToCancel.id);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -180,6 +203,7 @@ const Transactions = () => {
               ? transaction.currency.arCurrency
               : transaction.currency.enCurrency,
           Type: transaction.type,
+          Status: transaction.status,
           Date: date,
         }));
       } else {
@@ -192,6 +216,7 @@ const Transactions = () => {
               ? transaction.currency.arCurrency
               : transaction.currency.enCurrency,
           Type: transaction.type,
+          Status: transaction.status,
           Date: date,
         }));
       }
@@ -235,6 +260,7 @@ const Transactions = () => {
         "Points",
         "Currency",
         "Type",
+        "Status",
         "Date",
       ];
 
@@ -246,6 +272,7 @@ const Transactions = () => {
           ? transaction.currency.arCurrency
           : transaction.currency.enCurrency,
         transaction.type,
+        transaction.status,
         dayjs(transaction.date).format("YYYY-MM-DD"),
       ]);
 
@@ -338,6 +365,17 @@ const Transactions = () => {
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
+              {t("Transactions.Status")}:
+            </Typography>
+            <Chip
+              label={transaction.status}
+              color={transaction.status === "CANCELLED" ? "error" : "success"}
+              size="small"
+            />
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
               {t("Transactions.Date")}:
             </Typography>
             <Typography variant="body2">
@@ -346,7 +384,20 @@ const Transactions = () => {
           </Box>
           
           {profile.role === "ADMIN" && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, gap: 1 }}>
+              {transaction.status !== "CANCELLED" && (
+                <IconButton
+                  size="small"
+                  color="warning"
+                  onClick={() => {
+                    setOpenCancelModal(true);
+                    setTransactionToCancel(transaction);
+                  }}
+                  title={t("Transactions.Cancel")}
+                >
+                  <CloseCircleOutlined />
+                </IconButton>
+              )}
               <IconButton
                 size="small"
                 color="error"
@@ -598,6 +649,9 @@ const Transactions = () => {
                   {t("Transactions.Type")}
                 </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
+                  {t("Transactions.Status")}
+                </StyledTableCell>
+                <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                   {t("Transactions.Date")}
                 </StyledTableCell>
                 <StyledTableCell
@@ -607,20 +661,20 @@ const Transactions = () => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {t("Transactions.Delete")}
+                  {t("Transactions.Actions")}
                 </StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={customerId ? 7 : 8} align="center">
+                  <StyledTableCell colSpan={customerId ? 8 : 9} align="center">
                     <Spin size="large" />
                   </StyledTableCell>
                 </StyledTableRow>
               ) : !transactions || transactions.length === 0 ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={customerId ? 7 : 8} align="center">
+                  <StyledTableCell colSpan={customerId ? 8 : 9} align="center">
                     {t("Transactions.NoTransactions")}
                   </StyledTableCell>
                 </StyledTableRow>
@@ -661,23 +715,53 @@ const Transactions = () => {
                         size="small"
                       />
                     </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {transaction.status === "CANCELLED" ? (
+                        <Chip
+                          label={transaction.status}
+                          color="error"
+                          size="small"
+                        />
+                      ) : (
+                        "-"
+                      )}
+                    </StyledTableCell>
                     <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                       {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
                     </StyledTableCell>
                     <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        sx={{
-                          display: profile.role === "ADMIN" ? "" : "none",
-                        }}
-                        onClick={() => {
-                          setOpenDeleteModal(true);
-                          setTransactionToDelete(transaction);
-                        }}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
+                      <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                        {transaction.status !== "CANCELLED" && (
+                          <IconButton
+                            size="small"
+                            color="warning"
+                            sx={{
+                              display: profile.role === "ADMIN" ? "" : "none",
+                            }}
+                            onClick={() => {
+                              setOpenCancelModal(true);
+                              setTransactionToCancel(transaction);
+                            }}
+                            title={t("Transactions.CancelTransaction")}
+                          >
+                            <CloseCircleOutlined />
+                          </IconButton>
+                        )}
+                        <IconButton
+                          size="small"
+                          color="error"
+                          sx={{
+                            display: profile.role === "ADMIN" ? "" : "none",
+                          }}
+                          onClick={() => {
+                            setOpenDeleteModal(true);
+                            setTransactionToDelete(transaction);
+                          }}
+                          title={t("Transactions.Delete")}
+                        >
+                          <DeleteOutlined />
+                        </IconButton>
+                      </Box>
                     </StyledTableCell>
                   </StyledTableRow>
                 ))
@@ -749,6 +833,22 @@ const Transactions = () => {
         title={t("Transactions.DeleteTransaction")}
         onConfirm={handleDelete}
         isLoading={deleteMutation.isLoading}
+      />
+
+      {/* Cancel Transaction Modal */}
+      <DeleteModal
+        open={openCancelModal}
+        ButtonText={t("Transactions.Cancel")}
+        cancelText={t("Transactions.CancelNo")}
+        confirmText={t("Transactions.CancelYes")}
+          onClose={() => {
+          setOpenCancelModal(false);
+          setTransactionToCancel(null);
+        }}
+        message={t("Transactions.CancelTransactionMessage")}
+        title={t("Transactions.CancelTransaction")}
+        onConfirm={handleCancel}
+        isLoading={cancelMutation.isLoading}
       />
     </Box>
   );

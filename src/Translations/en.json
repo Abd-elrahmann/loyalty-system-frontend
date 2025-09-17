@@ -184,7 +184,8 @@
     "ClearFilter": "Clear Filter",
     "Point": "Point",
     "NeedToChangeCurrency": " Need to change the currency?",
-    "GoToSettings": "Go to settings"
+    "GoToSettings": "Go to settings",
+    "QRCode":"QR Code"
   },
   "Products": {
     "Products": "Products",
@@ -280,7 +281,16 @@
     "TransactionAdded": "Transaction added successfully",
     "TransactionsDescription": "Manage transactions in the cafe and restaurant",
     "CurrentPage": "Current Page",
-    "AllPages": "All Pages"
+    "AllPages": "All Pages",
+    "Status": "Status",
+    "Actions": "Actions",
+    "CancelTransaction": "Cancel Transaction",
+    "CancelTransactionMessage": "Are you sure you want to cancel the transaction?",
+    "CancelTransactionSuccess": "Transaction cancelled successfully",
+    "CancelTransactionFailed": "Transaction not cancelled",
+    "Cancel": "Cancel",
+    "CancelNo": "No",
+    "CancelYes": "Yes"
   },
   "Settings": {
     "Settings": "Settings",

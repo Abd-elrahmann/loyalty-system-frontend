@@ -183,7 +183,8 @@
     "ClearFilterEmailHint": "مسح الفلتر البريد الإلكتروني",
     "Point": "نقطة",
     "NeedToChangeCurrency": "هل تحتاج إلى تغيير العملة؟",
-    "GoToSettings": "الذهاب إلى الإعدادات"
+    "GoToSettings": "الذهاب إلى الإعدادات",
+    "QRCode":"كود الاستجابة السريعة"
   },
   "Products": {
     "Products": "المنتجات",
@@ -279,8 +280,16 @@
     "TransactionAdded": "تم إضافة التحويل بنجاح",
     "TransactionsDescription": "إدارة المعاملات في المقهى والمطعم",
     "CurrentPage": "الصفحة الحالية",
-    "AllPages": "جميع الصفحات"
-
+    "AllPages": "جميع الصفحات",
+    "Status": "الحالة",
+    "Actions": "الإجراءات",
+    "CancelTransaction": "إلغاء التحويل",
+    "CancelTransactionMessage": "هل أنت متأكد من إلغاء التحويل ؟",
+    "CancelTransactionSuccess": "تم إلغاء التحويل بنجاح",
+    "CancelTransactionFailed": "فشل إلغاء التحويل",
+    "Cancel": "إلغاء",
+    "CancelNo": "لا",
+    "CancelYes": "نعم"
   },
   "Settings": {
     "Settings": "الإعدادات",

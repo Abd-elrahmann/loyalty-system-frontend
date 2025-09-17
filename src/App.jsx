@@ -1,13 +1,12 @@
 import 'react-toastify/dist/ReactToastify.css';
-import { BrowserRouter } from 'react-router-dom';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import React, { useMemo } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, useMemo, useEffect } from 'react';
+import { Spin } from 'antd';
 import Register from './Auth/Register';
 import Login from './Auth/Login';
 import Profile from './Components/Shared/Profile';
 import { useTranslation } from 'react-i18next';
 import './App.css';
-import { useEffect } from 'react';
 import ForgetPassword from './Auth/ForgetPassword';
 import createCache from '@emotion/cache';
 import rtlPlugin from 'stylis-plugin-rtl';
@@ -21,11 +20,10 @@ import MainRoutes from './Config/routes';
 const Layout = React.lazy(() => import('./Layout'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 
-const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
 const routeComponents = {
   '/dashboard': React.lazy(() => {
     const component = import('./Pages/Dashboard');
-    import('./Pages/Transactions');
+    import('./Pages/Transactions'); 
     import('./Pages/Products');
     return component;
   }),
@@ -47,106 +45,122 @@ function App() {
 
   useEffect(() => {
     document.dir = i18n.dir();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i18n.dir()]);
+  }, [i18n]);
 
   const cacheRtl = useMemo(() => {
-    if (i18n.dir() === 'rtl') {
-      return createCache({
-        key: 'muirtl',
-        stylisPlugins: [prefixer, rtlPlugin],
-      });
-    } else {
-      return createCache({
-        key: "muiltr"
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i18n.dir()]);
+    return createCache({
+      key: i18n.dir() === 'rtl' ? 'muirtl' : 'muiltr',
+      stylisPlugins: i18n.dir() === 'rtl' ? [prefixer, rtlPlugin] : []
+    });
+  }, [i18n]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Layout >
-        <CacheProvider value={cacheRtl}>
-          <BrowserRouter> 
-
-          <Routes>
-            <Route path="/" element={
-              <Navigate to={localStorage.getItem('token') ? "/dashboard" : "/login"} replace />
-            } />
-            <Route path="/signup" element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } />
-            <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } />
-            <Route path="/forgot-password" element={
-              <PublicRoute>
-                <ForgetPassword />
-              </PublicRoute>
-            } />
-            <Route path="/reset-password" element={
-              <PublicRoute>
-                <ResetPassword />
-              </PublicRoute>
-            } />
-            {MainRoutes.map((route, index) => {
-              const RouteComponent = routeComponents[route.path];
-              return (
-                <Route key={index} path={route.path} element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <RouteComponent />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
-              );
-            })}
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Profile />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            <Route path="/transactions/:customerId" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  {React.createElement(routeComponents['/transactions'])}
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-          </Routes>
-          <ToastContainer />
-        </BrowserRouter>
-      </CacheProvider>
-      </Layout>
+      <Suspense fallback={<CenteredSpinner />}>
+        <Layout>
+          <CacheProvider value={cacheRtl}>
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={<Navigate to={localStorage.getItem('token') ? '/dashboard' : '/login'} replace />}
+                />
+                <Route
+                  path="/signup"
+                  element={
+                    <PublicRoute>
+                      <Register />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <PublicRoute>
+                      <ForgetPassword />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/reset-password"
+                  element={
+                    <PublicRoute>
+                      <ResetPassword />
+                    </PublicRoute>
+                  }
+                />
+                {MainRoutes.map((route, index) => {
+                  const RouteComponent = routeComponents[route.path];
+                  return (
+                    <Route
+                      key={index}
+                      path={route.path}
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <Suspense fallback={<CenteredSpinner />}>
+                              <RouteComponent />
+                            </Suspense>
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                  );
+                })}
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <Profile />
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/transactions/:customerId"
+                  element={
+                    <ProtectedRoute>
+                      <MainLayout>
+                        <Suspense fallback={<CenteredSpinner />}>
+                          {React.createElement(routeComponents['/transactions'])}
+                        </Suspense>
+                      </MainLayout>
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+              <ToastContainer />
+            </BrowserRouter>
+          </CacheProvider>
+        </Layout>
+      </Suspense>
     </QueryClientProvider>
   );
 }
 
+const CenteredSpinner = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+    <Spin size="large" />
+  </div>
+);
+
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
 };
 
-export default App
+export default App;

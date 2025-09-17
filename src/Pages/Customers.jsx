@@ -18,6 +18,7 @@ import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
 import ScanQRModal from "../Components/Modals/ScanQRModal";
+import ShowQrModal from "../Components/Modals/ShowQrModal"; // New import
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import debounce from "lodash.debounce";
@@ -35,6 +36,7 @@ const Customers = () => {
     arName: "",
     email: "",
     phone: "",
+    qrCode: "",
   });
   const [openAddCustomer, setOpenAddCustomer] = useState(false);
   const [isLoadingAddCustomer, setIsLoadingAddCustomer] = useState(false);
@@ -46,6 +48,8 @@ const Customers = () => {
   const [openScanQR, setOpenScanQR] = useState(false);
   const [scannedEmail, setScannedEmail] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [openShowQR, setOpenShowQR] = useState(false); // New state
+  const [customerToShowQR, setCustomerToShowQR] = useState(null); // New state
 
   const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
   const [excelAnchorEl, setExcelAnchorEl] = useState(null);
@@ -89,6 +93,7 @@ const Customers = () => {
       if (value) queryParams.append(key, value);
     });
     if (scannedEmail) queryParams.append("email", scannedEmail);
+    if (searchFilters.qrCode) queryParams.append("qrCode", searchFilters.qrCode);
     queryParams.append('limit', rowsPerPage);
 
     const response = await Api.get(`/api/users/${page}?${queryParams}`);
@@ -101,7 +106,7 @@ const Customers = () => {
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail],
+    queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail, searchFilters.qrCode],
     queryFn: fetchCustomers,
     keepPreviousData: true,
     staleTime: 30000,
@@ -249,6 +254,12 @@ const Customers = () => {
     }
   };
 
+  // Function to show QR code
+  const handleShowQR = (customer) => {
+    setCustomerToShowQR(customer);
+    setOpenShowQR(true);
+  };
+
   // دالة لعرض بيانات العميل في شكل بطاقة للشاشات الصغيرة
   const renderCustomerCard = (customer) => (
     <Card key={customer.id} sx={{ mb: 2, p: 2 }}>
@@ -309,6 +320,19 @@ const Customers = () => {
               {t("Customers.Points")}:
             </Typography>
             <Typography variant="body2">{customer.points}</Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {t("Customers.QRCode")}:
+            </Typography>
+            <IconButton 
+              size="small" 
+              onClick={() => handleShowQR(customer)}
+              title={t("Customers.ShowQR")}
+            >
+              <QrcodeOutlined />
+            </IconButton>
           </Box>
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -553,6 +577,7 @@ const Customers = () => {
                 <StyledTableCell align="center" sx={{ maxWidth: '300px' }}>{t("Customers.Email")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.Phone")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.Points")}</StyledTableCell>
+                <StyledTableCell align="center">{t("Customers.QRCode")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.CreatedAt")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.AddPoints")}</StyledTableCell>
                 <StyledTableCell align="center">{t("Customers.ViewTransactions")}</StyledTableCell>
@@ -563,13 +588,13 @@ const Customers = () => {
             <TableBody>
               {isLoading ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={11} align="center">
+                  <StyledTableCell colSpan={12} align="center">
                     <Spin size="large" />
                   </StyledTableCell>
                 </StyledTableRow>
               ) : !customers || customers.length === 0 ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={11} align="center">
+                  <StyledTableCell colSpan={12} align="center">
                     {t("Customers.NoCustomers")}
                   </StyledTableCell>
                 </StyledTableRow>
@@ -598,6 +623,15 @@ const Customers = () => {
                     </StyledTableCell>
                     <StyledTableCell align="center">{customer.phone}</StyledTableCell>
                     <StyledTableCell align="center">{customer.points}</StyledTableCell>
+                    <StyledTableCell align="center">
+                      <IconButton 
+                        size="small" 
+                        onClick={() => handleShowQR(customer)}
+                        title={t("Customers.ShowQR")}
+                      >
+                        <QrcodeOutlined />
+                      </IconButton>
+                    </StyledTableCell>
                     <StyledTableCell align="center">{dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}</StyledTableCell>
                     <StyledTableCell align="center">
                       <IconButton
@@ -735,6 +769,16 @@ const Customers = () => {
             setScannedEmail("");
           }}
           onScanSuccess={handleScanSuccess}
+        />
+      )}
+      {openShowQR && (
+        <ShowQrModal
+          open={openShowQR}
+          onClose={() => {
+            setOpenShowQR(false);
+            setCustomerToShowQR(null);
+          }}
+          customer={customerToShowQR}
         />
       )}
     </Box>
