@@ -22,7 +22,7 @@ const ProductGrid = ({
   const { t, i18n } = useTranslation();
   const isMobile = useMediaQuery('(max-width: 600px)');
   return (
-    <Box sx={{ mb: 4 }}>
+    <Box sx={{ mb: 4,height:'100vh',overflow:'auto'}}>
       <Tabs 
         value={activeTab} 
         onChange={(e, newValue) => setActiveTab(newValue)}
@@ -87,8 +87,8 @@ const ProductGrid = ({
                     borderColor: 'primary.main',
                     cursor: 'pointer'
                   },
-                  height: { xs: '160px', sm: '200px', md: '150px' },
-                  width: { xs: '100%', sm: '300px', md: '150px' },
+                  height: { xs: '160px', sm: '200px', md: '200px' },
+                  width: { xs: '100%', sm: '300px', md: '200px' },
                   maxWidth: { xs: '100%', sm: '300px', md: '400px' },
                   display: 'flex',
                   flexDirection: 'column',
@@ -98,17 +98,17 @@ const ProductGrid = ({
               >
                 <CardMedia
                   component="img"
-                  height="70"
-                  width="70"
+                  height="130"
+                  width="130"
                   image={product.image}
                   alt={i18n.language === 'ar' ? product.arName : product.enName}
                 />
                 <CardContent sx={{ p: 1.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5, fontSize: '0.85rem' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5, fontSize: '1rem' }}>
                     {i18n.language === 'ar' ? product.arName : product.enName}
                   </Typography>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5, mt: 'auto' }}>
-                    <Typography variant="caption" sx={{ color: 'black', fontWeight: 600 }}>
+                    <Typography variant="caption" sx={{ color: 'green', fontWeight: 600, fontSize: '0.90rem' }}>
                       ${product.price}
                     </Typography>
                   </Box>

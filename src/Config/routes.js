@@ -7,6 +7,8 @@ import {
   ReceiptLong as ReceiptLongIcon,
   PointOfSale as PointOfSaleIcon,
   Receipt as InvoiceIcon,
+  BarChart as BarChartIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 
 const routes = [
@@ -16,6 +18,13 @@ const routes = [
     path: '/dashboard',
     icon: DashboardIcon,
     role: ['ADMIN', 'USER'],
+  },
+  {
+    name: 'Permissions',
+    arName: 'الصلاحيات',
+    path: '/permissions',
+    icon: SecurityIcon,
+    role: ['ADMIN'],
   },
   {
     name: 'Customers',
@@ -61,6 +70,13 @@ const routes = [
     arName: 'الفواتير',
     path: '/invoice',
     icon: ReceiptLongIcon,
+    role: ['ADMIN'],
+  },
+  {
+    name: 'Reports',
+    arName: 'التقارير',
+    path: '/reports',
+    icon: BarChartIcon,
     role: ['ADMIN'],
   },
   {

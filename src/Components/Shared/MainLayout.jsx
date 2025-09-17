@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, useTheme, useMediaQuery } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useTranslation } from 'react-i18next';
+import { useRoutePrefetch } from '../../hooks/useRoutePrefetch';
 
 const MainLayout = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  useRoutePrefetch(); // Enable route prefetching
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
   const [sidebarVisible, setSidebarVisible] = useState(true);
+
+  // Update sidebar visibility when route changes
+  useEffect(() => {
+    if (location.pathname === '/point-of-sale') {
+      setSidebarVisible(false);
+    }
+  }, [location.pathname]);
 
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';

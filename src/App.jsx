@@ -14,36 +14,36 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import ResetPassword from './Auth/ResetPassword';
-import Dashboard from './Pages/Dashboard';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastContainer } from 'react-toastify'; 
+import { ToastContainer } from 'react-toastify';
+import MainRoutes from './Config/routes';
+
+const Layout = React.lazy(() => import('./Layout'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 
-const Customers = React.lazy(() => import('./Pages/Customers'));
-const Transactions = React.lazy(() => import('./Pages/Transactions'));
-const Products = React.lazy(() => import('./Pages/Products'));
-const Settings = React.lazy(() => import('./Pages/Settings'));
-const Rewards = React.lazy(() => import('./Pages/Rewards'));
-const Layout = React.lazy(() => import('./Layout'));
-import MainRoutes from './Config/routes';
-const PointOfSale = React.lazy(() => import('./Pages/PointOfSale'));
-const Invoice = React.lazy(() => import('./Pages/Invoice'));
+const Dashboard = React.lazy(() => import('./Pages/Dashboard'));
+const routeComponents = {
+  '/dashboard': React.lazy(() => {
+    const component = import('./Pages/Dashboard');
+    import('./Pages/Transactions');
+    import('./Pages/Products');
+    return component;
+  }),
+  '/permissions': React.lazy(() => import('./Pages/Permissions')),
+  '/customers': React.lazy(() => import('./Pages/Customers')),
+  '/transactions': React.lazy(() => import('./Pages/Transactions')),
+  '/products': React.lazy(() => import('./Pages/Products')),
+  '/settings': React.lazy(() => import('./Pages/Settings')),
+  '/rewards': React.lazy(() => import('./Pages/Rewards')),
+  '/point-of-sale': React.lazy(() => import('./Pages/PointOfSale')),
+  '/invoice': React.lazy(() => import('./Pages/Invoice')),
+  '/reports': React.lazy(() => import('./Pages/Reports'))
+};
 
 const queryClient = new QueryClient();
 
 function App() {
   const { i18n } = useTranslation();
-
-  const routeComponents = useMemo(() => ({
-    '/dashboard': Dashboard,
-    '/customers': Customers,
-    '/transactions': Transactions,
-    '/products': Products,
-    '/settings': Settings,
-    '/rewards': Rewards,
-    '/point-of-sale': PointOfSale,
-    '/invoice': Invoice,
-  }), []);
 
   useEffect(() => {
     document.dir = i18n.dir();
@@ -116,7 +116,7 @@ function App() {
             <Route path="/transactions/:customerId" element={
               <ProtectedRoute>
                 <MainLayout>
-                  <Transactions />
+                  {React.createElement(routeComponents['/transactions'])}
                 </MainLayout>
               </ProtectedRoute>
             } />

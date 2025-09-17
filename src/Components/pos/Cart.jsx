@@ -361,7 +361,7 @@ const Cart = ({
             fullWidth
             variant="contained"
             onClick={onCheckout}
-            disabled={cart.length === 0 || !phoneNumber}
+            disabled={cart.length === 0}
             sx={{
               backgroundColor: 'primary.main',
               '&:hover': { backgroundColor: '#600060' },

@@ -48,6 +48,7 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
         display: 'flex', 
         flexDirection: 'column', 
         pt: '64px',
+        overflowY: 'auto',
       }}>
       <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
