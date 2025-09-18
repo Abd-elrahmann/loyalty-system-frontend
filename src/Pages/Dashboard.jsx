@@ -18,8 +18,7 @@ import dayjs from 'dayjs';
 import Theme from '../utilities/Theme';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-const { Header, Content } = Layout;
-import PointsChart from '../Components/Dashboard/PointsChart';
+const { Content } = Layout;
 import DashboardCharts from '../Components/Dashboard/DashboardCharts';
 import { useQuery } from '@tanstack/react-query';
 
@@ -75,7 +74,6 @@ const Dashboard = () => {
     queryFn: async () => {
       const response = await Api.get('/api/dashboard');
       
-      // Get analytics data based on filters
       const analyticsResponse = await Api.get(`/api/dashboard/analytics?period=${selectedPeriod}&date=${selectedDate.format('YYYY-MM-DD')}`);
       
       return {
@@ -97,25 +95,22 @@ const Dashboard = () => {
         ...response.data
       };
     },
-    staleTime: 5 * 1000, // 5 seconds
-    cacheTime: 5 * 1000 // 5 seconds
+    staleTime: 5 * 1000, 
+    cacheTime: 5 * 1000 
   });
 
   const exportToPDF = async () => {
     try {
       if (!contentRef.current) return;
 
-      // Temporarily hide the filters section
       if (filterSectionRef.current) {
         filterSectionRef.current.style.display = 'none';
       }
 
-      // Create PDF with A4 dimensions
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
 
-      // Capture the dashboard content
       const canvas = await html2canvas(contentRef.current, {
         scale: 2,
         useCORS: true,
@@ -124,7 +119,6 @@ const Dashboard = () => {
         backgroundColor: '#f0f2f5'
       });
 
-      // Calculate dimensions to fit A4 while maintaining aspect ratio
       const imgWidth = pageWidth - 20;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
@@ -133,11 +127,9 @@ const Dashboard = () => {
       
       const imgData = canvas.toDataURL('image/png');
 
-      // Add first page
       pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
-      // Add new pages if content overflows
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
@@ -145,7 +137,6 @@ const Dashboard = () => {
         heightLeft -= pageHeight;
       }
 
-      // Restore the filters section display
       if (filterSectionRef.current) {
         filterSectionRef.current.style.display = 'block';
       }
@@ -153,7 +144,6 @@ const Dashboard = () => {
       pdf.save('dashboard_report.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      // Ensure filters are restored even if there's an error
       if (filterSectionRef.current) {
         filterSectionRef.current.style.display = 'block';
       }
@@ -177,7 +167,6 @@ const Dashboard = () => {
 
       <Content style={{ padding: '24px' }} ref={contentRef}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          {/* Filters Section */}
           <div ref={filterSectionRef}>
             <Row justify={user.role === 'ADMIN' ? "space-between" : "center"} align="middle" gutter={[16, 16]}>
               <Col>
@@ -224,7 +213,6 @@ const Dashboard = () => {
             </Row>
           </div>
 
-          {/* Stats Cards */}
           {user.role === 'ADMIN' && (
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} lg={6}>
@@ -262,7 +250,6 @@ const Dashboard = () => {
             </Row>
           )}
 
-          {/* Charts Section */}
           <Card>
             <Suspense fallback={<div style={{ textAlign: 'center', padding: '40px' }}><Spin /></div>}>
               <DashboardCharts dashboardData={dashboardData} />

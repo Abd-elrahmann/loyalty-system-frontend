@@ -27,7 +27,7 @@ const routeComponents = {
     import('./Pages/Products');
     return component;
   }),
-  '/permissions': React.lazy(() => import('./Pages/Permissions')),
+  '/mangers': React.lazy(() => import('./Pages/Mangers')),
   '/customers': React.lazy(() => import('./Pages/Customers')),
   '/transactions': React.lazy(() => import('./Pages/Transactions')),
   '/products': React.lazy(() => import('./Pages/Products')),
@@ -45,14 +45,16 @@ function App() {
 
   useEffect(() => {
     document.dir = i18n.dir();
-  }, [i18n]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.dir()]);
 
   const cacheRtl = useMemo(() => {
     return createCache({
       key: i18n.dir() === 'rtl' ? 'muirtl' : 'muiltr',
       stylisPlugins: i18n.dir() === 'rtl' ? [prefixer, rtlPlugin] : []
     });
-  }, [i18n]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.dir()]);
 
   return (
     <QueryClientProvider client={queryClient}>

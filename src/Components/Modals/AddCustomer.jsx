@@ -216,8 +216,10 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
                 value={formik.values.role}
                 onChange={(e) => formik.setValues({...formik.values, role: e.target.value})}
               >
-                <MenuItem value="ADMIN" sx={{ textAlign: isRTL ? 'right' : 'left' }}>{t('Customers.Admin')}</MenuItem>
-                <MenuItem value="USER" sx={{ textAlign: isRTL ? 'right' : 'left' }}>{t('Customers.User')}</MenuItem>
+                <MenuItem value="ADMIN" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#1677FF' }}>{t('Customers.Admin')}</MenuItem>
+                <MenuItem value="ACCOUNTANT" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#FFA500' }}>{t('Customers.Accountant')}</MenuItem>
+                <MenuItem value="CASHIER" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#800080' }}>{t('Customers.Cashier')}</MenuItem>
+                <MenuItem value="USER" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#4CAF50' }}>{t('Customers.User')}</MenuItem>
               </Select>
               </FormControl>
           {!isEdit && (

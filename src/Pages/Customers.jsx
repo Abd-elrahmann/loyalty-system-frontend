@@ -3,24 +3,19 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import { useTranslation } from "react-i18next";
-import { SearchOutlined, FilePdfOutlined, FileExcelOutlined } from "@ant-design/icons";
-import AddIcon from "@mui/icons-material/Add";
-import { DeleteOutlined, EditOutlined, PlusOutlined, QrcodeOutlined, EyeOutlined } from "@ant-design/icons";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
-import {
-  StyledTableCell,
-  StyledTableRow,
-} from "../Components/Shared/tableLayout";
 import { Helmet } from 'react-helmet-async';
-import { Box, Stack, InputBase, IconButton, Table, TableBody, TableContainer, TableHead, TableRow, TablePagination, Paper, Button, Menu, MenuItem, Link, Chip, Typography, Card, CardContent } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { Spin } from "antd";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
 import ScanQRModal from "../Components/Modals/ScanQRModal";
-import ShowQrModal from "../Components/Modals/ShowQrModal"; // New import
+import ShowQrModal from "../Components/Modals/ShowQrModal"; 
+import CustomerTable from "../Components/customers/CustomerTable";
+import CustomerCard from "../Components/customers/CustomerCard";
+import CustomerToolbar from "../Components/customers/CustomerToolbar";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import debounce from "lodash.debounce";
 import { useMediaQuery } from "@mui/material";
 
@@ -48,8 +43,8 @@ const Customers = () => {
   const [openScanQR, setOpenScanQR] = useState(false);
   const [scannedEmail, setScannedEmail] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [openShowQR, setOpenShowQR] = useState(false); // New state
-  const [customerToShowQR, setCustomerToShowQR] = useState(null); // New state
+  const [openShowQR, setOpenShowQR] = useState(false);
+  const [customerToShowQR, setCustomerToShowQR] = useState(null);
 
   const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
   const [excelAnchorEl, setExcelAnchorEl] = useState(null);
@@ -68,24 +63,6 @@ const Customers = () => {
     }, 800),
     []
   );
-
-  const handlePdfClick = (event) => {
-    const buttonElement = event.currentTarget;
-    setPdfAnchorEl(buttonElement);
-  };
-
-  const handleExcelClick = (event) => {
-    const buttonElement = event.currentTarget;
-    setExcelAnchorEl(buttonElement);
-  };
-
-  const handlePdfClose = () => {
-    setPdfAnchorEl(null);
-  };
-
-  const handleExcelClose = () => {
-    setExcelAnchorEl(null);
-  };
 
   const fetchCustomers = async () => {
     const queryParams = new URLSearchParams();
@@ -132,6 +109,14 @@ const Customers = () => {
     setSearchValue(e.target.value);
   };
 
+  const handleSearchClick = () => {
+    setSearchFilters((prev) => ({
+      ...prev,
+      email: searchValue,
+    }));
+    setPage(1);
+  };
+
   const handleDelete = async () => {
     if (!customerToDelete?.id) return;
     deleteMutation.mutate(customerToDelete.id);
@@ -142,6 +127,10 @@ const Customers = () => {
     setPage(1);
   };
 
+  const handlePageChange = (e, newPage) => {
+    setPage(newPage + 1);
+  };
+
   const handleScanSuccess = (email) => {
     setSearchFilters((prev) => ({
       ...prev,
@@ -150,6 +139,24 @@ const Customers = () => {
     setScannedEmail(email);
     setPage(1);
     notifySuccess(t("Customers.qrScanSuccess") + `: ${email}`);
+  };
+
+  const handlePdfClick = (event) => {
+    const buttonElement = event.currentTarget;
+    setPdfAnchorEl(buttonElement);
+  };
+
+  const handleExcelClick = (event) => {
+    const buttonElement = event.currentTarget;
+    setExcelAnchorEl(buttonElement);
+  };
+
+  const handlePdfClose = () => {
+    setPdfAnchorEl(null);
+  };
+
+  const handleExcelClose = () => {
+    setExcelAnchorEl(null);
   };
   
   const exportToPDF = async (exportAll = false) => {
@@ -254,146 +261,45 @@ const Customers = () => {
     }
   };
 
-  // Function to show QR code
   const handleShowQR = (customer) => {
     setCustomerToShowQR(customer);
     setOpenShowQR(true);
   };
 
-  // دالة لعرض بيانات العميل في شكل بطاقة للشاشات الصغيرة
-  const renderCustomerCard = (customer) => (
-    <Card key={customer.id} sx={{ mb: 2, p: 2 }}>
-      <CardContent>
-        <Stack spacing={1}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.ID")}:
-            </Typography>
-            <Typography variant="body2">{customer.id}</Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.Name")}:
-            </Typography>
-            <Typography variant="body2">
-              {i18n.language === 'ar' ? customer.arName : customer.enName}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.Role")}:
-            </Typography>
-            <Chip
-              label={customer.role}
-              size="small"
-              sx={{
-                fontSize: '10px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                color: 'white',
-                backgroundColor: customer.role === 'ADMIN' ? '#1677FF' : 'green',
-                height: '24px'
-              }}
-            />
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.Email")}:
-            </Typography>
-            <Link href={`mailto:${customer.email}`} underline="hover" color="black" sx={{ cursor: 'pointer', fontSize: '12px' }}>
-              {customer.email}
-            </Link>
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.Phone")}:
-            </Typography>
-            <Typography variant="body2">{customer.phone}</Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.Points")}:
-            </Typography>
-            <Typography variant="body2">{customer.points}</Typography>
-          </Box>
+  const handleAddPoints = (customer) => {
+    setOpenAddPointsModal(true);
+    setCustomerToAddPoints(customer);
+  };
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.QRCode")}:
-            </Typography>
-            <IconButton 
-              size="small" 
-              onClick={() => handleShowQR(customer)}
-              title={t("Customers.ShowQR")}
-            >
-              <QrcodeOutlined />
-            </IconButton>
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {t("Customers.CreatedAt")}:
-            </Typography>
-            <Typography variant="body2">
-              {dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 1 }}>
-            <IconButton
-              size="small"
-              color="success"
-              onClick={() => {
-                setOpenAddPointsModal(true);
-                setCustomerToAddPoints(customer);
-              }}
-              title={t("Customers.AddPoints")}
-            >
-              <PlusOutlined />
-            </IconButton>
-            
-            <IconButton
-              size="small"
-              color="info"
-              onClick={() => navigate(`/transactions/${customer.id}`)}
-              title={t("Customers.ViewTransactions")}
-            >
-              <EyeOutlined />
-            </IconButton>
-            
-            <IconButton
-              size="small"
-              color="warning"
-              onClick={() => {
-                setOpenAddCustomer(true);
-                setCustomer(customer);
-              }}
-              title={t("Customers.Update")}
-            >
-              <EditOutlined />
-            </IconButton>
-            
-            <IconButton 
-              size="small" 
-              color="error" 
-              onClick={() => {
-                setOpenDeleteModal(true);
-                setCustomerToDelete(customer);
-              }}
-              title={t("Customers.Delete")}
-            >
-              <DeleteOutlined />
-            </IconButton>
-          </Box>
-        </Stack>
-      </CardContent>
-    </Card>
-  );
+  const handleEdit = (customer) => {
+    setOpenAddCustomer(true);
+    setCustomer(customer);
+  };
+
+  const handleDeleteCustomer = (customer) => {
+    setOpenDeleteModal(true);
+    setCustomerToDelete(customer);
+  };
+
+  const handleViewTransactions = (customerId) => {
+    navigate(`/transactions/${customerId}`);
+  };
+
+  const handleScanQR = () => {
+    setScannedEmail("");
+    setPage(1);
+    setOpenScanQR(true);
+  };
+
+  const handleClearFilter = () => {
+    setScannedEmail("");
+    setPage(1);
+  };
+
+  const handleAddCustomer = () => {
+    setOpenAddCustomer(true);
+    setCustomer(null);
+  };
 
   return (
     <Box sx={{ p: { xs: 1, sm: 3 }, mt: 1 }}>
@@ -402,298 +308,40 @@ const Customers = () => {
         <meta name="description" content={t("Customers.CustomersDescription")} />
       </Helmet>
       
-      <Box sx={{ p: { xs: 1, sm: 2 }, mb: 2 }}>
-        <Box
-          sx={{
-            display: "flex", 
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 2,
-            flexDirection: { xs: "column", sm: "row" },
-          }}
-        >
-          <Stack direction={"row"} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
-            <InputBase
-              value={searchValue}
-              onChange={handleSearch}
-              placeholder={t("Customers.SearchEmail")}
-              sx={{
-                color: "text.primary",
-                textAlign: "center",
-                width: { xs: "100%", sm: "200px" },
-                borderRadius: 1,
-                px: 1,
-              }}
-            />
-            <IconButton
-              sx={{ color: "primary.main", padding: 0 }}
-              onClick={handleSearch}
-            >
-              <SearchOutlined  />
-            </IconButton>
-            <Stack direction="row" spacing={1}>
-              <IconButton
-                sx={{ color: "primary.main", padding: 0 }}
-                onClick={() => {
-                  setScannedEmail("");
-                  setPage(1);
-                  setOpenScanQR(true);
-                }}
-                title={t("Customers.ScanQR")}
-              >
-                <QrcodeOutlined />
-              </IconButton>
-              {scannedEmail && (
-                <Button
-                  variant="text"
-                  onClick={() => {
-                    setScannedEmail("");
-                    setPage(1);
-                  }}
-                  sx={{
-                    width: isSmallMobile ? "100px" : "auto",
-                    fontSize: "12px",
-                  }}
-                >
-                  {t("Customers.ClearFilter")}
-                </Button>
-              )}
-            </Stack>
-          </Stack>
-          
-          <Stack direction="row" spacing={1} sx={{ 
-            mt: { xs: 2, sm: 0 },
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: 1
-          }}>
-            <Button
-              variant="outlined"
-              startIcon={<FileExcelOutlined />}
-              onClick={handleExcelClick}
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                height: { xs: "40px", sm: "40px" },
-                fontSize: "12px",
-                "&:hover": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-              }}
-            >
-              {t("Customers.ExportCSV")}
-            </Button>
-            <Menu
-              anchorEl={excelAnchorEl}
-              open={Boolean(excelAnchorEl)}
-              onClose={handleExcelClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              sx={{
-                '& .MuiPaper-root': {
-                  minWidth: '200px',
-                }
-              }}
-            >
-              <MenuItem onClick={() => exportToCSV(false)}>{t("Customers.CurrentPage")}</MenuItem>
-              <MenuItem onClick={() => exportToCSV(true)}>{t("Customers.AllPages")}</MenuItem>
-            </Menu>
-
-            <Button
-              variant="outlined"
-              startIcon={<FilePdfOutlined />}
-              onClick={handlePdfClick}
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                height: { xs: "40px", sm: "40px" },
-                fontSize: "12px",
-                "&:hover": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-              }}
-            >
-              {t("Customers.ExportPDF")}
-            </Button>
-            <Menu
-              anchorEl={pdfAnchorEl}
-              open={Boolean(pdfAnchorEl)}
-              onClose={handlePdfClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              sx={{
-                '& .MuiPaper-root': {
-                  minWidth: '200px',
-                }
-              }}
-            >
-              <MenuItem onClick={() => exportToPDF(false)}>{t("Customers.CurrentPage")}</MenuItem>
-              <MenuItem onClick={() => exportToPDF(true)}>{t("Customers.AllPages")}</MenuItem>
-            </Menu>
-
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              onClick={() => {
-                setOpenAddCustomer(true);
-                setCustomer(null);
-              }}
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                height: { xs: "40px", sm: "40px" },
-                fontSize: "12px",
-                "&:hover": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-              }}
-            >
-              {t("Customers.AddCustomer")}
-            </Button>
-          </Stack>
-        </Box>
-      </Box>
+      <CustomerToolbar
+        searchValue={searchValue}
+        onSearchChange={handleSearch}
+        onSearchClick={handleSearchClick}
+        onScanQR={handleScanQR}
+        scannedEmail={scannedEmail}
+        onClearFilter={handleClearFilter}
+        onExcelClick={handleExcelClick}
+        excelAnchorEl={excelAnchorEl}
+        onExcelClose={handleExcelClose}
+        onPdfClick={handlePdfClick}
+        pdfAnchorEl={pdfAnchorEl}
+        onPdfClose={handlePdfClose}
+        onExportCSV={exportToCSV}
+        onExportPDF={exportToPDF}
+        onAddCustomer={handleAddCustomer}
+        isSmallMobile={isSmallMobile}
+      />
 
       {!isMobile ? (
-        <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <StyledTableCell align="center">{t("Customers.ID")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.Name")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.Role")}</StyledTableCell>
-                <StyledTableCell align="center" sx={{ maxWidth: '300px' }}>{t("Customers.Email")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.Phone")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.Points")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.QRCode")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.CreatedAt")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.AddPoints")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.ViewTransactions")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.Update")}</StyledTableCell>
-                <StyledTableCell align="center">{t("Customers.Delete")}</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isLoading ? (
-                <StyledTableRow>
-                  <StyledTableCell colSpan={12} align="center">
-                    <Spin size="large" />
-                  </StyledTableCell>
-                </StyledTableRow>
-              ) : !customers || customers.length === 0 ? (
-                <StyledTableRow>
-                  <StyledTableCell colSpan={12} align="center">
-                    {t("Customers.NoCustomers")}
-                  </StyledTableCell>
-                </StyledTableRow>
-              ) : (
-                customers.slice(0, rowsPerPage).map((customer) => (
-                  <StyledTableRow key={customer.id}>
-                    <StyledTableCell align="center">{customer.id}</StyledTableCell>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
-                    <StyledTableCell align="center">
-                        <Chip
-                          label={customer.role}
-                          variant="outlined"
-                          sx={{
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            textTransform: 'uppercase',
-                            color:'white',
-                            backgroundColor: customer.role === 'ADMIN' ? '#1677FF' : 'green'  
-                          }}
-                        />
-                    </StyledTableCell>
-                    <StyledTableCell align="center" sx={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <Link href={`mailto:${customer.email}`} underline="hover" color="black" sx={{ cursor: 'pointer' }}>
-                        {customer.email}
-                      </Link>
-                    </StyledTableCell>
-                    <StyledTableCell align="center">{customer.phone}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.points}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      <IconButton 
-                        size="small" 
-                        onClick={() => handleShowQR(customer)}
-                        title={t("Customers.ShowQR")}
-                      >
-                        <QrcodeOutlined />
-                      </IconButton>
-                    </StyledTableCell>
-                    <StyledTableCell align="center">{dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="success"
-                        onClick={() => {
-                          setOpenAddPointsModal(true);
-                          setCustomerToAddPoints(customer);
-                        }}>
-                        <PlusOutlined />
-                      </IconButton>
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="info"
-                        onClick={() => navigate(`/transactions/${customer.id}`)}
-                        title={t("Customers.ViewTransactions")}
-                      >
-                        <EyeOutlined />
-                      </IconButton>
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="warning"
-                        onClick={() => {
-                          setOpenAddCustomer(true);
-                          setCustomer(customer);
-                        }}
-                      >
-                        <EditOutlined color="warning" />
-                      </IconButton>
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      <IconButton 
-                        size="small" 
-                        color="error" 
-                        onClick={() => {
-                          setOpenDeleteModal(true);
-                          setCustomerToDelete(customer);
-                        }}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-          <TablePagination
-            component="div"
-            count={data?.totalCount || 0}
-            page={page - 1}
-            onPageChange={(e, newPage) => setPage(newPage + 1)}
-            rowsPerPage={rowsPerPage}
-            rowsPerPageOptions={[5, 10, 20, 50]}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage={t("Customers.RowsPerPage")}
-          />
-        </TableContainer>
+        <CustomerTable
+          customers={customers}
+          isLoading={isLoading}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          data={data}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          onShowQR={handleShowQR}
+          onAddPoints={handleAddPoints}
+          onEdit={handleEdit}
+          onDelete={handleDeleteCustomer}
+          onViewTransactions={handleViewTransactions}
+        />
       ) : (
         <Box>
           {isLoading ? (
@@ -706,7 +354,17 @@ const Customers = () => {
             </Typography>
           ) : (
             <Stack spacing={2}>
-              {customers.slice(0, rowsPerPage).map((customer) => renderCustomerCard(customer))}
+              {customers.slice(0, rowsPerPage).map((customer) => (
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  onShowQR={handleShowQR}
+                  onAddPoints={handleAddPoints}
+                  onEdit={handleEdit}
+                  onDelete={handleDeleteCustomer}
+                  onViewTransactions={handleViewTransactions}
+                />
+              ))}
             </Stack>
           )}
           
@@ -714,7 +372,7 @@ const Customers = () => {
             component="div"
             count={data?.totalCount || 0}
             page={page - 1}
-            onPageChange={(e, newPage) => setPage(newPage + 1)}
+            onPageChange={handlePageChange}
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={[5, 10, 20, 50]}
             onRowsPerPageChange={handleChangeRowsPerPage}

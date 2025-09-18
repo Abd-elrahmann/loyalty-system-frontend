@@ -20,9 +20,9 @@ const routes = [
     role: ['ADMIN', 'USER'],
   },
   {
-    name: 'Permissions',
-    arName: 'الصلاحيات',
-    path: '/permissions',
+    name: 'Mangers',
+    arName: 'المدراء',
+    path: '/mangers',
     icon: SecurityIcon,
     role: ['ADMIN'],
   },

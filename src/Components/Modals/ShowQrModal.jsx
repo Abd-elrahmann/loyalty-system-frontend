@@ -53,9 +53,7 @@ const ShowQrModal = ({ open, onClose, customer }) => {
           text: `QR Code for ${customer.enName || customer.arName}`,
           files: [file],
         });
-        notifySuccess(t("Customers.QRShareSuccess"));
       } else {
-        // Fallback for browsers that don't support Web Share API
         await handleDownload();
       }
     } catch (error) {
