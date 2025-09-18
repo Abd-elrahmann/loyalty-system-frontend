@@ -7,20 +7,25 @@ export default defineConfig({
     port: 3001,
     host: true,
   },
+  optimizeDeps: {
+    include: [
+      '@ant-design/icons', // عشان يمنع مشاكل CJS مع Vite
+    ],
+  },
   build: {
     minify: 'terser',
+    commonjsOptions: {
+      transformMixedEsModules: true, // مهم عشان يدعم CJS + ESM مع بعض
+    },
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react-vendor';
-            if (id.includes('@mui')) return 'mui-vendor';
-            if (id.includes('antd')) return 'antd-vendor';
-            if (id.includes('chart')) return 'charts-vendor';
-            if (id.includes('axios') || id.includes('lodash')) return 'utils-vendor';
-          }
-        }
-      }
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2'], // خلي الـ regex explicit
+          'mui-vendor': ['@mui/material', '@mui/icons-material'],
+          'utils-vendor': ['axios', 'lodash'],
+        },
+      },
     },
     chunkSizeWarningLimit: 1500,
     terserOptions: {
