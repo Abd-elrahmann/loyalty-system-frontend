@@ -19,7 +19,8 @@ import Api from "../../Config/Api";
 import routes from "../../Config/routes";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
 import { useMutation, useQuery } from "@tanstack/react-query";
-
+import { triggerPermissionsUpdate } from "../../hooks/usePermissionsSync";
+import {Spin} from 'antd'
 const PermissionsModal = ({ open, onClose, manager }) => {
   const { t, i18n } = useTranslation();
   const [selectedPages, setSelectedPages] = useState([]);
@@ -28,15 +29,14 @@ const PermissionsModal = ({ open, onClose, manager }) => {
   const availablePages = routes.map(route => {
     let pageName = route.path.replace('/', '').toLowerCase();
     
-    if (pageName === 'mangers') pageName = 'managers';
+    if (pageName === 'mangers') pageName = 'users';
     if (pageName === 'point-of-sale') pageName = 'pos';
     if (pageName === 'invoice') pageName = 'invoices';
-    if (pageName === 'customers') pageName = 'users';
+    if (pageName === 'customers') pageName = 'customers';
     
     return pageName;
   });
 
-  // eslint-disable-next-line no-unused-vars
   const { data: currentPermissions, isLoading } = useQuery({
     queryKey: ['permissions', manager?.role],
     queryFn: async () => {
@@ -64,6 +64,9 @@ const PermissionsModal = ({ open, onClose, manager }) => {
     },
     onSuccess: () => {
       notifySuccess(t("Mangers.PermissionsUpdated"));
+      
+      triggerPermissionsUpdate(manager.role);
+      
       onClose();
     },
     onError: (error) => {
@@ -94,9 +97,9 @@ const PermissionsModal = ({ open, onClose, manager }) => {
 
   const getPageLabel = (page) => {
     let routePath = `/${page}`;
-    if (page === 'managers') routePath = '/mangers';
+    if (page === 'users') routePath = '/mangers';
     if (page === 'pos') routePath = '/point-of-sale';
-    if (page === 'users') routePath = '/customers';
+    if (page === 'customers') routePath = '/customers';
     if (page === 'invoices') routePath = '/invoice';
     
     const route = routes.find(r => r.path === routePath);
@@ -138,39 +141,47 @@ const PermissionsModal = ({ open, onClose, manager }) => {
       </DialogTitle>
       
       <DialogContent sx={{ py: 3 }}>
-        <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}>
-          <Button 
-            variant="outlined" 
-            size="small" 
-            onClick={handleSelectAll}
-          >
-            {selectedPages.length === availablePages.length 
-              ? t("Mangers.DeselectAll") 
-              : t("Mangers.SelectAll")
-            }
-          </Button>
-          
-          <Chip 
-            label={`${selectedPages.length} / ${availablePages.length} ${t("Mangers.PagesSelected")}`}
-            color="primary"
-            variant="outlined"
-          />
-        </Box>
-        
-        <FormGroup sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
-          {availablePages.map((page) => (
-            <FormControlLabel
-              key={page}
-              control={
-                <Checkbox
-                  checked={selectedPages.includes(page)}
-                  onChange={() => handleTogglePage(page)}
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}>
+            <Spin size="large" />
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}>
+              <Button 
+                variant="outlined" 
+                size="small" 
+                onClick={handleSelectAll}
+              >
+                {selectedPages.length === availablePages.length 
+                  ? t("Mangers.DeselectAll") 
+                  : t("Mangers.SelectAll")
+                }
+              </Button>
+              
+              <Chip 
+                label={`${selectedPages.length} / ${availablePages.length} ${t("Mangers.PagesSelected")}`}
+                color="primary"
+                variant="outlined"
+              />
+            </Box>
+            
+            <FormGroup sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
+              {availablePages.map((page) => (
+                <FormControlLabel
+                  key={page}
+                  control={
+                    <Checkbox
+                      checked={selectedPages.includes(page)}
+                      onChange={() => handleTogglePage(page)}
+                    />
+                  }
+                  label={getPageLabel(page)}
                 />
-              }
-              label={getPageLabel(page)}
-            />
-          ))}
-        </FormGroup>
+              ))}
+            </FormGroup>
+          </>
+        )}
       </DialogContent>
       
       <DialogActions sx={{ justifyContent: "center", pb: 3, gap: 2 }}>
@@ -187,7 +198,7 @@ const PermissionsModal = ({ open, onClose, manager }) => {
         <Button
           variant="contained"
           onClick={handleSavePermissions}
-          disabled={updatePermissionsMutation.isLoading}
+          disabled={updatePermissionsMutation.isLoading || isLoading}
           sx={{
             minWidth: 120,
             backgroundColor: "primary.main",

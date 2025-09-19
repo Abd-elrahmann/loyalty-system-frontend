@@ -7,6 +7,7 @@ import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUser } from '../../utilities/user.jsx';
+import { filterRoutesByPermissions } from '../../utilities/permissions.js';
 import { LogoutOutlined } from '@ant-design/icons';
 const drawerWidth = 260;
 
@@ -28,10 +29,13 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
     document.dir = isRTL ? 'rtl' : 'ltr';
   }, [isRTL]);
   
-  const navigationItems = useMemo(() => routes.map(route => ({
-    ...route,
-    icon: <route.icon />
-  })), []);
+  const navigationItems = useMemo(() => {
+    const filteredRoutes = filterRoutesByPermissions(routes, user);
+    return filteredRoutes.map(route => ({
+      ...route,
+      icon: <route.icon />
+    }));
+  }, [user]);
 
   const handleNavigation = React.useCallback((path) => {
     requestAnimationFrame(() => {
@@ -53,9 +57,6 @@ const Sidebar = ({ onToggle, sidebarVisible, open }) => {
       <List sx={{ flex: 1, pt: 1 }}>
         {navigationItems.map((item) => {
           const isActive = location.pathname === item.path;
-          if (item.role && (!user || !item.role.includes(user.role))) {
-            return null;
-          }
           return (
             <ListItem
               key={item.path}

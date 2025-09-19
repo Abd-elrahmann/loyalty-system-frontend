@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Typography, TextField, Button, Grid, IconButton, Modal, InputAdornment } from '@mui/material';
+import { Box, Typography, TextField, Button, Grid, IconButton, Modal, InputAdornment, FormControl, InputLabel, Select, MenuItem, Alert } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormik } from 'formik';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Spin } from "antd";
-import { FaCoins,FaProductHunt, FaLink, FaFile, FaDollarSign } from 'react-icons/fa';
+import { FaCoins,FaProductHunt, FaLink, FaFile, FaDollarSign, FaList } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
 import Api from '../../Config/Api';
 
@@ -26,8 +26,8 @@ const style = {
   alignItems: "center",
 };
 
-const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit, fetchProducts }) => {
-  const { t } = useTranslation();
+const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, productToEdit, fetchProducts, categories, onOpenCategoryModal }) => {
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [imageUploadType, setImageUploadType] = useState('file');
   const isMobile = useMediaQuery('(max-width: 400px)');
@@ -63,6 +63,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       arName: "",
       price: "",
       points: "",
+      categoryId: "",
     },
     onSubmit: async (values) => {
       try {
@@ -93,6 +94,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
           image: productToEdit.image,
           imagePreview: productToEdit.image,
           imageUrl: productToEdit.image,
+          categoryId: productToEdit.categoryId || "",
         });
       } else {
         formik.resetForm();
@@ -184,6 +186,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
         arName: "",
         price: "",
         points: "",
+        categoryId: "",
       });
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -203,7 +206,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
 
   return (
     <Modal open={open} onClose={onClose}>
-        <Box sx={{...style, width: isMobile ? '90%' : 600,p:isMobile ? 1 : 4}}>
+        <Box sx={{...style, width: isMobile ? '90%' : 600, p: isMobile ? 1 : 4}}>
         <Box
           sx={{
             width: "100%",
@@ -224,9 +227,30 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
         </Box>
 
         <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          {(!categories || categories.length === 0) && (
+            <Alert 
+              severity="warning" 
+              sx={{ mb: 2 }}
+              action={
+                <Button 
+                  color="inherit" 
+                  size="small"
+                  onClick={() => {
+                    onClose();
+                    onOpenCategoryModal();
+                  }}
+                >
+                  {t("Products.AddCategory")}
+                </Button>
+              }
+            >
+              {t("Products.NoCategoriesAlert")}
+            </Alert>
+          )}
+          
           <Grid container spacing={isMobile ? 1 : 2} sx={{
             justifyContent: isMobile ? "center" : "flex-start",
-            mt:isMobile ? 3 : 0,
+            mt: isMobile ? 3 : 0,
           }}>
             <Grid item xs={12}>
               <TextField
@@ -236,6 +260,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 value={formik.values.enName}
                 onChange={handleChange}
                 required
+                disabled={!categories || categories.length === 0}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -253,6 +278,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 value={formik.values.arName}
                 onChange={handleChange}
                 required
+                disabled={!categories || categories.length === 0}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -262,6 +288,39 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 }}
               />
             </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth sx={{ minWidth: '245px' }}>
+                <InputLabel>{t("Products.Category")}</InputLabel>
+                <Select
+                  name="categoryId"
+                  value={formik.values.categoryId}
+                  label={t("Products.Category")}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  disabled={!categories || categories.length === 0}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <FaList style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    </InputAdornment>
+                  }
+                >
+                  {categories && categories.length > 0 ? (
+                    categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {i18n.language === 'ar' ? category.arName : category.enName}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>
+                      {t('Products.NoCategories')}
+                    </MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -271,6 +330,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 value={formik.values.price}
                 onChange={handleChange}
                 required
+                disabled={!categories || categories.length === 0}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -280,6 +340,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 }}
               />
             </Grid>
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -297,6 +358,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 }}
               />
             </Grid>
+            
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', width: '100%' }}>
               <Box sx={{ 
                 mb: 2, 
@@ -534,7 +596,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading || !formik.values.enName || !formik.values.arName || !formik.values.price || (!formik.values.imagePreview && !formik.values.imageUrl)}
+              disabled={loading || !categories || categories.length === 0 || !formik.values.enName || !formik.values.arName || !formik.values.price || !formik.values.categoryId || (!formik.values.imagePreview && !formik.values.imageUrl)}
               size="small"
             >
               {loading ? (

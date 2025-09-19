@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Select, MenuItem, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, InputAdornment } from '@mui/material';
+import { Box, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import Api from '../../Config/Api';
 import { notifyError, notifySuccess } from '../../utilities/Toastify';
@@ -96,7 +96,6 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         email: customer.email || '',
         phone: customer.phone || '',
         points: customer.points || 0,
-        role: customer.role || 'USER',
         password: '',
         confirmPassword: '',
         createdAt: customer.createdAt || new Date()
@@ -108,7 +107,6 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         email: '',
         phone: '',
         points: 0,
-        role: 'USER',
         password: '',
         confirmPassword: '',
         createdAt: new Date()
@@ -209,19 +207,6 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
               }}
             />
           )}
-              <FormControl fullWidth>
-                <InputLabel id="role-label">{t('Customers.Role')}</InputLabel>
-              <Select
-                labelId="role-label"
-                value={formik.values.role}
-                onChange={(e) => formik.setValues({...formik.values, role: e.target.value})}
-              >
-                <MenuItem value="ADMIN" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#1677FF' }}>{t('Customers.Admin')}</MenuItem>
-                <MenuItem value="ACCOUNTANT" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#FFA500' }}>{t('Customers.Accountant')}</MenuItem>
-                <MenuItem value="CASHIER" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#800080' }}>{t('Customers.Cashier')}</MenuItem>
-                <MenuItem value="USER" sx={{ textAlign: isRTL ? 'right' : 'left', color: '#4CAF50' }}>{t('Customers.User')}</MenuItem>
-              </Select>
-              </FormControl>
           {!isEdit && (
             <>
               <TextField

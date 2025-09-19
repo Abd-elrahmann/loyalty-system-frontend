@@ -5,7 +5,7 @@ import Api from "../Config/Api";
 import { useTranslation } from "react-i18next";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import { Helmet } from 'react-helmet-async';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, TablePagination } from '@mui/material';
 import { Spin } from "antd";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";

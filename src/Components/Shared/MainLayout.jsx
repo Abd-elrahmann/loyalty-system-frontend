@@ -5,11 +5,13 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useTranslation } from 'react-i18next';
 import { useRoutePrefetch } from '../../hooks/useRoutePrefetch';
+import { usePermissionsSync } from '../../hooks/usePermissionsSync';
 
 const MainLayout = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   useRoutePrefetch(); // Enable route prefetching
+  usePermissionsSync(); // Enable permissions synchronization
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();

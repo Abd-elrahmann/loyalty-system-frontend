@@ -16,6 +16,7 @@ import ResetPassword from './Auth/ResetPassword';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import MainRoutes from './Config/routes';
+import { getFirstAccessibleRoute } from './utilities/permissions.js';
 
 const Layout = React.lazy(() => import('./Layout'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
@@ -65,7 +66,7 @@ function App() {
               <Routes>
                 <Route
                   path="/"
-                  element={<Navigate to={localStorage.getItem('token') ? '/dashboard' : '/login'} replace />}
+                  element={<Navigate to={localStorage.getItem('token') ? getDefaultRoute() : '/login'} replace />}
                 />
                 <Route
                   path="/signup"
@@ -160,9 +161,22 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
+const getDefaultRoute = () => {
+  try {
+    const profile = localStorage.getItem('profile');
+    if (profile) {
+      const user = JSON.parse(profile);
+      return getFirstAccessibleRoute(user);
+    }
+  } catch (error) {
+    console.warn('Error parsing user profile:', error);
+  }
+  return '/dashboard';
+};
+
 const PublicRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
+  return isAuthenticated ? <Navigate to={getDefaultRoute()} replace /> : children;
 };
 
 export default App;

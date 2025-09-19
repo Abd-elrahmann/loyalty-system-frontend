@@ -7,6 +7,8 @@ import { notifyError, notifySuccess } from '../utilities/Toastify';
 import Api from '../Config/Api';
 import { useTranslation } from 'react-i18next';
 import { updateUserProfile } from '../utilities/user.jsx';
+import { getFirstAccessibleRoute } from '../utilities/permissions.js';
+import '../utilities/debugPermissions.js';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Helmet } from 'react-helmet-async';
@@ -51,20 +53,27 @@ const Login = () => {
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
         }
-       
-        notifySuccess('Login successful');
-        navigate('/dashboard');
+               
         if (response.data.user) {
-          localStorage.setItem('profile', JSON.stringify(response.data.user));
+          const loginUser = response.data.user;
+          localStorage.setItem('profile', JSON.stringify(loginUser));
           
           try {
             const profileResponse = await Api.get('/api/auth/profile');
-            localStorage.setItem('profile', JSON.stringify(profileResponse.data));
+            const profileData = profileResponse.data;
+            
+            localStorage.setItem('profile', JSON.stringify(profileData));
+            
+            const targetRoute = getFirstAccessibleRoute(profileData);
+            navigate(targetRoute);
+            notifySuccess('Login successful');
+            updateUserProfile();
           } catch (profileError) {
-            console.warn('Could not fetch full profile:', profileError);
+            console.warn('Could not fetch full profile, using login data:', profileError);
+            
+            const targetRoute = getFirstAccessibleRoute(loginUser);
+            navigate(targetRoute);
           }
-          
-          updateUserProfile(); 
         }
 
       } catch (error) {

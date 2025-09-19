@@ -41,7 +41,6 @@ const CustomerTable = ({
           <TableRow>
             <StyledTableCell align="center">{t("Customers.ID")}</StyledTableCell>
             <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Customers.Name")}</StyledTableCell>
-            <StyledTableCell align="center">{t("Customers.Role")}</StyledTableCell>
             <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Customers.Email")}</StyledTableCell>
             <StyledTableCell align="center">{t("Customers.Phone")}</StyledTableCell>
             <StyledTableCell align="center">{t("Customers.Points")}</StyledTableCell>
@@ -69,29 +68,6 @@ const CustomerTable = ({
               <StyledTableRow key={customer.id}>
                 <StyledTableCell align="center">{customer.id}</StyledTableCell>
                 <StyledTableCell align="center">{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
-                <StyledTableCell align="center">
-                  <Chip 
-                    label={i18n.language === 'ar' ? 
-                      customer.role === 'ADMIN' ? 'مدير عام' :
-                      customer.role === 'ACCOUNTANT' ? 'محاسب' :
-                      customer.role === 'CASHIER' ? 'كاشير' :
-                      'عميل'
-                      : customer.role
-                    }
-                    variant="outlined"
-                    sx={{
-                      fontSize: i18n.language === 'ar' ? '14px' : '12px',
-                      fontWeight: 'bold',
-                      textTransform: 'uppercase',
-                      color:'white',
-                      backgroundColor: 
-                        customer.role === 'ADMIN' ? '#1677FF' : 
-                        customer.role === 'ACCOUNTANT' ? '#FFA500' :
-                        customer.role === 'CASHIER' ? '#800080' :
-                        '#4CAF50'
-                    }}
-                  />
-                </StyledTableCell>
                 <StyledTableCell align="center" sx={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   <Link href={`mailto:${customer.email}`} underline="hover" color="black" sx={{ cursor: 'pointer', fontSize: i18n.language === 'ar' ? '14px' : '13px' }}>
                     {customer.email}

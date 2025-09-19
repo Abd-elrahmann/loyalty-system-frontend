@@ -244,7 +244,17 @@
     "ImageNotAccessible": "Image is not accessible. Please try a different URL.",
     "GoogleImagesNotSupported": "Google Images thumbnails are not supported. Please use the original image URL.",
     "ImageLoadError": "Failed to load image",
-    "ProductsDescription": "Manage products in the cafe and restaurant"
+    "ProductsDescription": "Manage products in the cafe and restaurant",
+    "Category": "Category",
+    "AllCategories": "All Categories",
+    "AddCategory": "Add Category",
+    "AddCafeCategory": "Add Cafe Category",
+    "AddRestaurantCategory": "Add Restaurant Category",
+    "CategoryAdded": "Category added successfully",
+    "CategoryNotAdded": "Category not added",
+    "NoCategories": "No categories",
+    "NoProducts": "No products",
+    "NoCategoriesAlert": "No categories found. Please add a category first before adding products."
   },
   "Transactions": {
     "Transactions": "Transactions",
