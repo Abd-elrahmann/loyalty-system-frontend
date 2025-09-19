@@ -86,7 +86,7 @@ const Customers = () => {
     queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail, searchFilters.qrCode],
     queryFn: fetchCustomers,
     keepPreviousData: true,
-    staleTime: 30000,
+    staleTime: 5000,
   });
 
   const customers = data?.users || [];

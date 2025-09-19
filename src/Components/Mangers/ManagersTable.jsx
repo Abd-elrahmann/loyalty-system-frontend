@@ -101,7 +101,7 @@ const ManagersTable = ({
                   {manager.email}
                 </StyledTableCell>
                 <StyledTableCell align="center">{manager.phone}</StyledTableCell>
-                <StyledTableCell align="center">{dayjs(manager.createdAt).format('DD/MM/YYYY hh:mm')}</StyledTableCell>
+                <StyledTableCell align="center">{dayjs(manager.createdAt).format('DD/MM/YYYY hh:mm A')}</StyledTableCell>
                 <StyledTableCell align="center">
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                     <IconButton

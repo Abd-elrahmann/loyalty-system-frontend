@@ -39,8 +39,8 @@ const Settings = () => {
       const response = await Api.get('/api/settings');
       return response.data;
     },
-    staleTime: 30000,
-    gcTime: 30000,
+    staleTime: 5000,
+    gcTime: 5000,
     refetchOnWindowFocus: false,
     refetchOnMount: true
   });

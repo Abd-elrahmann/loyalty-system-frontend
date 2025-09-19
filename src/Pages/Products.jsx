@@ -66,7 +66,7 @@ const Products = () => {
     queryKey: ['products', activeTab, currentPage, searchFilters.categoryId],
     queryFn: fetchProducts,
     keepPreviousData: true,
-    staleTime: 30000
+    staleTime: 5000
   });
 
   const products = data?.products || [];

@@ -49,7 +49,7 @@ const Mangers = () => {
     queryKey: ['managers'],
     queryFn: fetchManagers,
     keepPreviousData: true,
-    staleTime: 30000,
+    staleTime: 5000,
   });
 
   const managers = data || [];

@@ -112,7 +112,7 @@ const Transactions = () => {
     queryKey: ["transactions", page, filters, customerId, rowsPerPage],
     queryFn: fetchTransactions,
     keepPreviousData: true,
-    staleTime: 30000,
+    staleTime: 5000,
   });
 
   const transactions = data?.transactions || [];

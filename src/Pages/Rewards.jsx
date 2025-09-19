@@ -67,7 +67,7 @@ const Rewards = () => {
     queryKey: ['rewards', page, tabValue, filters],
     queryFn: fetchRewards,
     keepPreviousData: true,
-    staleTime: 30000
+    staleTime: 5000
   });
 
   const rewards = data?.rewards || [];

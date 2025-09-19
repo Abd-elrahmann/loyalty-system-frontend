@@ -95,8 +95,8 @@ const Dashboard = () => {
         ...response.data
       };
     },
-    staleTime: 5 * 1000, 
-    cacheTime: 5 * 1000 
+    staleTime: 5 * 1000,  // 5 seconds
+    cacheTime: 5 * 1000  // 5 seconds
   });
 
   const exportToPDF = async () => {

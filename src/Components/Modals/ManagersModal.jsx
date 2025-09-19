@@ -187,6 +187,29 @@ const ManagersModal = ({ open, onClose, manager, onSave, isLoading }) => {
             helperText={errors.phone}
             fullWidth
           />
+             <FormControl fullWidth error={!!errors.role}>
+            <InputLabel>{t("Mangers.Role")}</InputLabel>
+            <Select
+              value={formData.role}
+              label={t("Mangers.Role")}
+              onChange={handleChange("role")}
+            >
+              <MenuItem value="ADMIN">
+                {i18n.language === "ar" ? "مدير عام" : "ADMIN"}
+              </MenuItem>
+              <MenuItem value="ACCOUNTANT">
+                {i18n.language === "ar" ? "محاسب" : "ACCOUNTANT"}
+              </MenuItem>
+              <MenuItem value="CASHIER">
+                {i18n.language === "ar" ? "كاشير" : "CASHIER"}
+              </MenuItem>
+            </Select>
+            {errors.role && (
+              <Typography variant="caption" color="error">
+                {errors.role}
+              </Typography>
+            )}
+          </FormControl>
 
           <TextField
             type={showPassword ? "text" : "password"}
@@ -254,29 +277,6 @@ const ManagersModal = ({ open, onClose, manager, onSave, isLoading }) => {
               ),
             }}
           />
-          <FormControl fullWidth error={!!errors.role}>
-            <InputLabel>{t("Mangers.Role")}</InputLabel>
-            <Select
-              value={formData.role}
-              label={t("Mangers.Role")}
-              onChange={handleChange("role")}
-            >
-              <MenuItem value="ADMIN">
-                {i18n.language === "ar" ? "مدير عام" : "ADMIN"}
-              </MenuItem>
-              <MenuItem value="ACCOUNTANT">
-                {i18n.language === "ar" ? "محاسب" : "ACCOUNTANT"}
-              </MenuItem>
-              <MenuItem value="CASHIER">
-                {i18n.language === "ar" ? "كاشير" : "CASHIER"}
-              </MenuItem>
-            </Select>
-            {errors.role && (
-              <Typography variant="caption" color="error">
-                {errors.role}
-              </Typography>
-            )}
-          </FormControl>
         </Box>
       </DialogContent>
 

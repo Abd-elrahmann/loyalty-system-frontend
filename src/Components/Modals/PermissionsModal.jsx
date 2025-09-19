@@ -18,13 +18,14 @@ import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import routes from "../../Config/routes";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { triggerPermissionsUpdate } from "../../hooks/usePermissionsSync";
 import {Spin} from 'antd'
+import { updateUserPermissions } from "../../utilities/user.jsx";
 const PermissionsModal = ({ open, onClose, manager }) => {
   const { t, i18n } = useTranslation();
   const [selectedPages, setSelectedPages] = useState([]);
-
+  const queryClient = useQueryClient();
   
   const availablePages = routes.map(route => {
     let pageName = route.path.replace('/', '').toLowerCase();
@@ -59,13 +60,15 @@ const PermissionsModal = ({ open, onClose, manager }) => {
 
   const updatePermissionsMutation = useMutation({
     mutationFn: async (pages) => {
-      const response = await Api.post(`/api/roles/${manager.role}`, { pages });
+      const response = await Api.patch(`/api/roles/${manager.role}`, { pages });
       return response.data;
     },
     onSuccess: () => {
       notifySuccess(t("Mangers.PermissionsUpdated"));
-      
+
+      updateUserPermissions(manager.role);
       triggerPermissionsUpdate(manager.role);
+      queryClient.invalidateQueries({ queryKey: ['permissions', manager.role] });
       
       onClose();
     },
