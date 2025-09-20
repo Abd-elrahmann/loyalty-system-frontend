@@ -16,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash.debounce';
 import { FaDollarSign } from 'react-icons/fa';
 import { FaCoins } from 'react-icons/fa';
+import { RestartAltOutlined } from '@mui/icons-material';
 
 const Products = () => {
   const { t, i18n } = useTranslation();
@@ -23,6 +24,7 @@ const Products = () => {
   const [searchFilters, setSearchFilters] = useState({
     enName: '',
     arName: '',
+    category: '',
     categoryId: ''
   });
   const [openModal, setOpenModal] = useState(false);
@@ -54,8 +56,8 @@ const Products = () => {
       : `/api/restaurant-products/${currentPage}`;
     
     const queryParams = new URLSearchParams();
-    if (searchFilters.categoryId) {
-      queryParams.append('categoryId', searchFilters.categoryId);
+    if (searchFilters.category) {
+      queryParams.append('category', searchFilters.category);
     }
     
     const response = await Api.get(`${endpoint}?${queryParams}`);
@@ -63,7 +65,7 @@ const Products = () => {
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['products', activeTab, currentPage, searchFilters.categoryId],
+    queryKey: ['products', activeTab, currentPage, searchFilters.category],
     queryFn: fetchProducts,
     keepPreviousData: true,
     staleTime: 5000
@@ -74,7 +76,9 @@ const Products = () => {
 
   const filteredProducts = products.filter(product => 
     product.enName.toLowerCase().includes(searchFilters.enName.toLowerCase()) ||
-    product.arName.toLowerCase().includes(searchFilters.arName.toLowerCase())
+    product.arName.toLowerCase().includes(searchFilters.arName.toLowerCase()) ||
+    product.category.arName.toLowerCase().includes(searchFilters.category.toLowerCase()) ||
+    product.category.enName.toLowerCase().includes(searchFilters.category.toLowerCase())
   );
 
   const addProductMutation = useMutation({
@@ -159,8 +163,8 @@ const Products = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['categories']);
-      setOpenCategoryModal(false);
       notifySuccess(t('Products.CategoryAdded'));
+      setOpenCategoryModal(false);
     },
     onError: (error) => {
       handleApiError(error);
@@ -177,6 +181,7 @@ const Products = () => {
     setSearchFilters({
       enName: '',
       arName: '',
+      category: '',
       categoryId: ''
     });
     setCurrentPage(1);
@@ -226,8 +231,12 @@ const Products = () => {
   }, 800), []);
 
   const handleCategoryChange = (event) => {
+    const selectedCategory = categories.find(cat => cat.id === event.target.value);
+    const categoryName = selectedCategory ? (i18n.language === 'ar' ? selectedCategory.arName : selectedCategory.enName) : '';
+    
     setSearchFilters(prev => ({
       ...prev,
+      category: categoryName,
       categoryId: event.target.value
     }));
     setCurrentPage(1);
@@ -236,6 +245,7 @@ const Products = () => {
   const handleClearCategory = () => {
     setSearchFilters(prev => ({
       ...prev,
+      category: '',
       categoryId: ''
     }));
     setCurrentPage(1);
@@ -344,14 +354,13 @@ const Products = () => {
           </FormControl>
 
           {searchFilters.categoryId && (
-            <Button
-              variant="outlined"
+            <IconButton
               size="small"
               onClick={handleClearCategory}
               sx={{ height: '40px' }}
             >
-              {t('Products.ClearFilter')}
-            </Button>
+              <RestartAltOutlined />
+            </IconButton>
           )}
 
           {profile.role === 'ADMIN' && (
@@ -405,7 +414,7 @@ const Products = () => {
           {filteredProducts.length === 0 ? (
             <Box sx={{ 
               display: 'flex', 
-              justifyContent: 'center', 
+              justifyContent: isMobile ? 'center' : 'flex-start', 
               alignItems: 'center', 
               minHeight: '200px',
               flexDirection: 'column',
@@ -417,7 +426,7 @@ const Products = () => {
             </Box>
           ) : (
             <Grid container spacing={4} sx={{
-              justifyContent: 'center', 
+              justifyContent: isMobile ? 'center' : 'flex-start', 
               mt: isMobile ? 2 : 0,
             }}>
               {filteredProducts.map((product) => (
@@ -426,51 +435,171 @@ const Products = () => {
                     height: '100%', 
                     display: 'flex', 
                     flexDirection: 'column',
-                    borderRadius: '10px',
-                    border: '1px solid #e0e0e0',
-                    boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.2)',
-                    width: 250,
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+                    width: 280,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                     '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.1)'
+                      transform: 'translateY(-12px) scale(1.02)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+                      '& .product-image': {
+                        transform: 'scale(1.1)',
+                      },
+                      '& .product-overlay': {
+                        opacity: 1,
+                      }
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '4px',
+                      background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                      zIndex: 1
                     }
                   }}>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      loading="eager"
-                      image={product.image}
-                      alt={product.enName}
-                      sx={{ objectFit: 'cover' }}
-                    />
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'center' }}>
+                    <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                      <CardMedia
+                        component="img"
+                        height="180"
+                        loading="eager"
+                        image={product.image}
+                        alt={product.enName}
+                        className="product-image"
+                        sx={{ 
+                          objectFit: 'cover',
+                          transition: 'transform 0.4s ease',
+                          borderRadius: '20px 20px 0 0'
+                        }}
+                      />
+                      <Box 
+                        className="product-overlay"
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%)',
+                          opacity: 0,
+                          transition: 'opacity 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          padding: 2
+                        }}
+                      >
+                        {product.category && (
+                          <Box sx={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: '15px',
+                            padding: '4px 12px',
+                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}>
+                            <Typography variant="caption" sx={{ 
+                              fontWeight: 600,
+                              color: '#333',
+                              fontSize: '0.75rem'
+                            }}>
+                              {i18n.language === 'ar' ? product.category.arName : product.category.enName}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+
+                    <CardContent sx={{ 
+                      flexGrow: 1, 
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1.5
+                    }}>
+                      <Typography 
+                        gutterBottom 
+                        variant="h6" 
+                        component="div" 
+                        sx={{ 
+                          textAlign: 'center',
+                          fontWeight: 700,
+                          fontSize: '1.1rem',
+                          color: '#2c3e50',
+                          lineHeight: 1.3,
+                          mb: 1.5
+                        }}
+                      >
                         {i18n.language === 'ar' ? product.arName : product.enName}
                       </Typography>
       
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-                        <FaCoins style={{ color: '#ED6C02' }} /> 
-                        <Typography variant="body1">
-                          {t('Products.Points')}: {product.points}
-                        </Typography>
-                        <FaDollarSign style={{ color: '#00A300' }} /> 
-                        <Typography variant="body1">
-                          {t('Products.Price')}: {product.price}
-                        </Typography>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'row',
+                        gap: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <Box sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          backgroundColor: '#fff3cd',
+                          borderRadius: '20px',
+                          padding: '6px 12px',
+                          border: '2px solid #ffeaa7',
+                          minWidth: '100px',
+                          justifyContent: 'center'
+                        }}>
+                          <FaCoins style={{ color: '#f39c12', fontSize: '16px' }} />
+                          <Typography variant="body2" sx={{ 
+                            fontWeight: 600,
+                            color: '#e67e22',
+                            fontSize: '0.85rem'
+                          }}>
+                            {product.points}
+                          </Typography>
+                        </Box>
+
+                        <Box sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          backgroundColor: '#d4edda',
+                          borderRadius: '20px',
+                          padding: '6px 12px',
+                          border: '2px solid #c3e6cb',
+                          minWidth: '100px',
+                          justifyContent: 'center'
+                        }}>
+                          <FaDollarSign style={{ color: '#27ae60', fontSize: '14px' }} />
+                          <Typography variant="body2" sx={{ 
+                            fontWeight: 600,
+                            color: '#27ae60',
+                            fontSize: '0.85rem'
+                          }}>
+                            {product.price}
+                          </Typography>
+                        </Box>
                       </Box>
-                      
-                      {product.category && (
-                        <Typography variant="body2" sx={{ textAlign: 'center', mt: 1, color: 'text.secondary' }}>
-                          {t('Products.Category')}: {i18n.language === 'ar' ? product.category.arName : product.category.enName}
-                        </Typography>
-                      )}
                     </CardContent>
-                    <Box sx={{ p: 2, display: 'flex', justifyContent: profile.role === 'ADMIN' ? 'space-between' : 'center' }}>
+
+                    <Box sx={{ 
+                      p: 2, 
+                      pt: 0,
+                      display: 'flex', 
+                      justifyContent: profile.role === 'ADMIN' ? 'space-between' : 'center',
+                      alignItems: 'center',
+                      borderTop: '1px solid #f1f3f4',
+                      backgroundColor: '#fafbfc'
+                    }}>
                       <Button 
-                        variant="outlined" 
-                        color="primary"
-                        size="small"
+                        variant="contained"
+                        size="medium"
                         startIcon={<RedeemIcon />}
                         onClick={() => {
                           Swal.fire({
@@ -492,37 +621,69 @@ const Products = () => {
                           });
                         }}
                         sx={{
+                          background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                          borderRadius: '25px',
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          padding: '8px 20px',
+                          boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                          transition: 'all 0.3s ease',
                           "&:hover": {
-                            backgroundColor: "primary.main",
-                            color: "white",
+                            background: 'linear-gradient(45deg, #5a6fd8 0%, #6a4190 100%)',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
                           },
                         }}
                       >
                         {t('Products.Redeem')}
                       </Button>
+
                       <Box sx={{
-                         display: profile.role === 'ADMIN' ? 'flex' : 'none',
-                       alignItems: 'center',
-                       gap: 1,
-                       justifyContent: 'center'
-                       }}>
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => handleOpenModal(product)}
-                        aria-label="edit"
-                      >
-                        <EditOutlined sx={{ color: 'green' }} />
-                      </IconButton>
-                      <IconButton 
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          handleDeleteProduct(product.id);
-                        }}
-                        aria-label="delete"
+                        display: profile.role === 'ADMIN' ? 'flex' : 'none',
+                        alignItems: 'center',
+                        gap: 1,
+                        justifyContent: 'center'
+                      }}>
+                        <IconButton
+                          size="medium"
+                          onClick={() => handleOpenModal(product)}
+                          aria-label="edit"
+                          sx={{
+                            backgroundColor: '#e8f5e8',
+                            border: '2px solid #c8e6c9',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              backgroundColor: '#27ae60',
+                              transform: 'scale(1.1)',
+                              '& .MuiSvgIcon-root': {
+                                color: 'white'
+                              }
+                            }
+                          }}
                         >
-                          <DeleteOutlined sx={{ color: 'red' }} />
+                          <EditOutlined sx={{ color: '#27ae60', fontSize: '20px' }} />
+                        </IconButton>
+
+                        <IconButton 
+                          size="medium"
+                          onClick={() => {
+                            handleDeleteProduct(product.id);
+                          }}
+                          aria-label="delete"
+                          sx={{
+                            backgroundColor: '#ffebee',
+                            border: '2px solid #ffcdd2',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              backgroundColor: '#e74c3c',
+                              transform: 'scale(1.1)',
+                              '& .MuiSvgIcon-root': {
+                                color: 'white'
+                              }
+                            }
+                          }}
+                        >
+                          <DeleteOutlined sx={{ color: '#e74c3c', fontSize: '20px' }} />
                         </IconButton>
                       </Box>
                     </Box>

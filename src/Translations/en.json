@@ -254,7 +254,8 @@
     "CategoryNotAdded": "Category not added",
     "NoCategories": "No categories",
     "NoProducts": "No products",
-    "NoCategoriesAlert": "No categories found. Please add a category first before adding products."
+    "NoCategoriesAlert": "No categories found. Please add a category first before adding products.",
+    "ClearFilterCategory": "Clear Filter Category" 
   },
   "Transactions": {
     "Transactions": "Transactions",

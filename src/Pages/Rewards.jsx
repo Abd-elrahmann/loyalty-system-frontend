@@ -6,16 +6,12 @@ import {
   Button,
   Tab,
   Tabs,
-  Paper,
   IconButton,
   Stack,
   useMediaQuery,
 } from "@mui/material";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import RewardsSearchModal from "../Components/Modals/RewardsSearchModal";
-import * as xlsx from "xlsx";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import { Helmet } from 'react-helmet-async';
@@ -24,7 +20,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SearchOutlined, QrcodeOutlined, DoubleLeftOutlined } from "@ant-design/icons";
 import RewardsTable from "../Components/rewards/RewardsTable";
 import RewardsActions from "../Components/rewards/RewardsActions";
-import RewardsExportButtons from "../Components/rewards/RewardsExportButtons";
 
 const Rewards = () => {
   const { t, i18n } = useTranslation();
@@ -195,119 +190,6 @@ const Rewards = () => {
     (reward) => reward.status === ["PENDING", "APPROVED", "REJECTED"][tabValue]
   );
 
-  const exportToCSV = () => {
-    try {
-      const exportData = filteredRewards.map((reward) => ({
-        ID: reward.id,
-        "Customer Name": i18n.language === "ar" ? reward.user?.arName : reward.user?.enName,
-        "Product Name":
-          i18n.language === "ar" ? reward.cafeProduct?.arName || reward.restaurantProduct?.arName : reward.cafeProduct?.enName || reward.restaurantProduct?.enName || "",
-        Points: reward.points,
-        Type: reward.type,
-        Status: reward.status,
-        Date: reward.formattedDate,
-        ...(reward.status === "REJECTED" && {
-          "Rejection Note": reward.note || "",
-        }),
-      }));
-
-      const csv = xlsx.utils.json_to_sheet(exportData);
-      const workbook = xlsx.utils.book_new();
-      xlsx.utils.book_append_sheet(workbook, csv, "Rewards");
-      xlsx.writeFile(
-        workbook,
-        i18n.language === "ar"
-          ? `تقرير_المكافئات_${
-              ["pending", "approved", "rejected"][tabValue]
-            }_${new Date().toLocaleDateString()}.xlsx`
-          : `rewards_${
-              ["pending", "approved", "rejected"][tabValue]
-            }_report.xlsx`
-      );
-    } catch (error) {
-      console.log(error);
-      notifyError(t("Errors.generalError"));
-    }
-  };
-
-  const exportToPDF = () => {
-    try {
-      const doc = new jsPDF();
-
-      doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
-      doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
-      doc.setFont("Amiri");
-      doc.setFontSize(16);
-      doc.text(
-        `${
-          ["Pending", "Approved", "Rejected"][tabValue]
-        } Rewards Report | ${new Date().toLocaleDateString()}`,
-        14,
-        15
-      );
-
-      const columns = [
-        "ID",
-        "Customer Name",
-        "Product Name",
-        "Points",
-        "Type",
-        "Status",
-        "Date",
-        ...(tabValue === 2 ? ["Rejection Note"] : []),
-      ];
-
-      const rows = filteredRewards.map((reward) => [
-        reward.id,
-        i18n.language === "ar" ? reward.user?.arName : reward.user?.enName,
-        i18n.language === "ar"
-          ? reward.cafeProduct?.arName || reward.restaurantProduct?.arName
-          : reward.cafeProduct?.enName || reward.restaurantProduct?.enName,
-        reward.points,
-        reward.type,
-        reward.status,
-        reward.formattedDate,
-        ...(tabValue === 2 ? [reward.note || "-"] : []),
-      ]);
-
-      autoTable(doc, {
-        startY: 25,
-        head: [columns],
-        body: rows,
-        theme: "grid",
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [128, 0, 128] },
-        columnStyles: {
-          1: {
-            font: "Amiri",
-            fontStyle: "bold",
-            halign: i18n.language === "ar" ? "right" : "left",
-            cellWidth: 40,
-          },
-          2: {
-            font: "Amiri",
-            fontStyle: "bold",
-            halign: i18n.language === "ar" ? "right" : "left",
-            cellWidth: 40,
-          },
-        },
-      });
-
-      doc.save(
-        i18n.language === "ar"
-          ? `تقرير_المكافئات_${
-              ["pending", "approved", "rejected"][tabValue]
-            }_${new Date().toLocaleDateString()}.pdf`
-          : `rewards_${
-              ["pending", "approved", "rejected"][tabValue]
-            }_report.pdf`
-      );
-    } catch (error) {
-      console.log(error);
-      notifyError(t("Errors.generalError"));
-    }
-  };
-
   const PrintRewards = () => {
     try {
       const printWindow = window.open("", "_blank");
@@ -416,13 +298,6 @@ const Rewards = () => {
           <Tab label={t("Rewards.Approved")} sx={{ color: "success.main" }} />
           <Tab label={t("Rewards.Rejected")} sx={{ color: "error.main" }} />
         </Tabs>
-
-        <RewardsExportButtons
-          exportToCSV={exportToCSV}
-          exportToPDF={exportToPDF}
-          PrintRewards={PrintRewards}
-          isMobile={isMobile}
-        />
       </Box>
 
       <Box sx={{ p: isMobile ? 1 : 2, mb: isMobile ? 0 : 2, width: isMobile ? "100%" : "90%" }}>

@@ -15,8 +15,6 @@ import {
   TableRow,
   TablePagination,
   Paper,
-  Menu,
-  MenuItem,
   Chip,
   useMediaQuery,
   Typography,
@@ -35,10 +33,6 @@ import DeleteModal from "../Components/Modals/DeleteModal";
 import { RestartAltOutlined } from "@mui/icons-material";
 import TransactionSearchModal from "../Components/Modals/TransactionSearchModal";
 import { SearchOutlined, ArrowLeftOutlined } from "@ant-design/icons";
-import { FileExcelOutlined, FilePdfOutlined } from "@ant-design/icons";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as xlsx from "xlsx";
 import { useUser } from "../utilities/user";
 import { Helmet } from "react-helmet-async";
 import { Spin } from "antd";
@@ -50,8 +44,6 @@ const Transactions = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
-  const [excelAnchorEl, setExcelAnchorEl] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const [filters, setFilters] = useState({
@@ -83,29 +75,6 @@ const Transactions = () => {
 
     const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
     return response.data;
-  };
-
-  const fetchAllTransactions = async () => {
-    const response = await Api.get(`/api/transactions/all-transactions`);
-    return response.data;
-  };
-
-  const handlePdfClick = (event) => {
-    const buttonElement = event.currentTarget;
-    setPdfAnchorEl(buttonElement);
-  };
-
-  const handleExcelClick = (event) => {
-    const buttonElement = event.currentTarget;
-    setExcelAnchorEl(buttonElement);
-  };
-
-  const handlePdfClose = () => {
-    setPdfAnchorEl(null);
-  };
-
-  const handleExcelClose = () => {
-    setExcelAnchorEl(null);
   };
 
   const { data, isLoading } = useQuery({
@@ -181,135 +150,6 @@ const Transactions = () => {
     setPage(1);
   };
 
-  const getArabicName = (transaction) => {
-    if (i18n.language === "ar") {
-      return String(transaction.user.arName).normalize("NFC");
-    }
-    return transaction.user.enName;
-  };
-
-  const exportToCSV = async (exportAll = false) => {
-    try {
-      let exportData;
-      const date = dayjs(transactions.date).format("YYYY-MM-DD");
-      if (exportAll) {
-        const allTransactions = await fetchAllTransactions();
-        exportData = allTransactions.map((transaction) => ({
-          ID: transaction.id,
-          Name: getArabicName(transaction),
-          Points: transaction.points,
-          Currency:
-            i18n.language === "ar"
-              ? transaction.currency.arCurrency
-              : transaction.currency.enCurrency,
-          Type: transaction.type,
-          Status: transaction.status,
-          Date: date,
-        }));
-      } else {
-        exportData = transactions.map((transaction) => ({
-          ID: transaction.id,
-          Name: getArabicName(transaction),
-          Points: transaction.points,
-          Currency:
-            i18n.language === "ar"
-              ? transaction.currency.arCurrency
-              : transaction.currency.enCurrency,
-          Type: transaction.type,
-          Status: transaction.status,
-          Date: date,
-        }));
-      }
-
-      const workbook = xlsx.utils.book_new();
-      const worksheet = xlsx.utils.json_to_sheet(exportData);
-      xlsx.utils.book_append_sheet(workbook, worksheet, "Transactions");
-      xlsx.writeFile(workbook, "transactions_report.xlsx");
-      handleExcelClose();
-    } catch (error) {
-      console.log(error);
-      notifyError(t("Errors.generalError"));
-    }
-  };
-
-  const exportToPDF = async (exportAll = false) => {
-    try {
-      let dataToExport;
-
-      if (exportAll) {
-        dataToExport = await fetchAllTransactions();
-      } else {
-        dataToExport = transactions;
-      }
-
-      const doc = new jsPDF();
-
-      doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
-      doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
-      doc.setFont("Amiri");
-      doc.setFontSize(16);
-      doc.text(
-        "Transactions Report | Report Date: " + new Date().toLocaleDateString(),
-        14,
-        15
-      );
-
-      const columns = [
-        "ID",
-        i18n.language === "ar" ? "Arabic Name" : "English Name",
-        "Points",
-        "Currency",
-        "Type",
-        "Status",
-        "Date",
-      ];
-
-      const rows = dataToExport.map((transaction) => [
-        transaction.id,
-        getArabicName(transaction),
-        transaction.points,
-        i18n.language === "ar"
-          ? transaction.currency.arCurrency
-          : transaction.currency.enCurrency,
-        transaction.type,
-        transaction.status,
-        dayjs(transaction.date).format("YYYY-MM-DD"),
-      ]);
-
-      autoTable(doc, {
-        startY: 25,
-        head: [columns],
-        body: rows,
-        theme: "grid",
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [128, 0, 128] },
-        columnStyles: {
-          1: {
-            font: "Amiri",
-            fontStyle: "bold",
-            halign: "center",
-            cellWidth: 30,
-            direction: i18n.language === "ar" ? "rtl" : "ltr",
-          },
-          3: {
-            font: "Amiri",
-            fontStyle: "bold",
-            halign: "center",
-            cellWidth: 30,
-            direction: i18n.language === "ar" ? "rtl" : "ltr",
-          },
-        },
-      });
-
-      doc.save("transactions_report.pdf");
-      handlePdfClose();
-    } catch (error) {
-      console.log(error);
-      notifyError(t("Errors.generalError"));
-    }
-  };
-
-  // دالة لعرض بيانات المعاملة في شكل بطاقة للشاشات الصغيرة
   const renderTransactionCard = (transaction) => (
     <Card key={transaction.id} sx={{ mb: 2, p: 2 }}>
       <CardContent>
@@ -536,91 +376,6 @@ const Transactions = () => {
             gap: 1,
             width: { xs: "100%", sm: "auto" }
           }}>
-            <Button
-              variant="outlined"
-              startIcon={<FileExcelOutlined />}
-              onClick={handleExcelClick}
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                height: "40px", 
-                fontSize: "12px",
-                "&:hover": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-                display: profile.role === "ADMIN" ? "" : "none"
-              }}
-            >
-              {t("Transactions.ExportCSV")}
-            </Button>
-            <Menu
-              anchorEl={excelAnchorEl}
-              open={Boolean(excelAnchorEl)}
-              onClose={handleExcelClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              sx={{
-                '& .MuiPaper-root': {
-                  minWidth: "200px",
-                },
-              }}
-            >
-              <MenuItem onClick={() => exportToCSV(false)}>
-                {t("Transactions.CurrentPage")}
-              </MenuItem>
-              <MenuItem onClick={() => exportToCSV(true)}>
-                {t("Transactions.AllPages")}
-              </MenuItem>
-            </Menu>
-
-            <Button
-              variant="outlined"
-              startIcon={<FilePdfOutlined />}
-              onClick={handlePdfClick}
-              sx={{
-                width: { xs: "100%", sm: "auto" },
-                height: "40px",
-                fontSize: "12px",
-                "&:hover": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-                display: profile.role === "ADMIN" ? "" : "none"
-              }}
-            >
-              {t("Transactions.ExportPDF")}
-            </Button>
-            <Menu
-              anchorEl={pdfAnchorEl}
-              open={Boolean(pdfAnchorEl)}
-              onClose={handlePdfClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              sx={{
-                '& .MuiPaper-root': {
-                  minWidth: "200px",
-                },
-              }}
-            >
-              <MenuItem onClick={() => exportToPDF(false)}>
-                {t("Transactions.CurrentPage")}
-              </MenuItem>
-              <MenuItem onClick={() => exportToPDF(true)}>
-                {t("Transactions.AllPages")}
-              </MenuItem>
-            </Menu>
           </Stack>
         </Box>
       </Box>

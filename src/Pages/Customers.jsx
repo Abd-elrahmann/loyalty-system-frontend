@@ -20,7 +20,7 @@ import debounce from "lodash.debounce";
 import { useMediaQuery } from "@mui/material";
 
 const Customers = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -46,8 +46,7 @@ const Customers = () => {
   const [openShowQR, setOpenShowQR] = useState(false);
   const [customerToShowQR, setCustomerToShowQR] = useState(null);
 
-  const [pdfAnchorEl, setPdfAnchorEl] = useState(null);
-  const [excelAnchorEl, setExcelAnchorEl] = useState(null);
+
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 400px)');
   
@@ -77,10 +76,6 @@ const Customers = () => {
     return response.data;
   };
 
-  const fetchAllCustomers = async () => {
-    const response = await Api.get(`/api/users/all-users`);
-    return response.data.users || [];
-  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail, searchFilters.qrCode],
@@ -141,125 +136,7 @@ const Customers = () => {
     notifySuccess(t("Customers.qrScanSuccess") + `: ${email}`);
   };
 
-  const handlePdfClick = (event) => {
-    const buttonElement = event.currentTarget;
-    setPdfAnchorEl(buttonElement);
-  };
-
-  const handleExcelClick = (event) => {
-    const buttonElement = event.currentTarget;
-    setExcelAnchorEl(buttonElement);
-  };
-
-  const handlePdfClose = () => {
-    setPdfAnchorEl(null);
-  };
-
-  const handleExcelClose = () => {
-    setExcelAnchorEl(null);
-  };
-  
-  const exportToPDF = async (exportAll = false) => {
-    try { 
-      const allCustomers = await fetchAllCustomers();
-      const [jsPDFModule, autoTableModule] = await Promise.all([
-        import('jspdf'),
-        import('jspdf-autotable')
-      ]);
-      
-      const doc = new jsPDFModule.default();
-      
-      doc.addFont("/assets/fonts/Amiri-Regular.ttf", "Amiri", "normal");
-      doc.addFont("/assets/fonts/Amiri-Bold.ttf", "Amiri", "bold");
-      doc.setFont("Amiri");
-      doc.setFontSize(16);
-      doc.text('Customers Report | Report Date: ' + new Date().toLocaleDateString(), 14, 15);
-
-      const getArabicName = (customer) => {
-        if (i18n.language === "ar") {
-          return String(customer.arName).normalize("NFC");
-        }
-        return customer.enName;
-      };
-
-      const columns = ['ID', i18n.language === 'ar' ? 'Arabic Name' : 'English Name', 'Role', 'Email', 'Phone', 'Points', 'Created At'];
-      
-      let dataToExport = [];
-      if (exportAll && Array.isArray(allCustomers)) {
-        dataToExport = allCustomers;
-      } else if (!exportAll && Array.isArray(customers)) {
-        dataToExport = customers.slice(0, rowsPerPage);
-      }
-
-      const rows = dataToExport.map(customer => [
-        customer.id,
-        getArabicName(customer),
-        customer.role,
-        customer.email,
-        customer.phone,
-        customer.points,
-        customer.createdAt
-      ]);
-
-      autoTableModule.default(doc, {
-        startY: 25,
-        head: [columns],
-        body: rows,
-        theme: 'grid',
-        styles: { 
-          fontSize: 7,
-          cellPadding: 1
-        },
-        headStyles: { 
-          fillColor: [128, 0, 128],
-          fontSize: 8
-        },
-        columnStyles: {
-          1: {
-            font: "Amiri",
-            fontStyle: "bold",
-            halign: 'right',
-            cellWidth: 35,
-            direction: 'rtl'
-          }
-        },
-        margin: { left: 10, right: 10 }
-      });
-
-      doc.save('customers_report.pdf');
-      handlePdfClose();
-    } catch (error) {
-      console.error(error);
-      notifyError(t("Errors.generalError"));
-    }
-  };
-
-  const exportToCSV = async (exportAll = false) => {
-    try {
-      const xlsxModule = await import('xlsx');
-      const allCustomers = await fetchAllCustomers();
-      const dataToExport = exportAll ? allCustomers : customers.slice(0, rowsPerPage);
-      const rows = dataToExport.map(customer => ({  
-        ID: customer.id,
-        [i18n.language === 'ar' ? 'الاسم' : 'Name']: 
-          i18n.language === 'ar' ? customer.arName : customer.enName,
-        Role: customer.role,
-        Email: customer.email,
-        Phone: customer.phone,
-        Points: customer.points,
-        "Created At": customer.createdAt
-      }));
-  
-      const worksheet = xlsxModule.utils.json_to_sheet(rows);
-      const workbook = xlsxModule.utils.book_new();
-      xlsxModule.utils.book_append_sheet(workbook, worksheet, 'Customers');
-      xlsxModule.writeFile(workbook, 'customers_report.xlsx');
-      handleExcelClose();
-    } catch (error) {
-      console.error(error);
-      notifyError(t("Errors.generalError"));
-    }
-  };
+ 
 
   const handleShowQR = (customer) => {
     setCustomerToShowQR(customer);
@@ -315,14 +192,6 @@ const Customers = () => {
         onScanQR={handleScanQR}
         scannedEmail={scannedEmail}
         onClearFilter={handleClearFilter}
-        onExcelClick={handleExcelClick}
-        excelAnchorEl={excelAnchorEl}
-        onExcelClose={handleExcelClose}
-        onPdfClick={handlePdfClick}
-        pdfAnchorEl={pdfAnchorEl}
-        onPdfClose={handlePdfClose}
-        onExportCSV={exportToCSV}
-        onExportPDF={exportToPDF}
         onAddCustomer={handleAddCustomer}
         isSmallMobile={isSmallMobile}
       />

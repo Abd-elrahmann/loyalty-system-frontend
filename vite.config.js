@@ -9,19 +9,19 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
-      '@ant-design/icons', // عشان يمنع مشاكل CJS مع Vite
+      '@ant-design/icons',
     ],
   },
   build: {
     minify: 'terser',
     commonjsOptions: {
-      transformMixedEsModules: true, // مهم عشان يدعم CJS + ESM مع بعض
+      transformMixedEsModules: true,
     },
     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'chart-vendor': ['chart.js', 'react-chartjs-2'], // خلي الـ regex explicit
+          'chart-vendor': ['chart.js', 'react-chartjs-2'],
           'mui-vendor': ['@mui/material', '@mui/icons-material'],
           'utils-vendor': ['axios', 'lodash'],
         },

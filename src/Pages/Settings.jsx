@@ -93,7 +93,7 @@ const Settings = () => {
 
   const handleSave = () => {
     let settingsToSave;
-    if (user.role === 'ADMIN') {
+    if (user.role !== 'USER') {
       settingsToSave = {
         ...settings,
         pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
@@ -133,13 +133,13 @@ const Settings = () => {
           centered
           sx={{ mb: 3 }}
         >
-          {user.role === 'ADMIN' && <Tab label={t('Settings.CurrencySettings')} />}
+          {user.role !== 'USER' && <Tab label={t('Settings.CurrencySettings')} />}
           <Tab label={t('Settings.TimezoneSettings')} />
-          {user.role === 'ADMIN' && <Tab label={t('Settings.PrinterSettings')} />}
+          {user.role !== 'USER' && <Tab label={t('Settings.PrinterSettings')} />}
         </Tabs>
 
         {/* Currency Tab */}
-        {user.role === 'ADMIN' && tabIndex === 0 && (
+        {user.role !== 'USER' && tabIndex === 0 && (
           <Box sx={{ p: 2 }}>
             <Autocomplete
               fullWidth
@@ -191,7 +191,7 @@ const Settings = () => {
         )}
 
         {/* Timezone Tab */}
-        {(user.role === 'ADMIN' ? tabIndex === 1 : tabIndex === 0) && (
+        {(user.role !== 'USER' ? tabIndex === 1 : tabIndex === 0) && (
           <Box sx={{ p: 2 }}>
             <Autocomplete
               fullWidth
@@ -218,7 +218,7 @@ const Settings = () => {
         )}
 
         {/* Printer Settings Tab */}
-        {user.role === 'ADMIN' && tabIndex === 2 && (
+        {user.role !== 'USER' && tabIndex === 2 && (
           <Box sx={{ p: 2 }}>
             <FormControl fullWidth>
               <InputLabel>{t('Settings.PrinterType')}</InputLabel>

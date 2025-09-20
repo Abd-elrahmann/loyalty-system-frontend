@@ -253,7 +253,8 @@
     "CategoryNotAdded": "فشل إضافة الفئة",
     "NoCategories": "لا يوجد فئات",
     "NoProducts": "لا يوجد منتجات",
-    "NoCategoriesAlert": "لا يوجد فئات. يرجى إضافة فئة أولاً قبل إضافة المنتجات."
+    "NoCategoriesAlert": "لا يوجد فئات. يرجى إضافة فئة أولاً قبل إضافة المنتجات.",
+    "ClearFilterCategory": "مسح الفلتر الفئة"
   },
   "Transactions": {
     "Transactions": "المعاملات",

@@ -19,14 +19,6 @@ const CustomerToolbar = ({
   onScanQR,
   scannedEmail,
   onClearFilter,
-  onExcelClick,
-  excelAnchorEl,
-  onExcelClose,
-  onPdfClick,
-  pdfAnchorEl,
-  onPdfClose,
-  onExportCSV,
-  onExportPDF,
   onAddCustomer,
   isSmallMobile
 }) => {
@@ -91,82 +83,6 @@ const CustomerToolbar = ({
           justifyContent: 'center',
           gap: 1
         }}>
-          <Button
-            variant="outlined"
-            startIcon={<FileExcelOutlined />}
-            onClick={onExcelClick}
-            sx={{
-              width: { xs: "100%", sm: "auto" },
-              height: { xs: "40px", sm: "40px" },
-              fontSize: "12px",
-              "&:hover": {
-                backgroundColor: "primary.main",
-                color: "white",
-              },
-            }}
-          >
-            {t("Customers.ExportCSV")}
-          </Button>
-          <Menu
-            anchorEl={excelAnchorEl}
-            open={Boolean(excelAnchorEl)}
-            onClose={onExcelClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            sx={{
-              '& .MuiPaper-root': {
-                minWidth: '200px',
-              }
-            }}
-          >
-            <MenuItem onClick={() => onExportCSV(false)}>{t("Customers.CurrentPage")}</MenuItem>
-            <MenuItem onClick={() => onExportCSV(true)}>{t("Customers.AllPages")}</MenuItem>
-          </Menu>
-
-          <Button
-            variant="outlined"
-            startIcon={<FilePdfOutlined />}
-            onClick={onPdfClick}
-            sx={{
-              width: { xs: "100%", sm: "auto" },
-              height: { xs: "40px", sm: "40px" },
-              fontSize: "12px",
-              "&:hover": {
-                backgroundColor: "primary.main",
-                color: "white",
-              },
-            }}
-          >
-            {t("Customers.ExportPDF")}
-          </Button>
-          <Menu
-            anchorEl={pdfAnchorEl}
-            open={Boolean(pdfAnchorEl)}
-            onClose={onPdfClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            sx={{
-              '& .MuiPaper-root': {
-                minWidth: '200px',
-              }
-            }}
-          >
-            <MenuItem onClick={() => onExportPDF(false)}>{t("Customers.CurrentPage")}</MenuItem>
-            <MenuItem onClick={() => onExportPDF(true)}>{t("Customers.AllPages")}</MenuItem>
-          </Menu>
-
           <Button
             variant="outlined"
             startIcon={<AddIcon />}

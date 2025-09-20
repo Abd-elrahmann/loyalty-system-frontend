@@ -5,11 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormik } from 'formik';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Spin } from "antd";
 import { FaCoins,FaProductHunt, FaLink, FaFile, FaDollarSign, FaList } from 'react-icons/fa';
-import { useQuery } from '@tanstack/react-query';
-import Api from '../../Config/Api';
 
 const style = {
   position: "absolute",
@@ -33,27 +30,6 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
   const isMobile = useMediaQuery('(max-width: 400px)');
   const fileInputRef = useRef(null);
 
-  const { data: settings } = useQuery({
-    queryKey: ['settings'],
-    queryFn: async () => {
-      const response = await Api.get('/api/settings');
-      return response.data;
-    },
-    staleTime: 30000,
-    gcTime: 30000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true
-  });
-
-  const calculatePoints = (price) => {
-    if (!settings || !price) return 0;
-    if (settings.enCurrency === 'USD') {
-      return Math.floor(price * settings.pointsPerDollar);
-    } else {
-      return Math.floor(price * settings.pointsPerIQD); 
-    }
-  };
-
   const formik = useFormik({
     initialValues: {
       image: null,
@@ -70,7 +46,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
         const submitData = {
           ...values,
           image: values.imageUrl || values.imagePreview,
-          points: calculatePoints(values.price)
+          points: values.points
         };
         if (handleUpdateProduct) {
           await handleUpdateProduct(submitData);
@@ -105,12 +81,6 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productToEdit, open]);
-
-  useEffect(() => {
-    const points = calculatePoints(formik.values.price);
-    formik.setFieldValue('points', points);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values.price, settings]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -171,7 +141,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
       const submitData = {
         ...formik.values,
         image: formik.values.imageUrl || formik.values.imagePreview,
-        points: calculatePoints(formik.values.price)
+        points: formik.values.points
       };
       if (handleUpdateProduct && productToEdit) {
         await handleUpdateProduct(submitData);
@@ -348,7 +318,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 name="points"
                 type="number"
                 value={formik.values.points}
-                disabled
+                onChange={handleChange}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

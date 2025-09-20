@@ -7,7 +7,6 @@ import {
   SwapOutlined,
   UserOutlined,
   BarChartOutlined,
-  AreaChartOutlined
 } from '@ant-design/icons';
 import {Button} from "@mui/material";
 import { FilePdfOutlined } from '@ant-design/icons';
@@ -85,7 +84,7 @@ const Dashboard = () => {
         period: analyticsResponse.data.period,
         from: analyticsResponse.data.from,
         to: analyticsResponse.data.to,
-        ...(user.role === 'ADMIN' && {
+        ...(user.role !== 'USER' && {
           customersCount: 0,
           avgPoints: 0,
           topEarners: [],
@@ -191,7 +190,7 @@ const Dashboard = () => {
                   </Select>
                 </Space>
               </Col>
-              {user.role === 'ADMIN' && (
+              {user.role !== 'USER' && (
                 <Col>
                   <Button
                     variant="outlined"
@@ -213,7 +212,7 @@ const Dashboard = () => {
             </Row>
           </div>
 
-          {user.role === 'ADMIN' && (
+          {user.role !== 'USER' && (
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} lg={6}>
                 <StatCard
