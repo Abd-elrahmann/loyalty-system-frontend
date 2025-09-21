@@ -19,6 +19,7 @@ const PointOfSale = () => {
   const [restaurantProducts, setRestaurantProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedMode, setSelectedMode] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -96,6 +97,7 @@ const PointOfSale = () => {
   const handleClearAll = () => {
     setCart([]);
     setPhoneNumber('');
+    setEmail('');
     setDiscount('');
     setSelectedProductId(null);
     setSelectedMode(null);
@@ -189,11 +191,6 @@ const PointOfSale = () => {
       return;
     }
 
-    if (!phoneNumber) {
-      notifyError(t('PointOfSale.please_enter_customer_phone_number'));
-      return;
-    }
-
     try {
       const items = cart.map(item => ({
         productId: item.id,
@@ -209,16 +206,24 @@ const PointOfSale = () => {
       }
 
       const payload = {
-        phone: phoneNumber.toString(),
         totalPrice: calculateDiscountedTotal(),
         discount: discountValue,
         items: items
       };
 
+      // Add phone or email based on what's available
+      if (phoneNumber) {
+        payload.phone = phoneNumber.toString();
+      }
+      if (email) {
+        payload.email = email;
+      }
+
       await Api.post('/api/pos', payload);
       
       setCart([]);
       setPhoneNumber('');
+      setEmail('');
       setDiscount('');
       notifySuccess(t('PointOfSale.order_placed_successfully'));
       fetchProfile();
@@ -350,6 +355,8 @@ const PointOfSale = () => {
             onClearAll={handleClearAll}
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
+            email={email}
+            setEmail={setEmail}
             discount={discount}
             setDiscount={setDiscount}
             selectedMode={selectedMode}

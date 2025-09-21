@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -6,17 +6,24 @@ import {
   Divider,
   TextField,
   InputAdornment,
-  Button
+  Button,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from '@mui/material';
 import {
   Remove as RemoveIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
   ShoppingCart as ShoppingCartIcon,
-  Refresh as ResetIcon
+  Refresh as ResetIcon,
+  QrCodeScanner as QrCodeScannerIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import NumericKeypad from './NumericKeypad';
+import ScanQRModal from '../Modals/ScanQRModal';
 
 const Cart = ({
   cart,
@@ -28,6 +35,8 @@ const Cart = ({
   onClearAll,
   phoneNumber,
   setPhoneNumber,
+  email,
+  setEmail,
   discount,
   setDiscount,
   selectedMode,
@@ -41,6 +50,8 @@ const Cart = ({
   settings
 }) => {
   const { t, i18n } = useTranslation();
+  const [verificationMethod, setVerificationMethod] = useState('phone');
+  const [scanQRModalOpen, setScanQRModalOpen] = useState(false);
 
   const calculateTotalPrice = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -74,6 +85,28 @@ const Cart = ({
     let value = e.target.value.replace('%', '');
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
       setDiscount(value ? `${value}%` : '');
+    }
+  };
+
+  const handleQRScanSuccess = (scannedData) => {
+    try {
+      const qrData = typeof scannedData === 'string' ? JSON.parse(scannedData) : scannedData;
+      if (qrData.email) {
+        setEmail(qrData.email);
+        setVerificationMethod('qr');
+      }
+      if (qrData.id && qrData.phone) {
+        setPhoneNumber(qrData.phone);
+      }
+    } catch (error) {
+      console.error('Error parsing QR data:', error);
+    }
+  };
+
+  const handleVerificationMethodChange = (event) => {
+    setVerificationMethod(event.target.value);
+    if (event.target.value === 'qr') {
+      setScanQRModalOpen(true);
     }
   };
 
@@ -297,33 +330,121 @@ const Cart = ({
               variant="h6" 
               sx={{ 
                 fontWeight: 600,
-                mb: 2,
+                mb: 1,
                 color: '#1a1a1a'
               }}
             >
               {t('PointOfSale.customer_information')}
             </Typography>
             
-            <TextField
-              fullWidth
-              label={t('PointOfSale.phone_number')}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              variant="outlined"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '&:hover fieldset': {
-                    borderColor: 'primary.main',
+            {/* Verification Method Selection */}
+            <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
+              <FormLabel component="legend" sx={{ mb: 2, color: '#1a1a1a', fontWeight: 500 }}>
+                {t('PointOfSale.choose_verify_method')}
+              </FormLabel>
+              <RadioGroup
+                row
+                value={verificationMethod}
+                onChange={handleVerificationMethodChange}
+                sx={{ 
+                  gap: 2,
+                  '& .MuiFormControlLabel-root': {
+                    '& .MuiRadio-root': {
+                      color: '#1a1a1a',
+                      '&.Mui-checked': {
+                        color: 'primary.main',
+                      },
+                    },
                   },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'primary.main',
+                }}
+              >
+                <FormControlLabel 
+                  value="phone" 
+                  control={<Radio />} 
+                  label={t('PointOfSale.with_phone_number')} 
+                />
+                <FormControlLabel 
+                  value="qr" 
+                  control={<Radio />} 
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <QrCodeScannerIcon sx={{ fontSize: 20 }} />
+                      {t('PointOfSale.scan_qr_code')}
+                    </Box>
+                  } 
+                />
+              </RadioGroup>
+            </FormControl>
+
+            {/* Phone Number Field */}
+            {verificationMethod === 'phone' && (
+              <TextField
+                fullWidth
+                label={t('PointOfSale.phone_number')}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                variant="outlined"
+                sx={{
+                  mb: 2,
+                  '& .MuiOutlinedInput-root': {
+                    '&:hover fieldset': {
+                      borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'primary.main',
+                    },
                   },
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: 'primary.main',
-                },
-              }}
-            />
+                  '& .MuiInputLabel-root.Mui-focused': {
+                    color: 'primary.main',
+                  },
+                }}
+              />
+            )}
+
+            {/* Email Field (shown when QR is scanned or method is QR) */}
+            {verificationMethod === 'qr' && (
+              <Box>
+                <TextField
+                  fullWidth
+                  label={t('PointOfSale.email_address')}
+                  value={email || ''}
+                  onChange={(e) => setEmail(e.target.value)}
+                  variant="outlined"
+                  disabled={!!email}
+                  sx={{
+                    mb: 2,
+                    '& .MuiOutlinedInput-root': {
+                      '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: 'primary.main',
+                      },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: 'primary.main',
+                    },
+                  }}
+                />
+                {!email && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<QrCodeScannerIcon />}
+                    onClick={() => setScanQRModalOpen(true)}
+                    sx={{
+                      color: 'primary.main',
+                      borderColor: 'primary.main',
+                      '&:hover': {
+                        borderColor: '#600060',
+                        backgroundColor: 'rgba(96, 0, 96, 0.04)'
+                      }
+                    }}
+                  >
+                    {t('PointOfSale.scan_qr_code')}
+                  </Button>
+                )}
+              </Box>
+            )}
           </Box>
 
           {/* Numeric Keypad */}
@@ -381,6 +502,13 @@ const Cart = ({
           </Button>
         </>
       )}
+
+      {/* QR Scanner Modal */}
+      <ScanQRModal
+        open={scanQRModalOpen}
+        onClose={() => setScanQRModalOpen(false)}
+        onScanSuccess={handleQRScanSuccess}
+      />
     </Box>
   );
 };
