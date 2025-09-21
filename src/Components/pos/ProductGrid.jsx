@@ -20,12 +20,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { SearchOutlined } from "@ant-design/icons";
 import { RestartAltOutlined } from '@mui/icons-material';
-import { FaDollarSign } from 'react-icons/fa';
 import { FaCoins } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
 import Api from '../../Config/Api';
 import debounce from 'lodash.debounce';
 import { Spin } from "antd";
+import { useSettings } from '../../hooks/useSettings';
 
 const ProductGrid = ({ 
   activeTab, 
@@ -43,6 +43,22 @@ const ProductGrid = ({
     categoryId: ''
   });
   const [searchValue, setSearchValue] = useState('');
+  
+  // Get settings for currency conversion
+  const { data: settings } = useSettings();
+
+  // Function to format price based on currency settings
+  const formatPrice = (price) => {
+    if (!settings || !price) return `$${price}`;
+    
+    if (settings.enCurrency === 'USD') {
+      return `$${price}`;
+    } else if (settings.enCurrency === 'IQD') {
+      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
+      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
+    }
+    return `$${price}`;
+  };
 
   // Fetch categories based on active tab
   const { data: categories } = useQuery({
@@ -406,13 +422,12 @@ const ProductGrid = ({
                       minWidth: '80px',
                       justifyContent: 'center'
                     }}>
-                      <FaDollarSign style={{ color: '#27ae60', fontSize: '12px' }} />
                       <Typography variant="body2" sx={{ 
                         fontWeight: 600,
                         color: '#27ae60',
                         fontSize: '0.8rem'
                       }}>
-                        {product.price}
+                        {formatPrice(product.price)}
                       </Typography>
                     </Box>
                   </Box>

@@ -74,23 +74,23 @@ const PointOfSale = () => {
   };
 
   const handleAddToCart = (product) => {
-    const productWithCategory = {
+    const productWithType = {
       ...product,
-      category: activeTab === 0 ? 'cafe' : 'restaurant'
+      type: activeTab === 0 ? 'cafe' : 'restaurant'
     };
     
     const existingItem = cart.find(item => 
-      item.id === product.id && item.category === productWithCategory.category
+      item.id === product.id && item.type === productWithType.type
     );
     
     if (existingItem) {
       setCart(cart.map(item =>
-        item.id === product.id && item.category === productWithCategory.category
+        item.id === product.id && item.type === productWithType.type
           ? { ...item, quantity: item.quantity + 1 }
           : item
       ));
     } else {
-      setCart([...cart, { ...productWithCategory, quantity: 1 }]);
+      setCart([...cart, { ...productWithType, quantity: 1 }]);
     }
   };
 
@@ -104,31 +104,31 @@ const PointOfSale = () => {
     setInputValue('');
   };
 
-  const handleIncreaseQuantity = (id, category) => {
+  const handleIncreaseQuantity = (id, type) => {
     setCart(cart.map(item =>
-      item.id === id && item.category === category
+      item.id === id && item.type === type
         ? { ...item, quantity: item.quantity + 1 }
         : item
     ));
   };
 
-  const handleDecreaseQuantity = (id, category) => {
+  const handleDecreaseQuantity = (id, type) => {
     setCart(cart.map(item =>
-      item.id === id && item.category === category && item.quantity > 1
+      item.id === id && item.type === type && item.quantity > 1
         ? { ...item, quantity: item.quantity - 1 }
         : item
     ).filter(item => item.quantity > 0));
   };
 
-  const handleRemoveFromCart = (id, category) => {
-    setCart(cart.filter(item => !(item.id === id && item.category === category)));
+  const handleRemoveFromCart = (id, type) => {
+    setCart(cart.filter(item => !(item.id === id && item.type === type)));
   };
 
   const handleKeypadNumberClick = (number) => {
     if (!selectedProductId) return;
     
     const selectedItem = cart.find(item => 
-      item.id === selectedProductId.id && item.category === selectedProductId.category
+      item.id === selectedProductId.id && item.type === selectedProductId.type
     );
     if (!selectedItem) return;
     
@@ -139,7 +139,7 @@ const PointOfSale = () => {
         const finalQty = newQty === '' ? 1 : parseInt(newQty);
         
         setCart(cart.map(item =>
-          item.id === selectedProductId.id && item.category === selectedProductId.category
+          item.id === selectedProductId.id && item.type === selectedProductId.type
             ? { ...item, quantity: Math.max(1, finalQty) }
             : item
         ));
@@ -147,7 +147,7 @@ const PointOfSale = () => {
         const newQty = parseInt(number);
         if (newQty > 0) {
           setCart(cart.map(item =>
-            item.id === selectedProductId.id && item.category === selectedProductId.category
+            item.id === selectedProductId.id && item.type === selectedProductId.type
               ? { ...item, quantity: newQty }
               : item
           ));
@@ -160,7 +160,7 @@ const PointOfSale = () => {
         const finalPrice = newPrice === '' ? selectedItem.originalPrice || selectedItem.price : parseFloat(newPrice);
         
         setCart(cart.map(item =>
-          item.id === selectedProductId.id && item.category === selectedProductId.category
+          item.id === selectedProductId.id && item.type === selectedProductId.type
             ? { ...item, price: Math.max(0.01, finalPrice) }
             : item
         ));
@@ -168,7 +168,7 @@ const PointOfSale = () => {
         const newPrice = parseFloat(number);
         if (newPrice > 0) {
           setCart(cart.map(item =>
-            item.id === selectedProductId.id && item.category === selectedProductId.category
+            item.id === selectedProductId.id && item.type === selectedProductId.type
               ? { ...item, price: newPrice, originalPrice: item.originalPrice || item.price }
               : item
           ));
@@ -194,7 +194,8 @@ const PointOfSale = () => {
     try {
       const items = cart.map(item => ({
         productId: item.id,
-        type: item.category,
+        categoryId: item.category?.id || item.categoryId,
+        type: item.type,
         quantity: item.quantity,
         price: item.price,
         total: item.price * item.quantity

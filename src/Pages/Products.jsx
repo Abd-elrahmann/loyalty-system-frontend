@@ -14,9 +14,9 @@ import { Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash.debounce';
-import { FaDollarSign } from 'react-icons/fa';
 import { FaCoins } from 'react-icons/fa';
 import { RestartAltOutlined } from '@mui/icons-material';
+import { useSettings } from '../hooks/useSettings';
 
 const Products = () => {
   const { t, i18n } = useTranslation();
@@ -39,6 +39,22 @@ const Products = () => {
   const isMobile = useMediaQuery('(max-width: 400px)');
   const profile = useUser();
   const queryClient = useQueryClient();
+  
+  // Get settings for currency conversion
+  const { data: settings, isLoading: settingsLoading } = useSettings();
+
+  // Function to convert and format price based on currency
+  const formatPrice = (price) => {
+    if (!settings) return price;
+    
+    if (settings.enCurrency === 'USD') {
+      return `$${price}`;
+    } else if (settings.enCurrency === 'IQD') {
+      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
+      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
+    }
+    return price;
+  };
 
   // Fetch categories based on active tab
   const { data: categories } = useQuery({
@@ -405,7 +421,7 @@ const Products = () => {
         </Button>
       </Box>
 
-      {isLoading ? (
+      {isLoading || settingsLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
           <Spin size="large" />
         </Box>
@@ -576,13 +592,12 @@ const Products = () => {
                           minWidth: '100px',
                           justifyContent: 'center'
                         }}>
-                          <FaDollarSign style={{ color: '#27ae60', fontSize: '14px' }} />
                           <Typography variant="body2" sx={{ 
                             fontWeight: 600,
                             color: '#27ae60',
                             fontSize: '0.85rem'
                           }}>
-                            {product.price}
+                            {formatPrice(product.price)}
                           </Typography>
                         </Box>
                       </Box>

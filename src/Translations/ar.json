@@ -202,6 +202,7 @@
     "EnglishName": "الاسم الانجليزي",
     "ArabicName": "الاسم العربي",
     "Price": "السعر",
+    "ConvertedPrice": "السعر المحول",
     "Points": "النقاط",
     "AddProduct": "إضافة المنتج",
     "Cancel": "إلغاء",
@@ -328,7 +329,8 @@
     "SettingsDescription": "إعدادات النظام",
     "PrinterSettings": "إعدادات الطابعة",
     "PrinterType": "نوع الطابعة",
-    "PrinterIP": "عنوان IP الطابعة"
+    "PrinterIP": "عنوان IP الطابعة",
+    "USDtoIQDRate": "سعر الدولار بالدينار"
   },
   "Rewards": {
     "Rewards": "المكافآت",
@@ -406,6 +408,7 @@
     "customer_info_optional_note": "يمكنك إنشاء الفاتورة بدون إدخال معلومات العميل، أو أدخل المعلومات لكسب النقاط",
     "phone_number": "رقم هاتف العميل",
     "email_address": "البريد الإلكتروني",
+    "email_from_qr": "تم الحصول على الإيميل من QR Code",
     "choose_verify_method": "اختر طريقة التحقق:",
     "with_phone_number": "برقم الهاتف",
     "scan_qr_code": "مسح رمز QR",

@@ -107,8 +107,8 @@ const ScanQRModal = ({ open, onClose, onScanSuccess }) => {
           return;
         }
 
-        if (qrData.email) {
-          onScanSuccess(qrData.email);
+        if (qrData.email || qrData.id) {
+          onScanSuccess(qrData);
           notifySuccess(t("Customers.qrScanSuccess"));
           onClose();
         } else {

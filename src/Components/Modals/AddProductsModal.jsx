@@ -7,6 +7,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormik } from 'formik';
 import { Spin } from "antd";
 import { FaCoins,FaProductHunt, FaLink, FaFile, FaDollarSign, FaList } from 'react-icons/fa';
+import { TbCurrencyDinar } from 'react-icons/tb';
+import { useSettings } from '../../hooks/useSettings';
 
 const style = {
   position: "absolute",
@@ -29,6 +31,22 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
   const [imageUploadType, setImageUploadType] = useState('file');
   const isMobile = useMediaQuery('(max-width: 400px)');
   const fileInputRef = useRef(null);
+  
+  // Get settings for currency conversion
+  const { data: settings } = useSettings();
+
+  // Function to format price based on currency settings
+  const formatPrice = (price) => {
+    if (!settings || !price) return price;
+    
+    if (settings.enCurrency === 'USD') {
+      return `$${price}`;
+    } else if (settings.enCurrency === 'IQD') {
+      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
+      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
+    }
+    return price;
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -294,13 +312,17 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label={t("Products.Price")}
+                label={t("Products.Price") + (settings?.enCurrency === 'USD' ? ' (USD)' : ' (IQD)')}
                 name="price"
                 type="number"
                 value={formik.values.price}
                 onChange={handleChange}
                 required
                 disabled={!categories || categories.length === 0}
+                helperText={formik.values.price && settings?.enCurrency === 'IQD' ? 
+                  `${t('Products.ConvertedPrice')}: ${formatPrice(formik.values.price)}` : 
+                  ''
+                }
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

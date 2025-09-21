@@ -57,6 +57,19 @@ const Cart = ({
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
+  // Function to format price based on currency settings
+  const formatPrice = (price) => {
+    if (!settings) return `$${price}`;
+    
+    if (settings.enCurrency === 'USD') {
+      return `$${price}`;
+    } else if (settings.enCurrency === 'IQD') {
+      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
+      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
+    }
+    return `$${price}`;
+  };
+
   const calculateTotalPoints = () => {
     const totalPrice = calculateTotalPrice();
     if (!settings) return 0;
@@ -88,15 +101,23 @@ const Cart = ({
     }
   };
 
-  const handleQRScanSuccess = (scannedData) => {
+  const handleQRScanSuccess = (qrData) => {
     try {
-      const qrData = typeof scannedData === 'string' ? JSON.parse(scannedData) : scannedData;
+      console.log('QR Data received:', qrData); // Debug log
+      
+      // Always set verification method to QR when scanning
+      setVerificationMethod('qr');
+      
+      // Fill email if available
       if (qrData.email) {
         setEmail(qrData.email);
-        setVerificationMethod('qr');
+        console.log('Email set to:', qrData.email); // Debug log
       }
-      if (qrData.id && qrData.phone) {
+      
+      // Fill phone if available  
+      if (qrData.phone) {
         setPhoneNumber(qrData.phone);
+        console.log('Phone set to:', qrData.phone); // Debug log
       }
     } catch (error) {
       console.error('Error parsing QR data:', error);
@@ -104,9 +125,16 @@ const Cart = ({
   };
 
   const handleVerificationMethodChange = (event) => {
-    setVerificationMethod(event.target.value);
-    if (event.target.value === 'qr') {
+    const newMethod = event.target.value;
+    setVerificationMethod(newMethod);
+    
+    if (newMethod === 'qr') {
+      // Clear phone when switching to QR method
+      setPhoneNumber('');
       setScanQRModalOpen(true);
+    } else if (newMethod === 'phone') {
+      // Clear email when switching to phone method
+      setEmail('');
     }
   };
 
@@ -153,11 +181,11 @@ const Cart = ({
           }}>
             {cart.map((item) => (
               <Box 
-                key={`${item.id}-${item.category}`}
+                key={`${item.id}-${item.type}`}
                 onClick={() => setSelectedProductId(
-                  selectedProductId && selectedProductId.id === item.id && selectedProductId.category === item.category 
+                  selectedProductId && selectedProductId.id === item.id && selectedProductId.type === item.type 
                     ? null 
-                    : { id: item.id, category: item.category }
+                    : { id: item.id, type: item.type }
                 )}
                 sx={{ 
                   display: 'flex',
@@ -169,10 +197,10 @@ const Cart = ({
                   borderRadius: 1,
                   px: 1,
                   mx: -1,
-                  backgroundColor: selectedProductId && selectedProductId.id === item.id && selectedProductId.category === item.category ? '#f8f4ff' : 'transparent',
-                  border: selectedProductId && selectedProductId.id === item.id && selectedProductId.category === item.category ? '2px solid primary.main' : '2px solid transparent',
+                  backgroundColor: selectedProductId && selectedProductId.id === item.id && selectedProductId.type === item.type ? '#f8f4ff' : 'transparent',
+                  border: selectedProductId && selectedProductId.id === item.id && selectedProductId.type === item.type ? '2px solid primary.main' : '2px solid transparent',
                   '&:hover': {
-                    backgroundColor: selectedProductId && selectedProductId.id === item.id && selectedProductId.category === item.category ? '#f8f4ff' : '#f9f9f9'
+                    backgroundColor: selectedProductId && selectedProductId.id === item.id && selectedProductId.type === item.type ? '#f8f4ff' : '#f9f9f9'
                   }
                 }}
               >
@@ -180,8 +208,18 @@ const Cart = ({
                   <Typography variant="body1" sx={{ fontWeight: 500, mb: 0.5 }}>
                     {i18n.language === 'ar' ? item.arName : item.enName}
                   </Typography>
+                  {item.category && (
+                    <Typography variant="caption" color="text.primary" sx={{ 
+                      display: 'block',
+                      fontStyle: 'italic',
+                      fontSize: '0.75rem',
+                      mb: 0.5
+                    }}>
+                      {i18n.language === 'ar' ? item.category.arName : item.category.enName}
+                    </Typography>
+                  )}
                   <Typography variant="body2" color="text.secondary">
-                    ${item.price}
+                    {formatPrice(item.price)}
                   </Typography>
                 </Box>
                 
@@ -190,7 +228,7 @@ const Cart = ({
                     size="small" 
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDecreaseQuantity(item.id, item.category);
+                      onDecreaseQuantity(item.id, item.type);
                     }}
                     sx={{ 
                       color: 'black',
@@ -210,7 +248,7 @@ const Cart = ({
                     size="small" 
                     onClick={(e) => {
                       e.stopPropagation();
-                      onIncreaseQuantity(item.id, item.category);
+                      onIncreaseQuantity(item.id, item.type);
                     }}
                     sx={{ 
                       color: 'black',
@@ -222,7 +260,7 @@ const Cart = ({
                 </Box>
                 
                 <Typography variant="body1" sx={{ fontWeight: 600, minWidth: '80px', textAlign: 'right' }}>
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {formatPrice((item.price * item.quantity).toFixed(2))}
                 </Typography>
                 
                 <IconButton 
@@ -230,7 +268,7 @@ const Cart = ({
                   color="error"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onRemoveFromCart(item.id, item.category);
+                    onRemoveFromCart(item.id, item.type);
                   }}
                   sx={{ ml: 1 }}
                 >
@@ -251,7 +289,7 @@ const Cart = ({
             }}>
               <Typography variant="body1">{t('PointOfSale.subtotal')}</Typography>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                ${calculateTotalPrice().toFixed(2)}
+                {formatPrice(calculateTotalPrice().toFixed(2))}
               </Typography>
             </Box>
             
@@ -319,7 +357,7 @@ const Cart = ({
                 fontWeight: 600,
                 color: 'blue'
               }}>
-                ${calculateDiscountedTotal().toFixed(2)}
+                {formatPrice(calculateDiscountedTotal().toFixed(2))}
               </Typography>
             </Box>
           </Box>
@@ -402,7 +440,7 @@ const Cart = ({
             )}
 
             {/* Email Field (shown when QR is scanned or method is QR) */}
-            {verificationMethod === 'qr' && (
+            {(verificationMethod === 'qr' || email) && (
               <Box>
                 <TextField
                   fullWidth
@@ -410,7 +448,7 @@ const Cart = ({
                   value={email || ''}
                   onChange={(e) => setEmail(e.target.value)}
                   variant="outlined"
-                  disabled={!!email}
+                  disabled={!!email && verificationMethod === 'qr'}
                   sx={{
                     mb: 2,
                     '& .MuiOutlinedInput-root': {
@@ -426,7 +464,20 @@ const Cart = ({
                     },
                   }}
                 />
-                {!email && (
+                {email && verificationMethod === 'qr' && (
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      color: 'green',
+                      display: 'block',
+                      mb: 1,
+                      fontWeight: 500
+                    }}
+                  >
+                    ✓ {t('PointOfSale.email_from_qr')}
+                  </Typography>
+                )}
+                {!email && verificationMethod === 'qr' && (
                   <Button
                     variant="outlined"
                     startIcon={<QrCodeScannerIcon />}

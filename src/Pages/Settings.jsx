@@ -10,6 +10,7 @@ import { Spin } from "antd";
 import { SaveOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Button from '@mui/material/Button';
+import { useCurrencyManager } from '../Config/globalCurrencyManager';
 
 const Settings = () => {
   const queryClient = useQueryClient();
@@ -17,6 +18,9 @@ const Settings = () => {
   const timezones = moment.tz.names();
   const { t, i18n } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
+  
+  // Use Global Currency Manager
+  const { currentSettings: currencySettings, updateSettings: updateCurrencySettings } = useCurrencyManager();
 
   const currencies = [
     { enValue: 'IQD', arValue: 'الدينار العراقي' },
@@ -29,6 +33,7 @@ const Settings = () => {
     timezone: 'Asia/Baghdad',
     pointsPerDollar: 0,
     pointsPerIQD: 0,
+    usdToIqd: 0,
     printerType: 'USB',
     printerIp: null
   });
@@ -39,24 +44,35 @@ const Settings = () => {
       const response = await Api.get('/api/settings');
       return response.data;
     },
-    staleTime: 5000,
-    gcTime: 5000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
     refetchOnWindowFocus: false,
-    refetchOnMount: true
+    refetchOnMount: 'always',
+    refetchInterval: false,
+    refetchIntervalInBackground: false
   });
 
   useEffect(() => {
-    if (data) {
+    if (data && !settingsMutation.isLoading) {
       const currencyObj = currencies.find(c => c.enValue === data.enCurrency);
       setSettings({
         ...data,
-        pointsPerDollar: parseInt(data.pointsPerDollar) || 0,
-        pointsPerIQD: parseInt(data.pointsPerIQD) || 0,
-        enCurrency: currencyObj?.enValue || null,
+        pointsPerDollar: parseFloat(data.pointsPerDollar) || 0,
+        pointsPerIQD: parseFloat(data.pointsPerIQD) || 0,
+        usdToIqd: parseFloat(data.usdToIqd) || 0,
+        enCurrency: currencyObj?.enValue || currencySettings?.defaultCurrency || null,
         arCurrency: currencyObj?.arValue || null,
         printerType: data.printerType || 'USB',
         printerIp: data.printerIp || null
       });
+      
+      // Update global currency manager with current settings only if not just saved
+      if (data.enCurrency && data.usdToIqd !== undefined) {
+        updateCurrencySettings({
+          defaultCurrency: data.enCurrency,
+          USDtoIQD: data.usdToIqd
+        });
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -65,9 +81,17 @@ const Settings = () => {
     mutationFn: async (settingsToSave) => {
       return await Api.post('/api/settings', settingsToSave);
     },
-    onSuccess: () => {
+    onSuccess: (response, variables) => {
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
-      queryClient.invalidateQueries(['settings']);
+      
+      // Update global currency manager with new settings
+      updateCurrencySettings({
+        defaultCurrency: variables.enCurrency,
+        USDtoIQD: variables.usdToIqd
+      });
+      
+      // Update the query cache directly instead of invalidating
+      queryClient.setQueryData(['settings'], response.data || variables);
     },
     onError: (error) => {
       notifyError(error.response?.data?.message || t('Errors.generalError'));
@@ -76,10 +100,23 @@ const Settings = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      [name]: value === "" ? 0 : parseInt(value)
-    }));
+    const newSettings = {
+      ...settings,
+      [name]: value === "" ? 0 : parseFloat(value)
+    };
+    
+    setSettings(newSettings);
+    
+    // Update global currency manager when exchange rate changes
+    if (name === 'usdToIqd') {
+      const newRate = value === "" ? 0 : parseFloat(value);
+      if (newRate !== currencySettings?.USDtoIQD) {
+        updateCurrencySettings({
+          defaultCurrency: settings.enCurrency,
+          USDtoIQD: newRate
+        });
+      }
+    }
   };
 
   const handlePrinterChange = (e) => {
@@ -96,8 +133,9 @@ const Settings = () => {
     if (user.role !== 'USER') {
       settingsToSave = {
         ...settings,
-        pointsPerDollar: parseInt(settings.pointsPerDollar) || 0,
-        pointsPerIQD: parseInt(settings.pointsPerIQD) || 0,
+        pointsPerDollar: parseFloat(settings.pointsPerDollar) || 0,
+        pointsPerIQD: parseFloat(settings.pointsPerIQD) || 0,
+        usdToIqd: parseFloat(settings.usdToIqd) || 0,
         enCurrency: settings.enCurrency,
         arCurrency: settings.arCurrency,
         timezone: settings.timezone,
@@ -151,6 +189,14 @@ const Settings = () => {
                   enCurrency: newValue ? newValue.enValue : null,
                   arCurrency: newValue ? newValue.arValue : null
                 }));
+                
+                // Update global currency manager immediately when currency changes
+                if (newValue && newValue.enValue !== currencySettings?.defaultCurrency) {
+                  updateCurrencySettings({
+                    defaultCurrency: newValue.enValue,
+                    USDtoIQD: settings.usdToIqd
+                  });
+                }
               }}
               options={currencies}
               getOptionLabel={(option) =>
@@ -166,11 +212,24 @@ const Settings = () => {
               noOptionsText={t('Settings.NoCurrencies')}
             />
 
+            <TextField
+              fullWidth
+              size="small"
+              type="number"
+              name="usdToIqd"
+              label={t('Settings.USDtoIQDRate')}
+              value={settings.usdToIqd}
+              onChange={handleChange}
+              inputProps={{ min: 1 }}
+              sx={{ mt: 2 }}
+            />
+
             {settings.enCurrency && (
               <TextField
                 fullWidth
                 size="small"
                 type="number"
+                step="0.1"
                 name={settings.enCurrency === 'USD' ? 'pointsPerDollar' : 'pointsPerIQD'}
                 label={
                   t(`Settings.EnterPointsPer`) +
@@ -183,7 +242,7 @@ const Settings = () => {
                     : settings.pointsPerIQD
                 }
                 onChange={handleChange}
-                inputProps={{ min: 1 }}
+                inputProps={{ min: 0.1, step: 0.1 }}
                 sx={{ mt: 2 }}
               />
             )}

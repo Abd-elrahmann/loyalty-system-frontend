@@ -203,6 +203,7 @@
     "EnglishName": "English Name",
     "ArabicName": "Arabic Name",
     "Price": "Price",
+    "ConvertedPrice": "Converted Price",
     "Points": "Points",
     "AddProduct": "Add Product",
     "Cancel": "Cancel",
@@ -329,7 +330,8 @@
     "SettingsDescription": "System settings",
     "PrinterSettings": "Printer Settings",
     "PrinterType": "Printer Type",
-    "PrinterIP": "Printer IP"
+    "PrinterIP": "Printer IP",
+    "USDtoIQDRate": "USD to IQD Rate"
   },
   "Rewards": {
     "Rewards": "Rewards",
@@ -407,6 +409,7 @@
     "customer_info_optional_note": "You can create an invoice without customer information, or enter details to earn points",
     "phone_number": "Phone Number",
     "email_address": "Email Address",
+    "email_from_qr": "Email retrieved from QR Code",
     "choose_verify_method": "Choose verify method:",
     "with_phone_number": "With phone number",
     "scan_qr_code": "Scan QR Code",
@@ -428,7 +431,8 @@
     "cart_item_selected_hint": "Cart item selected! Use keypad for quantity/price operations.",
     "phone_input_mode": "Phone Input Mode - Enter customer phone number",
     "quantity_input_mode": "Quantity Mode - Modify product quantity",
-    "price_input_mode": "Price Mode - Modify product price"
+    "price_input_mode": "Price Mode - Modify product price",
+    "USDtoIQDRate": "USD to IQD Rate"
   },
   "Mangers": {
     "Mangers": "Managers",
