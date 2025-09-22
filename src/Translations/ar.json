@@ -339,6 +339,8 @@
     "Rejected": "مرفوض",
     "ID": "المسلسل",
     "Customer": "العميل",
+    "enName": "الاسم الإنجليزي",
+    "arName": "الاسم العربي",
     "Product": "المنتج",
     "Points": "النقاط",
     "Type": "النوع",
@@ -533,6 +535,100 @@
     "cafe": "مقهى",
     "restaurant": "مطعم",
     "NoInvoicesFound": "لم يتم العثور على فواتير",
-    "description": "إدارة الفواتير في المقهى والمطعم"
+    "description": "إدارة الفواتير في المقهى والمطعم",
+    "id": "المسلسل",
+    "arName": "الاسم العربي",
+    "enName": "الاسم الإنجليزي",
+    "currency": "العملة"
+  },
+  "error": {
+    "fetchingManagers": "خطأ في جلب المديرين",
+    "fetchingCustomers": "خطأ في جلب العملاء",
+    "selectCustomer": "يرجى اختيار عميل",
+    "generateReport": "خطأ في إنشاء التقرير",
+    "exportReport": "لا توجد بيانات للتصدير",
+    "printReport": "لا توجد بيانات للطباعة",
+    "noData": "لا توجد بيانات متاحة",
+    "phoneRequired": "رقم الهاتف مطلوب",
+    "customerNotFound": "العميل غير موجود"
+  },
+  "success": {
+    "generateReport": "تم إنشاء التقرير بنجاح",
+    "exportReport": "تم تصدير التقرير بنجاح",
+    "customerFound": "تم العثور على العميل بنجاح"
+  },
+  "manager": {
+    "arName": "الاسم العربي",
+    "enName": "الاسم الإنجليزي",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "role": "الدور",
+    "createdAt": "تاريخ الإنشاء"
+  },
+  "customer": {
+    "arName": "الاسم العربي",
+    "enName": "الاسم الإنجليزي",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "points": "النقاط",
+    "transactions": "المعاملات",
+    "rewards": "المكافآت",
+    "information": "معلومات العميل",
+    "transactionId": "رقم المعاملة",
+    "type": "النوع",
+    "currency": "العملة",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "earn": "كسب",
+    "redeem": "استبدال",
+    "rewardId": "رقم المكافأة",
+    "note": "الملاحظة"
+  },
+  "product": {
+    "id": "المسلسل",
+    "arName": "الاسم العربي",
+    "enName": "الاسم الإنجليزي",
+    "price": "السعر",
+    "points": "النقاط",
+    "type": "النوع",
+    "category": "الفئة"
+  },
+  "reward": {
+    "id": "المسلسل",
+    "arName": "اسم العربي", 
+    "enName": "الاسم الإنجليزي",
+    "type": "النوع",
+    "points": "النقاط",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "note": "الملاحظة"
+  },
+  "report": {
+    "title": "التقارير",
+    "sections": {
+      "customersManagement": "إدارة العملاء والمديرين",
+      "financialReports": "التقارير المالية", 
+      "productReports": "تقارير المنتجات",
+      "selectType": "اختر النوع"
+    },
+    "managers": "المديرين",
+    "customers": "العملاء",
+    "individualCustomer": "عميل محدد",
+    "transactions": "المعاملات",
+    "products": "المنتجات",
+    "rewards": "المكافآت",
+    "invoices": "الفواتير",
+    "selectCustomer": "اختر عميل",
+    "searchByPhone": "البحث برقم الهاتف",
+    "enterPhone": "أدخل رقم الهاتف",
+    "search": "بحث",
+    "selectDateRange": "اختر نطاق التاريخ",
+    "selectStartDate": "تاريخ البداية",
+    "selectEndDate": "تاريخ النهاية",
+    "preview": "معاينة",
+    "cancel": "إلغاء",
+    "print": "طباعة",
+    "exportExcel": "تصدير إلى Excel",
+    "exportPdf": "تصدير إلى PDF"
   }
 }

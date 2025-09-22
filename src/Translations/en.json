@@ -535,6 +535,100 @@
     "cafe": "Cafe",
     "restaurant": "Restaurant",
     "NoInvoicesFound": "No invoices found",
-    "description": "Manage invoices in the cafe and restaurant"
+    "description": "Manage invoices in the cafe and restaurant",
+    "id": "ID",
+    "arName": "Arabic Name",
+    "enName": "English Name",
+    "currency": "Currency"
+  },
+  "error": {
+    "fetchingManagers": "Error fetching managers",
+    "fetchingCustomers": "Error fetching customers",
+    "selectCustomer": "Please select a customer",
+    "generateReport": "Error generating report",
+    "exportReport": "No data to export",
+    "printReport": "No data to print",
+    "noData": "No data available",
+    "phoneRequired": "Phone number is required",
+    "customerNotFound": "Customer not found"
+  },
+  "success": {
+    "generateReport": "Report generated successfully",
+    "exportReport": "Report exported successfully",
+    "customerFound": "Customer found successfully"
+  },
+  "manager": {
+    "arName": "Arabic Name",
+    "enName": "English Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "createdAt": "Created At"
+  },
+  "customer": {
+    "arName": "Arabic Name",
+    "enName": "English Name",
+    "email": "Email",
+    "phone": "Phone",
+    "points": "Points",
+    "transactions": "Transactions",
+    "rewards": "Rewards",
+    "information": "Customer Information",
+    "transactionId": "Transaction ID",
+    "type": "Type",
+    "currency": "Currency",
+    "status": "Status",
+    "date": "Date",
+    "earn": "Earn",
+    "redeem": "Redeem",
+    "rewardId": "Reward ID",
+    "note": "Note"
+  },
+  "product": {
+    "id": "ID",
+    "arName": "Arabic Name",
+    "enName": "English Name",
+    "price": "Price",
+    "points": "Points",
+    "type": "Type",
+    "category": "Category"
+  },
+  "reward": {
+    "id": "ID",
+    "arName": "Arabic Name",
+    "enName": "English Name",
+    "type": "Type",
+    "points": "Points",
+    "status": "Status",
+    "date": "Date",
+    "note": "Note"
+  },
+  "report": {
+    "title": "Reports",
+    "sections": {
+      "customersManagement": "Customers & Managers Management",
+      "financialReports": "Financial Reports",
+      "productReports": "Product Reports",
+      "selectType": "Select Type"
+    },
+    "managers": "Managers",
+    "customers": "Customers",
+    "individualCustomer": "Individual Customer",
+    "transactions": "Transactions",
+    "products": "Products",
+    "rewards": "Rewards",
+    "invoices": "Invoices",
+    "selectCustomer": "Select Customer",
+    "searchByPhone": "Search by Phone",
+    "enterPhone": "Enter phone number",
+    "search": "Search",
+    "selectDateRange": "Select Date Range",
+    "selectStartDate": "Start Date",
+    "selectEndDate": "End Date",
+    "preview": "Preview",
+    "cancel": "Cancel",
+    "print": "Print",
+    "exportExcel": "Export to Excel",
+    "exportPdf": "Export to PDF"
   }
 }

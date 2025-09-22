@@ -219,7 +219,7 @@ const Transactions = () => {
               {t("Transactions.Date")}:
             </Typography>
             <Typography variant="body2">
-              {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
+              {dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")}
             </Typography>
           </Box>
           
@@ -482,7 +482,7 @@ const Transactions = () => {
                       )}
                     </StyledTableCell>
                     <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                      {dayjs(transaction.date).format("DD/MM/YYYY hh:mm")}
+                      {dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")}
                     </StyledTableCell>
                     <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                       <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
