@@ -34,13 +34,26 @@ import {
   LocalOfferOutlined,
   StarsOutlined
 } from '@mui/icons-material';
-
+import { useSettings } from '../hooks/useSettings';
 const Invoice = () => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const { data:settings } = useSettings();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceItems, setInvoiceItems] = useState([]);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const formatPrice = (price) => {
+    if (!settings) return price;
+    
+    if (settings.enCurrency === 'USD') {
+      return `$${price}`;
+    } else if (settings.enCurrency === 'IQD') {
+      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
+      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
+    }
+    return price;
+  };
 
   const handleViewInvoice = (invoiceData) => {
     setSelectedInvoice(invoiceData);
@@ -235,7 +248,7 @@ const Invoice = () => {
                             {t('Invoice.date')}
                           </Typography>
                           <Typography variant="body1" fontWeight={500}>
-                            {dayjs(selectedInvoice.createdAt).format('DD/MM/YYYY HH:mm')}
+                            {dayjs(selectedInvoice.createdAt).format('DD/MM/YYYY HH:mm A')}
                           </Typography>
                         </Box>
                       </Box>
@@ -247,7 +260,7 @@ const Invoice = () => {
                             {t('Invoice.totalPrice')}
                           </Typography>
                           <Typography variant="h6" fontWeight={700} color="primary.main">
-                            ${selectedInvoice.totalPrice}
+                            {formatPrice(selectedInvoice.totalPrice)}
                           </Typography>
                         </Box>
                       </Box>
@@ -308,7 +321,7 @@ const Invoice = () => {
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                               <Typography color="text.secondary">{t('Invoice.price')}:</Typography>
-                              <Typography>${item.price}</Typography>
+                              <Typography>{formatPrice(item.price)}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                               <Typography color="text.secondary">{t('Invoice.quantity')}:</Typography>
@@ -316,7 +329,7 @@ const Invoice = () => {
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                               <Typography color="text.secondary">{t('Invoice.total')}:</Typography>
-                              <Typography color="primary.main" fontWeight={600}>${item.total}</Typography>
+                              <Typography color="primary.main" fontWeight={600}>{formatPrice(item.total)}</Typography>
                             </Box>
                           </Stack>
                         </Card>
@@ -391,7 +404,7 @@ const Invoice = () => {
                                 </Box>
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                ${item.price}
+                                {formatPrice(item.price)}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {item.quantity}
@@ -403,7 +416,7 @@ const Invoice = () => {
                                   color: item.total > 100 ? 'error.main' : 'primary.main'
                                 }}
                               >
-                                ${item.total}
+                                {formatPrice(item.total)}
                               </StyledTableCell>
                             </StyledTableRow>
                           );

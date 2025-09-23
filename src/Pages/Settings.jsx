@@ -44,12 +44,8 @@ const Settings = () => {
       const response = await Api.get('/api/settings');
       return response.data;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 10, // 10 minutes
-    refetchOnWindowFocus: false,
-    refetchOnMount: 'always',
-    refetchInterval: false,
-    refetchIntervalInBackground: false
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   useEffect(() => {
@@ -66,7 +62,6 @@ const Settings = () => {
         printerIp: data.printerIp || null
       });
       
-      // Update global currency manager with current settings only if not just saved
       if (data.enCurrency && data.usdToIqd !== undefined) {
         updateCurrencySettings({
           defaultCurrency: data.enCurrency,
@@ -84,13 +79,11 @@ const Settings = () => {
     onSuccess: (response, variables) => {
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
       
-      // Update global currency manager with new settings
       updateCurrencySettings({
         defaultCurrency: variables.enCurrency,
         USDtoIQD: variables.usdToIqd
       });
       
-      // Update the query cache directly instead of invalidating
       queryClient.setQueryData(['settings'], response.data || variables);
     },
     onError: (error) => {
@@ -100,23 +93,10 @@ const Settings = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const newSettings = {
-      ...settings,
+    setSettings(prev => ({
+      ...prev,
       [name]: value === "" ? 0 : parseFloat(value)
-    };
-    
-    setSettings(newSettings);
-    
-    // Update global currency manager when exchange rate changes
-    if (name === 'usdToIqd') {
-      const newRate = value === "" ? 0 : parseFloat(value);
-      if (newRate !== currencySettings?.USDtoIQD) {
-        updateCurrencySettings({
-          defaultCurrency: settings.enCurrency,
-          USDtoIQD: newRate
-        });
-      }
-    }
+    }));
   };
 
   const handlePrinterChange = (e) => {
@@ -125,6 +105,28 @@ const Settings = () => {
       ...prev,
       [name]: value,
       printerIp: value === 'USB' ? null : prev.printerIp
+    }));
+  };
+
+  const handleCurrencyChange = (newValue) => {
+    setSettings(prev => ({
+      ...prev,
+      enCurrency: newValue ? newValue.enValue : null,
+      arCurrency: newValue ? newValue.arValue : null
+    }));
+  };
+
+  const handleTimezoneChange = (newValue) => {
+    setSettings(prev => ({
+      ...prev,
+      timezone: newValue || 'Asia/Baghdad'
+    }));
+  };
+
+  const handlePrinterIpChange = (e) => {
+    setSettings(prev => ({
+      ...prev,
+      printerIp: e.target.value
     }));
   };
 
@@ -183,21 +185,7 @@ const Settings = () => {
               fullWidth
               name="currency"
               value={currencies.find(c => c.enValue === settings.enCurrency) || null}
-              onChange={(event, newValue) => {
-                setSettings(prev => ({
-                  ...prev,
-                  enCurrency: newValue ? newValue.enValue : null,
-                  arCurrency: newValue ? newValue.arValue : null
-                }));
-                
-                // Update global currency manager immediately when currency changes
-                if (newValue && newValue.enValue !== currencySettings?.defaultCurrency) {
-                  updateCurrencySettings({
-                    defaultCurrency: newValue.enValue,
-                    USDtoIQD: settings.usdToIqd
-                  });
-                }
-              }}
+              onChange={(event, newValue) => handleCurrencyChange(newValue)}
               options={currencies}
               getOptionLabel={(option) =>
                 typeof option === 'string'
@@ -217,10 +205,11 @@ const Settings = () => {
               size="small"
               type="number"
               name="usdToIqd"
+              step="0.1"
               label={t('Settings.USDtoIQDRate')}
               value={settings.usdToIqd}
               onChange={handleChange}
-              inputProps={{ min: 1 }}
+              inputProps={{ min: 1, step: 0.1 }}
               sx={{ mt: 2 }}
             />
 
@@ -256,12 +245,7 @@ const Settings = () => {
               fullWidth
               name="timezone"
               value={settings.timezone || null}
-              onChange={(event, newValue) => {
-                setSettings(prev => ({
-                  ...prev,
-                  timezone: newValue || 'Asia/Baghdad'
-                }));
-              }}
+              onChange={(event, newValue) => handleTimezoneChange(newValue)}
               options={timezones}
               getOptionLabel={(option) => option.replace(/_/g, ' ')}
               renderOption={(props, option) => (
@@ -299,10 +283,7 @@ const Settings = () => {
                 label={t('Settings.PrinterIP')}
                 name="printerIp"
                 value={settings.printerIp || ''}
-                onChange={(e) => setSettings(prev => ({
-                  ...prev,
-                  printerIp: e.target.value
-                }))}
+                onChange={handlePrinterIpChange}
               />
             )}
           </Box>

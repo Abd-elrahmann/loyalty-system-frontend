@@ -435,7 +435,7 @@
     "price_input_mode": "وضع السعر - تعديل سعر المنتج"
   },
   "Mangers": {
-    "Mangers": "المديرين",
+    "Mangers": "مسؤولي النظام",
     "ManagersDescription": "إدارة المديرين والموظفين",
     "AddManager": "إضافة مدير",
     "EditManager": "تعديل المدير",
@@ -611,7 +611,7 @@
       "productReports": "تقارير المنتجات",
       "selectType": "اختر النوع"
     },
-    "managers": "المديرين",
+    "managers": "مسؤولي النظام",
     "customers": "العملاء",
     "individualCustomer": "عميل محدد",
     "transactions": "المعاملات",

@@ -21,7 +21,7 @@ const routes = [
   },
   {
     name: 'Mangers',
-    arName: 'المدراء',
+    arName: 'مسؤولي النظام',
     path: '/mangers',
     icon: SecurityIcon,
     role: ['ADMIN'],

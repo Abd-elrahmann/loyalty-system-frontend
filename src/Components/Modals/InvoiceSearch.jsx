@@ -11,12 +11,14 @@ import debounce from 'lodash.debounce'
 import { Spin } from 'antd';
 import { DatePicker } from '@mui/x-date-pickers';
 import InvoiceCard from './InvoiceCard';
+import { useSettings } from '../../hooks/useSettings';
 const InvoiceSearch = ({ onViewInvoice }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const { data:settings } = useSettings();
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(1);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [count, setCount] = useState(0);
     const [data, setData] = useState([]);
     const [isLoading, setLoading] = useState(false);
@@ -106,6 +108,18 @@ const InvoiceSearch = ({ onViewInvoice }) => {
             ...prevData,
             [name]: value,
         }));
+    };
+
+    const formatPrice = (price) => {
+        if (!settings) return price;
+        if (settings.enCurrency === 'USD') {
+            return `$${price}`;
+        }
+        if (settings.enCurrency === 'IQD') {
+            const convertedPrice = (price * settings.usdToIqd).toLocaleString();
+            return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
+        }
+        return price;
     };
 
     return (
@@ -235,7 +249,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                                                 </StyledTableCell>
                                                 <StyledTableCell align="center">{invoice.phone || '-'}</StyledTableCell>
                                                 <StyledTableCell align="center">{invoice.email || '-'}</StyledTableCell>
-                                                <StyledTableCell align="center">${invoice.totalPrice}</StyledTableCell>
+                                                <StyledTableCell align="center">{formatPrice(invoice.totalPrice)}</StyledTableCell>
                                                 <StyledTableCell align="center">{invoice.points}</StyledTableCell>
                                                 <StyledTableCell align="center">
                                                     {dayjs(invoice.createdAt).format('DD/MM/YYYY HH:mm')}
