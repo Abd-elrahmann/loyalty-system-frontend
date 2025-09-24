@@ -26,10 +26,13 @@ const Login = () => {
   const validate = values => {
     const errors = {};
 
-    if (!values.email) {
-      errors.email = 'Email is required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-      errors.email = 'Invalid email address';
+    if (!values.emailOrPhone) {
+      errors.emailOrPhone = 'Email or phone is required';
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.emailOrPhone) &&
+      !/^\d{7,}$/.test(values.emailOrPhone)
+    ) {
+      errors.emailOrPhone = 'Invalid email or phone number';
     }
 
     if (!values.password) {
@@ -41,14 +44,17 @@ const Login = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: '',
+      emailOrPhone: '',
       password: ''
     },
     validate,
     onSubmit: async (values) => {
       try {
         setLoading(true);
-        const response = await Api.post('/api/auth/login', values);
+        const response = await Api.post('/api/auth/login', {
+          emailOrPhone: values.emailOrPhone,
+          password: values.password
+        });
         
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
@@ -105,13 +111,13 @@ const Login = () => {
 
           <TextField
             fullWidth
-            name="email"
-            label={t('Login.email')}
+            name="emailOrPhone"
+            label={"Email or Phone"}
             sx={{ mb: 2 }}
-            value={formik.values.email}
+            value={formik.values.emailOrPhone}
             onChange={formik.handleChange}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
+            error={formik.touched.emailOrPhone && Boolean(formik.errors.emailOrPhone)}
+            helperText={formik.touched.emailOrPhone && formik.errors.emailOrPhone}
             disabled={loading}
             InputProps={{
               startAdornment: (
