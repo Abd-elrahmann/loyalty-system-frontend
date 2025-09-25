@@ -4,8 +4,11 @@ import { useSettings } from '../hooks/useSettings';
 
 // Default settings in case nothing saved
 const DEFAULT_SETTINGS = {
-  defaultCurrency: 'USD',
-  USDtoIQD: 0
+  enCurrency: '',
+  arCurrency: '',
+  usdToIqd: 0,
+  pointsPerDollar: 0,
+  pointsPerIQD: 0
 };
 
 class GlobalCurrencyManager {
@@ -33,8 +36,11 @@ class GlobalCurrencyManager {
       const response = await Api.get('/api/settings');
       if (response.data) {
         this.currentSettings = {
-          defaultCurrency: response.data.defaultCurrency,
-          USDtoIQD: response.data.USDtoIQD
+          enCurrency: response.data.enCurrency,
+          arCurrency: response.data.arCurrency,
+          usdToIqd: response.data.usdToIqd,
+          pointsPerDollar: response.data.pointsPerDollar,
+          pointsPerIQD: response.data.pointsPerIQD
         };
         localStorage.setItem('currencySettings', JSON.stringify(this.currentSettings));
       }
@@ -48,19 +54,19 @@ class GlobalCurrencyManager {
 
   // Get selected display currency
   getCurrentDisplayCurrency() {
-    return this.currentSettings.defaultCurrency || DEFAULT_SETTINGS.defaultCurrency;
+    return this.currentSettings.enCurrency || DEFAULT_SETTINGS.enCurrency;
   }
 
   // Calculate exchange rate
   getExchangeRate(fromCurrency, toCurrency) {
     if (fromCurrency === toCurrency) return 1;
 
-    if (fromCurrency === 'USD' && toCurrency === 'IQD') {
-      return this.currentSettings.USDtoIQD || DEFAULT_SETTINGS.USDtoIQD;
+    if (fromCurrency === 'USD' && toCurrency === this.currentSettings.enCurrency) {
+      return this.currentSettings.usdToIqd || DEFAULT_SETTINGS.usdToIqd;
     }
 
-    if (fromCurrency === 'IQD' && toCurrency === 'USD') {
-      return 1 / (this.currentSettings.USDtoIQD || DEFAULT_SETTINGS.USDtoIQD);
+    if (fromCurrency === this.currentSettings.enCurrency && toCurrency === 'USD') {
+      return 1 / (this.currentSettings.usdToIqd || DEFAULT_SETTINGS.usdToIqd);
     }
 
     return 1;
@@ -73,13 +79,13 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
   if (fromCurrency === targetCurrency) return amount;
   if (typeof amount !== 'number' || isNaN(amount)) return amount;
 
-  if (fromCurrency === 'IQD' && targetCurrency === 'USD') {
-    const rate = this.currentSettings.USDtoIQD;
+  if (fromCurrency === this.currentSettings.enCurrency && targetCurrency === 'USD') {
+    const rate = this.currentSettings.usdToIqd;
     return rate && rate > 0 ? amount / rate : amount;
   }
 
-  if (fromCurrency === 'USD' && targetCurrency === 'IQD') {
-    const rate = this.currentSettings.USDtoIQD;
+  if (fromCurrency === 'USD' && targetCurrency === this.currentSettings.enCurrency) {
+    const rate = this.currentSettings.usdToIqd;
     return rate && rate > 0 ? amount * rate : amount;
   }
 
@@ -102,25 +108,33 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
 
   // Currency symbols
   getCurrencySymbol(currency) {
-    const symbols = {
-      'IQD': 'د.ع',
-      'USD': '$'
-    };
-    return symbols[currency] || currency;
+    if (currency === 'USD') {
+      return '$';
+    }
+    if (currency === this.currentSettings.enCurrency) {
+      return 'د.ع';
+    }
+    return currency;
   }
 
   // Update settings (API + localStorage)
   async updateSettings(newSettings) {
     try {
       const response = await Api.post('/api/settings', {
-        defaultCurrency: newSettings.defaultCurrency,
-        USDtoIQD: newSettings.USDtoIQD
+        enCurrency: newSettings.enCurrency,
+        arCurrency: newSettings.arCurrency,
+        usdToIqd: newSettings.usdToIqd,
+        pointsPerDollar: newSettings.pointsPerDollar,
+        pointsPerIQD: newSettings.pointsPerIQD
       });
 
       if (response.data) {
         this.currentSettings = {
-          defaultCurrency: response.data.defaultCurrency,
-          USDtoIQD: response.data.USDtoIQD
+          enCurrency: response.data.enCurrency,
+          arCurrency: response.data.arCurrency,
+          usdToIqd: response.data.usdToIqd,
+          pointsPerDollar: response.data.pointsPerDollar,
+          pointsPerIQD: response.data.pointsPerIQD
         };
         this.notifyListeners();
         localStorage.setItem('currencySettings', JSON.stringify(this.currentSettings));
@@ -175,8 +189,11 @@ export const useCurrencyManager = () => {
   React.useEffect(() => {
     if (settings) {
       globalCurrencyManager.currentSettings = {
-        defaultCurrency: settings.defaultCurrency,
-        USDtoIQD: settings.USDtoIQD
+        enCurrency: settings.enCurrency,
+        arCurrency: settings.arCurrency,
+        usdToIqd: settings.usdToIqd,
+        pointsPerDollar: settings.pointsPerDollar,
+        pointsPerIQD: settings.pointsPerIQD
       };
       setCurrencySettings(globalCurrencyManager.getSettings());
     }

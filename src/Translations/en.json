@@ -9,8 +9,10 @@
 
   "Login": {
     "login": "Login",
-    "email": "Email",
+    "emailOrPhone": "Email or Phone",
+    "emailOrPhonePlaceholder": "Please enter your email or phone",
     "password": "Password",
+    "passwordPlaceholder": "Please enter your password",
     "forgotPassword": "Forgot Password?",
     "dontHaveAccount": "Don't have an account?",
     "signUp": "Sign Up",
@@ -126,6 +128,7 @@
     "Name": "Name",
     "EnglishName": "English Name",
     "ArabicName": "Arabic Name",
+    "customerName": "Customer Name",
     "Email": "Email",
     "Phone": "Phone",
     "Points": "Points",
@@ -268,6 +271,7 @@
     "RowsPerPage": "Rows per page",
     "ID": "ID",
     "CustomerName": "Name",
+    "customerName": "Customer Name",
     "Points": "Points",
     "Type": "Type",
     "Date": "Date",
@@ -340,6 +344,7 @@
     "Rejected": "Rejected",
     "ID": "ID",
     "Customer": "Customer",
+    "customerName": "Customer Name",
     "Product": "Product",
     "Points": "Points",
     "Type": "Type",
@@ -511,7 +516,6 @@
     "searchInvoices": "Search Invoices",
     "clear": "Clear",
     "customerInfo": "Customer Information",
-    "name": "Name",
     "phone": "Phone",
     "email": "Email",
     "notProvided": "Not Provided",
@@ -537,9 +541,11 @@
     "NoInvoicesFound": "No invoices found",
     "description": "Manage invoices in the cafe and restaurant",
     "id": "ID",
-    "arName": "Arabic Name",
-    "enName": "English Name",
-    "currency": "Currency"
+    "InvoiceName": "Invoice Name",
+    "currency": "Currency",
+    "PhonePlaceholder": "Enter phone number",
+    "EmailPlaceholder": "Enter email",
+    "PriceAfterDiscount": "Price After Discount"
   },
   "error": {
     "fetchingManagers": "Error fetching managers",
@@ -558,16 +564,14 @@
     "customerFound": "Customer found successfully"
   },
   "manager": {
-    "arName": "Arabic Name",
-    "enName": "English Name",
+    "ManagerName": "Manager Name",
     "email": "Email",
     "phone": "Phone",
     "role": "Role",
     "createdAt": "Created At"
   },
   "customer": {
-    "arName": "Arabic Name",
-    "enName": "English Name",
+    "CustomerName": "Customer Name",
     "email": "Email",
     "phone": "Phone",
     "points": "Points",
@@ -586,8 +590,7 @@
   },
   "product": {
     "id": "ID",
-    "arName": "Arabic Name",
-    "enName": "English Name",
+    "ProductName": "Product Name",
     "price": "Price",
     "points": "Points",
     "type": "Type",
@@ -595,8 +598,7 @@
   },
   "reward": {
     "id": "ID",
-    "arName": "Arabic Name",
-    "enName": "English Name",
+    "RewardName": "Reward Name",
     "type": "Type",
     "points": "Points",
     "status": "Status",

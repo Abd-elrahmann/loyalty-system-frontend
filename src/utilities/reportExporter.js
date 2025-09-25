@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import i18n from '../Config/translationConfig';
 import dayjs from 'dayjs';
+import { formatCurrency } from '../Config/globalCurrencyManager';
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [
@@ -423,7 +424,7 @@ export const exportProductsToPDF = async (data) => {
     const rows = data.map(product => [
       product.id,
       isRTL() ? product.arName : product.enName,
-      product.price,
+      formatCurrency(product.price),
       product.points,
       product.type,
       isRTL() ? product.category?.arName : product.category?.enName
@@ -758,7 +759,7 @@ export const exportToExcel = (data, reportType) => {
         ...data.map(product => [
           product.id,
           isRTL() ? product.arName : product.enName,
-          product.price,
+          formatCurrency(product.price),
           product.points,
           product.type,
           isRTL() ? product.category?.arName : product.category?.enName
@@ -803,7 +804,7 @@ export const exportToExcel = (data, reportType) => {
           invoice.id,
           isRTL() ? invoice.user?.arName : invoice.user?.enName||'Guest',
           invoice.phone,
-          invoice.totalPrice,
+          formatCurrency(invoice.totalPrice),
           invoice.discount,
           invoice.points,
           isRTL() ? invoice.currency==='USD' ? 'دولار' : 'دينار' : invoice.currency,

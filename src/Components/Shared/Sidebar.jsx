@@ -1,8 +1,7 @@
 import React, { useLayoutEffect, useMemo } from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box } from '@mui/material';
 import { useTheme } from '@mui/material';
 import { useMediaQuery, Button } from '@mui/material';
-import { Support as SupportIcon } from '@mui/icons-material';
 import routes from '../../Config/routes.js';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

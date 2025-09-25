@@ -25,7 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 import Api from '../../Config/Api';
 import debounce from 'lodash.debounce';
 import { Spin } from "antd";
-import { useSettings } from '../../hooks/useSettings';
+import { useCurrencyManager } from '../../Config/globalCurrencyManager';
 
 const ProductGrid = ({ 
   activeTab, 
@@ -44,21 +44,8 @@ const ProductGrid = ({
   });
   const [searchValue, setSearchValue] = useState('');
   
-  // Get settings for currency conversion
-  const { data: settings } = useSettings();
-
-  // Function to format price based on currency settings
-  const formatPrice = (price) => {
-    if (!settings || !price) return `$${price}`;
-    
-    if (settings.enCurrency === 'USD') {
-      return `$${price}`;
-    } else if (settings.enCurrency === 'IQD') {
-      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
-      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
-    }
-    return `$${price}`;
-  };
+  // Use currency manager hook
+  const { formatAmount } = useCurrencyManager();
 
   // Fetch categories based on active tab
   const { data: categories } = useQuery({
@@ -427,7 +414,7 @@ const ProductGrid = ({
                         color: '#27ae60',
                         fontSize: '0.8rem'
                       }}>
-                        {formatPrice(product.price)}
+                        {formatAmount(product.price)}
                       </Typography>
                     </Box>
                   </Box>

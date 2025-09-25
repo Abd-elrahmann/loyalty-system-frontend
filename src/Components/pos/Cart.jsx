@@ -24,6 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import NumericKeypad from './NumericKeypad';
 import ScanQRModal from '../Modals/ScanQRModal';
+import { useCurrencyManager } from '../../Config/globalCurrencyManager';
 
 const Cart = ({
   cart,
@@ -52,34 +53,37 @@ const Cart = ({
   const { t, i18n } = useTranslation();
   const [verificationMethod, setVerificationMethod] = useState('phone');
   const [scanQRModalOpen, setScanQRModalOpen] = useState(false);
+  const { formatAmount, convertAmount, currentCurrency } = useCurrencyManager();
 
   const calculateTotalPrice = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  // Function to format price based on currency settings
   const formatPrice = (price) => {
-    if (!settings) return `$${price}`;
-    
-    if (settings.enCurrency === 'USD') {
-      return `$${price}`;
-    } else if (settings.enCurrency === 'IQD') {
-      const convertedPrice = (price * settings.usdToIqd).toLocaleString();
-      return `${convertedPrice} ${i18n.language === 'ar' ? settings.arCurrency : settings.enCurrency}`;
-    }
-    return `$${price}`;
+    return formatAmount(parseFloat(price));
+  };
+
+  // Calculate total in display currency
+  const calculateDisplayTotalPrice = () => {
+    return cart.reduce((total, item) => {
+      const displayPrice = convertAmount(item.price, 'USD', currentCurrency);
+      return total + (displayPrice * item.quantity);
+    }, 0);
   };
 
   const calculateTotalPoints = () => {
-    const totalPrice = calculateTotalPrice();
     if (!settings) return 0;
     
-    const pointsMultiplier = settings.enCurrency === 'USD' ? 
+    const displayTotalPrice = calculateDisplayTotalPrice();
+    
+    // Use currentCurrency from the currency manager
+    const pointsMultiplier = currentCurrency === 'USD' ? 
       settings.pointsPerDollar : 
       settings.pointsPerIQD;
 
-    return Math.floor(totalPrice * pointsMultiplier);
+    return Math.floor(displayTotalPrice * pointsMultiplier);
   };
+
 
   const calculateDiscountedTotal = () => {
     const total = calculateTotalPrice();

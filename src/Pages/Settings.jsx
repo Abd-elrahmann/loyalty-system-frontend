@@ -298,7 +298,7 @@ const Settings = () => {
             startIcon={<SaveOutlined />}
             sx={{ px: 4, fontSize: "12px" }}
           >
-            {settingsMutation.isPending ? t('General.Saving') : t('Settings.Save')}
+            {settingsMutation.isPending ? t('Settings.Saving') : t('Settings.Save')}
           </Button>
         </Box>
       </Container>

@@ -38,17 +38,17 @@ import {
 } from '../utilities/reportExporter';
 import Api from '../Config/Api';
 import { Helmet } from "react-helmet-async";
+import {useSettings} from '../hooks/useSettings'; 
+
 import { StyledTableRow, StyledTableCell } from '../Components/Shared/tableLayout';
-import { useSettings } from '../hooks/useSettings'; 
 import { useTranslation } from 'react-i18next';
 import { notifyError } from '../utilities/Toastify';
+import { formatCurrency } from '../Config/globalCurrencyManager';
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-
 const Reports = () => {
   const { t, i18n } = useTranslation();
-  // eslint-disable-next-line no-unused-vars
   const { data: settings } = useSettings();
   const [reportType, setReportType] = useState('');
   // eslint-disable-next-line no-unused-vars
@@ -60,6 +60,10 @@ const Reports = () => {
   const [reportData, setReportData] = useState([]);
   const [previewLoading, setPreviewLoading] = useState(false);
   const printRef = useRef();
+
+  const formatPrice = (price, currency) => {
+    return formatCurrency(price, currency);
+  };
 
   useEffect(() => {
     fetchManagers();
@@ -362,16 +366,16 @@ const Reports = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                    {t('manager.enName')} / {t('manager.arName')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                    {t('manager.managerName')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('manager.email')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('manager.phone')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('manager.role')}
                   </StyledTableCell>
                 </TableRow>
@@ -379,16 +383,22 @@ const Reports = () => {
               <TableBody>
                 {Array.isArray(reportData) && reportData.map((manager) => (
                   <StyledTableRow key={manager.id}>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? manager.arName : manager.enName}</StyledTableCell>
-                    <StyledTableCell align="center">{manager.email}</StyledTableCell>
-                    <StyledTableCell align="center">{manager.phone}</StyledTableCell>
-                    <StyledTableCell align="center">
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? manager.arName : manager.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{manager.email}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{manager.phone}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
                       <span style={{ 
-                        color: manager.role === 'ADMIN' ? 'green' : 
+                        fontSize: i18n.language === 'ar' ? '16px' : '14px',
+                        color:  manager.role ===  'ADMIN' ? 'green' : 
                                manager.role === 'ACCOUNTANT' ? 'blue' :
                                manager.role === 'CASHIER' ? 'black' : 'black'
                       }}>
-                        {manager.role}
+                        {i18n.language === 'ar' ? 
+                          manager.role === 'ADMIN' ? 'مدير عام' :
+                          manager.role === 'ACCOUNTANT' ? 'محاسب' :
+                          manager.role === 'CASHIER' ? 'كاشير' :
+                          manager.role
+                          : manager.role}
                       </span>
                     </StyledTableCell>
                   </StyledTableRow>
@@ -404,22 +414,22 @@ const Reports = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                    {t('customer.enName')} / {t('customer.arName')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                    {t('customer.customerName')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('customer.email')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('customer.phone')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.points')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('customer.transactions')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('customer.rewards')}
                   </StyledTableCell>
                 </TableRow>
@@ -427,12 +437,12 @@ const Reports = () => {
               <TableBody>
                 {Array.isArray(reportData) && reportData.map((customer) => (
                   <StyledTableRow key={customer.id}>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.email}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.phone}</StyledTableCell>
-                    <StyledTableCell align="center">{customer.points}</StyledTableCell>
-                    <StyledTableCell align="center">{customer._count?.transactions || 0}</StyledTableCell>
-                    <StyledTableCell align="center">{customer._count?.myRewards || 0}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{customer.email}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{customer.phone}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{customer.points}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{customer._count?.transactions || 0}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{customer._count?.myRewards || 0}</StyledTableCell>
                   </StyledTableRow>
                 ))}
               </TableBody>
@@ -450,26 +460,26 @@ const Reports = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                      {t('customer.enName')} / {t('customer.arName')}
+                      <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                      {t('customer.customerName')}
                     </StyledTableCell>
-                    <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                    <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.email')}
                     </StyledTableCell>
-                    <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                    <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.phone')}
                     </StyledTableCell>
-                    <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                    <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.points')}
                     </StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <StyledTableRow>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? reportData.arName : reportData.enName}</StyledTableCell>
-                    <StyledTableCell align="center">{reportData.email}</StyledTableCell>
-                    <StyledTableCell align="center">{reportData.phone}</StyledTableCell>
-                    <StyledTableCell align="center">{reportData.points}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? reportData.arName : reportData.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reportData.email}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reportData.phone}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reportData.points}</StyledTableCell>
                   </StyledTableRow>
                 </TableBody>
               </Table>
@@ -484,19 +494,19 @@ const Reports = () => {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                          <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.transactionId')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.type')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                             {t('customer.points')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.currency')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.date')}
                         </StyledTableCell>
                       </TableRow>
@@ -504,13 +514,13 @@ const Reports = () => {
                     <TableBody>
                       {reportData.transactions.map((transaction) => (
                         <StyledTableRow key={transaction.id}>
-                          <StyledTableCell align="center">{transaction.id}</StyledTableCell>
-                          <StyledTableCell align="center">
-                            {transaction.type === 'earn' ? t('customer.earn') : transaction.type === 'redeem' ? t('customer.redeem') : transaction.type}
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{transaction.id}</StyledTableCell>
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
+                              {transaction.type === 'earn' ? t('Transactions.earn') : transaction.type === 'redeem' ? t('Transactions.redeem') : transaction.type}
                           </StyledTableCell>
-                          <StyledTableCell align="center">{transaction.points}</StyledTableCell>
-                          <StyledTableCell align="center">{i18n.language === 'ar' ? transaction.currency?.arCurrency : transaction.currency?.enCurrency}</StyledTableCell>
-                          <StyledTableCell align="center">{new Date(transaction.date).toLocaleString('en-GB', {
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{transaction.points}</StyledTableCell>
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? transaction.currency?.arCurrency : transaction.currency?.enCurrency}</StyledTableCell>
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{new Date(transaction.date).toLocaleString('en-GB', {
                             day: '2-digit',
                             month: '2-digit', 
                             year: 'numeric',
@@ -535,16 +545,16 @@ const Reports = () => {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.rewardId')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.type')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.points')}
                         </StyledTableCell>
-                        <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                        <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                           {t('customer.date')}
                         </StyledTableCell>
                       </TableRow>
@@ -552,10 +562,10 @@ const Reports = () => {
                     <TableBody>
                       {reportData.myRewards.map((reward) => (
                         <StyledTableRow key={reward.id}>
-                          <StyledTableCell align="center">{reward.id}</StyledTableCell>
-                          <StyledTableCell align="center">{t('reward.type')}</StyledTableCell>
-                          <StyledTableCell align="center">{reward.points}</StyledTableCell>
-                          <StyledTableCell align="center">{new Date(reward.date).toLocaleString('en-GB', {
+                            <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.id}</StyledTableCell>
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.type}</StyledTableCell>
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.points}</StyledTableCell>
+                          <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{new Date(reward.date).toLocaleString('en-GB', {
                             day: '2-digit',
                             month: '2-digit', 
                             year: 'numeric',
@@ -579,22 +589,22 @@ const Reports = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                    <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.transactionId')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                      {t('customer.enName')} / {t('customer.arName')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                      {t('customer.customerName')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.type')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.points')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.currency')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.date')}
                   </StyledTableCell>
                 </TableRow>
@@ -602,16 +612,16 @@ const Reports = () => {
               <TableBody>
                 {Array.isArray(reportData) && reportData.map((transaction) => (
                   <StyledTableRow key={transaction.id}>
-                    <StyledTableCell align="center">{transaction.id}</StyledTableCell>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? transaction.user?.arName : transaction.user?.enName}</StyledTableCell>
-                    <StyledTableCell align="center">
-                      {transaction.type === 'earn' ? t('customer.earn') : transaction.type === 'redeem' ? t('customer.redeem') : transaction.type}
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{transaction.id}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? transaction.user?.arName : transaction.user?.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
+                      {transaction.type === 'earn' ? t('Transactions.earn') : transaction.type === 'redeem' ? t('Transactions.redeem') : transaction.type}
                     </StyledTableCell>
-                    <StyledTableCell align="center">{transaction.points}</StyledTableCell>
-                    <StyledTableCell align="center" sx={{ color: transaction.currency?.enCurrency === 'USD' ? '#008000' : transaction.currency?.enCurrency === 'IQD' ? '#0000FF' : 'inherit' }}>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{transaction.points}</StyledTableCell>
+                    <StyledTableCell align="center" style={{ fontSize: i18n.language === 'ar' ? '16px' : '14px', color: transaction.currency?.enCurrency === 'USD' ? '#008000' : transaction.currency?.enCurrency === 'IQD' ? '#0000FF' : 'inherit' }}>
                       {i18n.language === 'ar' ? transaction.currency?.arCurrency : transaction.currency?.enCurrency}
                     </StyledTableCell>
-                    <StyledTableCell align="center">{new Date(transaction.date).toLocaleString('en-GB', {
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{new Date(transaction.date).toLocaleString('en-GB', {
                       day: '2-digit',
                       month: '2-digit', 
                       year: 'numeric',
@@ -632,22 +642,22 @@ const Reports = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('product.id')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                      {t('product.enName')} / {t('product.arName')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                      {t('product.ProductName')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('product.price')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                         {t('product.points')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('product.type')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('product.category')}
                   </StyledTableCell>
                 </TableRow>
@@ -655,14 +665,14 @@ const Reports = () => {
               <TableBody>
                 {Array.isArray(reportData) && reportData.map((product) => (
                   <StyledTableRow key={product.id}>
-                    <StyledTableCell align="center">{product.id}</StyledTableCell>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? product.arName : product.enName}</StyledTableCell>
-                    <StyledTableCell align="center">{product.price}</StyledTableCell>
-                    <StyledTableCell align="center">{product.points}</StyledTableCell>
-                    <StyledTableCell align="center">
+                      <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.id}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? product.arName : product.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.price ? formatPrice(product.price, i18n.language === 'ar' ? settings?.arCurrency : settings?.enCurrency) : '-'}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.points}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
                       {product.type}
                     </StyledTableCell>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? product.category?.arName : product.category?.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? product.category?.arName : product.category?.enName}</StyledTableCell>
                   </StyledTableRow>
                 ))}
               </TableBody>
@@ -676,19 +686,19 @@ const Reports = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                      <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('reward.id')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                      {t('reward.enName')} / {t('reward.arName')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                      {t('reward.rewardName')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('reward.type')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('reward.points')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('reward.date')}
                   </StyledTableCell>
                 </TableRow>
@@ -696,11 +706,11 @@ const Reports = () => {
               <TableBody>
                 {Array.isArray(reportData) && reportData.map((reward) => (
                   <StyledTableRow key={reward.id}>
-                    <StyledTableCell align="center">{reward.id}</StyledTableCell>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? reward.user?.arName : reward.user?.enName}</StyledTableCell>
-                    <StyledTableCell align="center">{reward.type}</StyledTableCell>
-                    <StyledTableCell align="center">{reward.points}</StyledTableCell>
-                    <StyledTableCell align="center">{new Date(reward.date).toLocaleString('en-GB', {
+                    <StyledTableCell align="center" style={{ fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.id}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? reward.user?.arName : reward.user?.enName}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.type}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.points}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{new Date(reward.date).toLocaleString('en-GB', {
                       day: '2-digit',
                       month: '2-digit', 
                       year: 'numeric',
@@ -721,28 +731,28 @@ const Reports = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.id')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                      {t('Invoice.enName')} / {t('Invoice.arName')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                      {t('Invoice.InvoiceName')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
-                        {t('Invoice.phone')}
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                    {t('Invoice.phone')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.totalPrice')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.discount')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.points')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                    <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.currency')}
                   </StyledTableCell>
-                  <StyledTableCell align="center" sx={{ backgroundColor: '#800080', color: 'white', fontWeight: 'bold' }}>
+                  <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.date')}
                   </StyledTableCell>
                 </TableRow>
@@ -750,18 +760,18 @@ const Reports = () => {
               <TableBody>
                 {Array.isArray(reportData) && reportData.map((invoice) => (
                   <StyledTableRow key={invoice.id}>
-                    <StyledTableCell align="center">{invoice.id}</StyledTableCell>
-                    <StyledTableCell align="center">{i18n.language === 'ar' ? (invoice.user?.arName || 'Guest') : (invoice.user?.enName || 'Guest')}</StyledTableCell>
-                    <StyledTableCell align="center">{invoice.phone}</StyledTableCell>
-                    <StyledTableCell align="center">{invoice.totalPrice}</StyledTableCell>
-                    <StyledTableCell align="center">{invoice.discount}</StyledTableCell>
-                    <StyledTableCell align="center">{invoice.points}</StyledTableCell>
-                    <StyledTableCell align="center">
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.id}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? (invoice.user?.arName || 'Guest') : (invoice.user?.enName || 'Guest')}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.phone}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{formatPrice(invoice.totalPrice, i18n.language === 'ar' ? settings?.arCurrency : settings?.enCurrency)}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.discount}%</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.points}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
                       {i18n.language === 'ar' ? 
                         invoice.currency === 'USD' ? 'دولار' : 'دينار' 
                         : invoice.currency}
                     </StyledTableCell>
-                    <StyledTableCell align="center">{new Date(invoice.createdAt).toLocaleString('en-GB', {
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{new Date(invoice.createdAt).toLocaleString('en-GB', {
                       day: '2-digit',
                       month: '2-digit', 
                       year: 'numeric',
@@ -795,12 +805,14 @@ const Reports = () => {
       flexDirection: 'column',
       justifyContent: 'center',
       minHeight: 120,
+      fontWeight: 'bold',
+      fontSize: '20px',
     });
 
     const sectionTitleStyle = {
-      fontSize: '18px',
+      fontSize: '22px',
       fontWeight: 'bold',
-      color: '#800080',
+      color: 'black',
       marginBottom: '16px',
       marginTop: '24px',
       textAlign: i18n.language === 'ar' ? 'right' : 'left',
@@ -808,7 +820,7 @@ const Reports = () => {
       display: 'inline-flex',
       alignItems: 'center',
       gap: '8px',
-      borderBottom: '2px solid #800080',
+      borderBottom: '2px solid black',
       width: 'fit-content'
     };
 
@@ -818,7 +830,7 @@ const Reports = () => {
       <div style={{ marginBottom: 20 }}>
         {/* إدارة العملاء والمديرين */}
         <div style={sectionTitleStyle}>
-          <TeamOutlined style={{ fontSize: 20, color: '#800080' }} />
+          <TeamOutlined style={{ fontSize: 25, color: 'black' }} />
           {t('report.sections.customersManagement')}
         </div>
         <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
@@ -829,7 +841,7 @@ const Reports = () => {
               onClick={() => setReportType('managers')}
             >
               <TeamOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.managers')}
               </Title>
             </Card>
@@ -841,7 +853,7 @@ const Reports = () => {
               onClick={() => setReportType('customers')}
             >
               <UsergroupAddOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.customers')}
               </Title>
             </Card>
@@ -853,7 +865,7 @@ const Reports = () => {
               onClick={() => setReportType('individual-customer')}
             >
               <UserOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.individualCustomer')}
               </Title>
             </Card>
@@ -862,7 +874,7 @@ const Reports = () => {
 
         {/* التقارير المالية */}
         <div style={sectionTitleStyle}>
-          <CalendarOutlined style={{ fontSize: 20, color: '#800080' }} />
+          <CalendarOutlined style={{ fontSize: 25, color: 'black' }} />
           {t('report.sections.financialReports')}
         </div>
         <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
@@ -873,7 +885,7 @@ const Reports = () => {
               onClick={() => setReportType('transactions')}
             >
               <TransactionOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.transactions')}
               </Title>
             </Card>
@@ -885,7 +897,7 @@ const Reports = () => {
               onClick={() => setReportType('invoices')}
             >
               <FileTextOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.invoices')}
               </Title>
             </Card>
@@ -897,7 +909,7 @@ const Reports = () => {
               onClick={() => setReportType('rewards')}
             >
               <GiftOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.rewards')}
               </Title>
             </Card>
@@ -906,7 +918,7 @@ const Reports = () => {
 
         {/* تقارير المنتجات */}
         <div style={sectionTitleStyle}>
-          <ShopOutlined style={{ fontSize: 20, color: '#800080' }} />
+          <ShopOutlined style={{ fontSize: 25, color: 'black' }} />
           {t('report.sections.productReports')}
         </div>
         <Row gutter={[16, 16]} style={{ marginBottom: 20 }}>
@@ -917,7 +929,7 @@ const Reports = () => {
               onClick={() => setReportType('products')}
             >
               <ShopOutlined style={iconStyle} />
-              <Title level={5} style={{ margin: 0, fontSize: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
                 {t('report.products')}
               </Title>
             </Card>
@@ -984,7 +996,7 @@ const Reports = () => {
                     placeholder={t('report.sections.selectType')}
                     value={type}
                     onChange={(value) => setType(value)}
-                    style={{ width: '100%' }}
+                    style={{ width: '60%' }}
                     allowClear
                   >
                     <Option value="earn">{t("Transactions.Earn")}</Option>
@@ -1024,6 +1036,7 @@ const Reports = () => {
                   backgroundColor: '#800080',
                   borderColor: '#800080',
                   width: 140,
+                  fontSize: '15px'
                 }}
               >
                 {t('report.preview')}
@@ -1036,7 +1049,7 @@ const Reports = () => {
                   setDateRange([]);
                   setType('');
                 }}
-                style={{ width: 80 }}
+                style={{ width: 80, fontSize: '15px' }}
               >
                 {t('report.cancel')}
               </Button>
@@ -1069,6 +1082,7 @@ const Reports = () => {
                   style={{
                     color: '#800080',
                     borderColor: '#800080',
+                    fontSize: '15px'
                   }}
                 >
                   {t('report.print')}
@@ -1079,6 +1093,7 @@ const Reports = () => {
                   style={{
                     color: '#800080',
                     borderColor: '#800080',
+                    fontSize: '15px'
                   }}
                 >
                   {t('report.exportExcel')}
@@ -1089,6 +1104,7 @@ const Reports = () => {
                   style={{
                     color: '#800080',
                     borderColor: '#800080',
+                    fontSize: '15px'
                   }}
                 >
                   {t('report.exportPdf')}

@@ -26,10 +26,10 @@ const Login = () => {
   const validate = values => {
     const errors = {};
 
-    if (!values.email) {
-      errors.email = 'Email is required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-      errors.email = 'Invalid email address';
+    if (!values.emailOrPhone) {
+      errors.emailOrPhone = 'Email or phone is required';
+    } else if (values.emailOrPhone.includes('@') && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.emailOrPhone)) {
+      errors.emailOrPhone = 'Invalid email address';
     }
 
     if (!values.password) {
@@ -41,7 +41,7 @@ const Login = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: '',
+      emailOrPhone: '',
       password: ''
     },
     validate,
@@ -77,7 +77,16 @@ const Login = () => {
         }
 
       } catch (error) {
-        notifyError(error.response?.data?.message || 'Login failed');
+        if (error.response?.data?.message) {
+          // Handle array of error messages
+          if (Array.isArray(error.response.data.message)) {
+            notifyError(error.response.data.message.join(', '));
+          } else {
+            notifyError(error.response.data.message);
+          }
+        } else {
+          notifyError('Login failed');
+        }
       } finally {
         setLoading(false);
       }
@@ -105,13 +114,14 @@ const Login = () => {
 
           <TextField
             fullWidth
-            name="email"
-            label={t('Login.email')}
+            name="emailOrPhone"
+            label={t('Login.emailOrPhone')}
+            placeholder={t('Login.emailOrPhonePlaceholder')}
             sx={{ mb: 2 }}
-            value={formik.values.email}
+            value={formik.values.emailOrPhone}
             onChange={formik.handleChange}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
+            error={formik.touched.emailOrPhone && Boolean(formik.errors.emailOrPhone)}
+            helperText={formik.touched.emailOrPhone && formik.errors.emailOrPhone}
             disabled={loading}
             InputProps={{
               startAdornment: (
@@ -127,6 +137,13 @@ const Login = () => {
             name="password"
             label={t('Login.password')}
             type={showPassword ? 'text' : 'password'}
+            placeholder={t('Login.passwordPlaceholder')}
+            sx={{ mb: 2 }}
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
+            disabled={loading}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -139,12 +156,6 @@ const Login = () => {
                 </IconButton>
               )
             }}
-            sx={{ mb: 2 }}
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
-            disabled={loading}
           />
 
           <Box sx={{ mb: 3, textAlign: 'left' }}>

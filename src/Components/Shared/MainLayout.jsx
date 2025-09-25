@@ -10,14 +10,14 @@ import { usePermissionsSync } from '../../hooks/usePermissionsSync';
 const MainLayout = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  useRoutePrefetch(); // Enable route prefetching
-  usePermissionsSync(); // Enable permissions synchronization
+  useRoutePrefetch(); 
+  usePermissionsSync(); 
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
-  // Update sidebar visibility when route changes
+  
   useEffect(() => {
     if (location.pathname === '/point-of-sale') {
       setSidebarVisible(false);

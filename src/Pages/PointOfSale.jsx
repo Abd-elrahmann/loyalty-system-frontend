@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { updateUserProfile } from "../utilities/user";
 import ProductGrid from '../Components/pos/ProductGrid';
 import Cart from '../Components/pos/Cart';
-
+import { useCurrencyManager } from '../Config/globalCurrencyManager';
 const PointOfSale = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
@@ -26,7 +26,7 @@ const PointOfSale = () => {
   const [discount, setDiscount] = useState('');
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [settings, setSettings] = useState(null);
-
+  const { currentCurrency, convertAmount } = useCurrencyManager();
   useEffect(() => {
     fetchProducts();
     fetchSettings();
@@ -190,36 +190,49 @@ const PointOfSale = () => {
       notifyError(t('PointOfSale.cart_empty'));
       return;
     }
-
+  
     try {
-      const items = cart.map(item => ({
-        productId: item.id,
-        categoryId: item.category?.id || item.categoryId,
-        type: item.type,
-        quantity: item.quantity,
-        price: item.price,
-        total: item.price * item.quantity
-      }));
-
+      const currencyToSend = currentCurrency;
+      
+      const items = cart.map(item => {
+        let priceToSend = item.price;
+        
+        if (currencyToSend === 'IQD' && item.price > 0) {
+          priceToSend = convertAmount(item.price, 'USD', 'IQD');
+        } else if (currencyToSend === 'USD' && item.price > 0) {
+          priceToSend = convertAmount(item.price, 'IQD', 'USD');
+        }
+        
+        return {
+          productId: item.id,
+          categoryId: item.category?.id || item.categoryId,
+          type: item.type,
+          quantity: item.quantity,
+          price: parseFloat(priceToSend), // Convert price to float
+          total: parseFloat((priceToSend * item.quantity).toFixed(2)), // Ensure total is float with 2 decimals
+          currency: currencyToSend
+        };
+      });
+  
       let discountValue = 0;
       if (discount) {
         discountValue = parseFloat(discount.replace('%', ''));
       }
-
+  
       const payload = {
-        totalPrice: calculateDiscountedTotal(),
+        totalPrice: parseFloat(calculateDiscountedTotal().toFixed(2)), // Convert to float with 2 decimals
         discount: discountValue,
-        items: items
+        items: items,
+        currency: currencyToSend
       };
-
-      // Add phone or email based on what's available
+  
       if (phoneNumber) {
         payload.phone = phoneNumber.toString();
       }
       if (email) {
         payload.email = email;
       }
-
+  
       await Api.post('/api/pos', payload);
       
       setCart([]);
