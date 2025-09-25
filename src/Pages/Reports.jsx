@@ -949,7 +949,9 @@ const Reports = () => {
           borderRadius: 12,
           boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
         }}
-        bodyStyle={{ padding: 10 }}
+        styles={{
+          body: { padding: 10 }
+        }}
       >
         <Row gutter={[24, 24]} align="middle" justify="center">
           {reportType === 'individual-customer' && (

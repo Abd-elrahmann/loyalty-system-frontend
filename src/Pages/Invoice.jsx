@@ -208,7 +208,7 @@ const Invoice = () => {
 
                 <TextField
                   label={t("Invoice.totalPrice")}
-                  value={formatPrice(selectedInvoice.totalPrice)}
+                  value={`${selectedInvoice.totalPrice} ${i18n.language === "ar" ? selectedInvoice.currency === "USD" ? "دولار امريكي" : "دينار عراقي" : selectedInvoice.currency}`}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

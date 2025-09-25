@@ -12,8 +12,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography,
-  Autocomplete,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
@@ -28,17 +26,13 @@ import debounce from "lodash.debounce";
 import { Spin } from "antd";
 import { DatePicker } from "@mui/x-date-pickers";
 import InvoiceCard from "./InvoiceCard";
-import { useSettings } from "../../hooks/useSettings";
-import { useCurrencyManager } from "../../Config/globalCurrencyManager";
 
 const InvoiceSearch = ({ onViewInvoice }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { data: settings } = useSettings();
-  const { formatAmount } = useCurrencyManager();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -96,7 +90,6 @@ const InvoiceSearch = ({ onViewInvoice }) => {
     setLoading(true);
     try {
       const queryParams = {
-        page: page,
         limit: 10,
         fromDate: formData.fromDate
           ? dayjs(formData.fromDate).format("YYYY-MM-DD")
@@ -116,7 +109,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
         .map((key) => `${key}=${encodeURIComponent(queryParams[key])}`)
         .join("&");
 
-      const url = `/api/invoices/all/1${queryString ? `?${queryString}` : ""}`;
+      const url = `/api/invoices/all/${page}${queryString ? `?${queryString}` : ""}`;
       const res = await Api.get(url);
 
       setData(res.data.data || []);
@@ -179,11 +172,6 @@ const InvoiceSearch = ({ onViewInvoice }) => {
       debouncedSearch.cancel();
     };
   }, [debouncedSearch]);
-
-  const formatPrice = (price) => {
-    if (!settings) return price;
-    return formatAmount(price);
-  };
 
   return (
     <div>
@@ -383,7 +371,9 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                           {invoice.email || "-"}
                         </StyledTableCell>
                         <StyledTableCell align="center">
-                          {formatPrice(invoice.totalPrice)}
+                          {invoice.totalPrice} {i18n.language === "ar" ? 
+                            invoice.currency === "USD" ? "دولار امريكي" : "دينار عراقي" 
+                            : invoice.currency}
                         </StyledTableCell>
                         <StyledTableCell align="center">
                           {invoice.points}

@@ -58,7 +58,7 @@ const ManagersTable = ({
         <TableHead>
           <TableRow>
             <StyledTableCell align="center">{t("Mangers.ID")}</StyledTableCell>
-            <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Mangers.EnglishName")}/{t("Mangers.ArabicName")}</StyledTableCell>
+            <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Mangers.ManagerName")}</StyledTableCell>
             <StyledTableCell align="center">{t("Mangers.Role")}</StyledTableCell>
             <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Mangers.Email")}</StyledTableCell>
             <StyledTableCell align="center">{t("Mangers.Phone")}</StyledTableCell>

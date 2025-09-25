@@ -133,9 +133,6 @@ const RewardsTable = ({
               {t("Rewards.Product")}
             </StyledTableCell>
             <StyledTableCell align="center">
-              {t("Rewards.Image")}
-            </StyledTableCell>
-            <StyledTableCell align="center">
               {t("Rewards.Points")}
             </StyledTableCell>
             <StyledTableCell align="center">
@@ -215,17 +212,6 @@ const RewardsTable = ({
                           : reward.restaurantProduct.enName
                       }`
                     : "-"}
-                </StyledTableCell>
-                <StyledTableCell align="center">
-                  <img
-                    src={
-                      reward.cafeProduct?.image ||
-                      reward.restaurantProduct?.image ||
-                      "-"
-                    }
-                    alt="Reward Image"
-                    style={{ width: "60px", height: "60px" }}
-                  />
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   {reward.points}

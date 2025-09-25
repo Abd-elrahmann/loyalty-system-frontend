@@ -195,13 +195,8 @@ const PointOfSale = () => {
       const currencyToSend = currentCurrency;
       
       const items = cart.map(item => {
-        let priceToSend = item.price;
-        
-        if (currencyToSend === 'IQD' && item.price > 0) {
-          priceToSend = convertAmount(item.price, 'USD', 'IQD');
-        } else if (currencyToSend === 'USD' && item.price > 0) {
-          priceToSend = convertAmount(item.price, 'IQD', 'USD');
-        }
+        // تحويل السعر إلى العملة الحالية قبل الإرسال
+        const priceToSend = convertAmount(item.price, 'USD', currencyToSend);
         
         return {
           productId: item.id,
@@ -218,9 +213,25 @@ const PointOfSale = () => {
       if (discount) {
         discountValue = parseFloat(discount.replace('%', ''));
       }
+
+      // حساب التوتال برايس باستخدام الأسعار المحولة
+      const displayTotalPrice = cart.reduce((total, item) => {
+        const displayPrice = convertAmount(item.price, 'USD', currencyToSend);
+        return total + (displayPrice * item.quantity);
+      }, 0);
+      
+      let finalTotalPrice = displayTotalPrice;
+      if (discount) {
+        const discountValue = parseFloat(discount.replace('%', ''));
+        if (discount.includes('%')) {
+          finalTotalPrice = displayTotalPrice - (displayTotalPrice * (discountValue / 100));
+        } else {
+          finalTotalPrice = displayTotalPrice - discountValue;
+        }
+      }
   
       const payload = {
-        totalPrice: parseFloat(calculateDiscountedTotal().toFixed(2)), // Convert to float with 2 decimals
+        totalPrice: parseFloat(finalTotalPrice.toFixed(2)), // Convert to float with 2 decimals
         discount: discountValue,
         items: items,
         currency: currencyToSend
@@ -252,6 +263,7 @@ const PointOfSale = () => {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const calculateDiscountedTotal = () => {
     const total = calculateTotalPrice();
     if (discount) {
