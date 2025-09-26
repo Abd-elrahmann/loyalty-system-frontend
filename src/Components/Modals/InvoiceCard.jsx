@@ -6,11 +6,12 @@ import {
   Button,
   Paper,
   Divider,
+  TableSortLabel,
 } from "@mui/material";
 import { Visibility } from '@mui/icons-material';
 import dayjs from "dayjs";
 
-const InvoiceCard = ({ invoice, onViewInvoice, t }) => {
+const InvoiceCard = ({ invoice, onViewInvoice, t, orderBy, order, handleSort }) => {
   return (
     <Paper 
       elevation={1} 
@@ -26,10 +27,17 @@ const InvoiceCard = ({ invoice, onViewInvoice, t }) => {
       <Stack spacing={2}>
         {/* Header with ID */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle2" color="text.secondary">
-            {t("Invoice.ID")}: {invoice.id}
-          </Typography>
-          <Button 
+          <TableSortLabel
+            active={orderBy === "id"}
+            direction={orderBy === "id" ? order : "asc"}
+            onClick={() => handleSort("id")}
+            sx={{ color: "primary.main !important" }}
+          >
+            <Typography variant="subtitle2" color="text.secondary">
+              {t("Invoice.ID")}: {invoice.id}
+            </Typography>
+          </TableSortLabel>
+          <Button
             onClick={() => onViewInvoice(invoice.id)}
             variant="outlined"
             size="small"
@@ -44,30 +52,51 @@ const InvoiceCard = ({ invoice, onViewInvoice, t }) => {
         {/* Customer Info */}
         <Stack spacing={1}>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Invoice.Customer")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "user.name"}
+              direction={orderBy === "user.name" ? order : "asc"}
+              onClick={() => handleSort("user.name")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Invoice.Customer")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1">
-              {invoice.user ? 
-                (localStorage.getItem('i18nextLng') === 'ar' ? 
-                  invoice.user.arName : invoice.user.enName) 
+              {invoice.user ?
+                (localStorage.getItem('i18nextLng') === 'ar' ?
+                  invoice.user.arName : invoice.user.enName)
                 : t('Invoice.guest')}
             </Typography>
           </Box>
 
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Box flex={1}>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t("Invoice.Phone")}:
-              </Typography>
+              <TableSortLabel
+                active={orderBy === "phone"}
+                direction={orderBy === "phone" ? order : "asc"}
+                onClick={() => handleSort("phone")}
+                sx={{ color: "primary.main !important" }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t("Invoice.Phone")}:
+                </Typography>
+              </TableSortLabel>
               <Typography variant="body1">
                 {invoice.phone || '-'}
               </Typography>
             </Box>
             <Box flex={1}>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t("Invoice.Email")}:
-              </Typography>
+              <TableSortLabel
+                active={orderBy === "email"}
+                direction={orderBy === "email" ? order : "asc"}
+                onClick={() => handleSort("email")}
+                sx={{ color: "primary.main !important" }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t("Invoice.Email")}:
+                </Typography>
+              </TableSortLabel>
               <Typography variant="body1">
                 {invoice.email || '-'}
               </Typography>
@@ -80,25 +109,46 @@ const InvoiceCard = ({ invoice, onViewInvoice, t }) => {
         {/* Invoice Details */}
         <Stack direction="row" spacing={2} justifyContent="space-between">
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Invoice.Total")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "totalPrice"}
+              direction={orderBy === "totalPrice" ? order : "asc"}
+              onClick={() => handleSort("totalPrice")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Invoice.Total")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1" color="primary.main" fontWeight="bold">
               ${invoice.totalPrice}
             </Typography>
           </Box>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Invoice.Points")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "points"}
+              direction={orderBy === "points" ? order : "asc"}
+              onClick={() => handleSort("points")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Invoice.Points")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1" color="success.main" fontWeight="bold">
               {invoice.points}
             </Typography>
           </Box>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Invoice.Date")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "createdAt"}
+              direction={orderBy === "createdAt" ? order : "asc"}
+              onClick={() => handleSort("createdAt")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Invoice.Date")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1">
               {dayjs(invoice.createdAt).format('DD/MM/YYYY HH:mm')}
             </Typography>

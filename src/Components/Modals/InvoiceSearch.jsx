@@ -14,8 +14,9 @@ import {
   TextField,
   useTheme,
   useMediaQuery,
+  TableSortLabel,
 } from "@mui/material";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { StyledTableCell, StyledTableRow } from "../Shared/tableLayout";
 import { useTranslation } from "react-i18next";
 import { Search, RestartAltOutlined, Visibility } from "@mui/icons-material";
@@ -27,6 +28,7 @@ import { Spin } from "antd";
 import { DatePicker } from "@mui/x-date-pickers";
 import InvoiceCard from "./InvoiceCard";
 import { useCurrencyManager } from "../../Config/globalCurrencyManager";
+
 const InvoiceSearch = ({ onViewInvoice }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -47,6 +49,20 @@ const InvoiceSearch = ({ onViewInvoice }) => {
   const [phoneInputValue, setPhoneInputValue] = useState("");
   const [emailInputValue, setEmailInputValue] = useState("");
   const [searchTriggered, setSearchTriggered] = useState(false);
+  
+  // Get initial sort values from localStorage
+  const [orderBy, setOrderBy] = useState(() => 
+    localStorage.getItem('invoice_search_sort_orderBy') || "id"
+  );
+  const [order, setOrder] = useState(() => 
+    localStorage.getItem('invoice_search_sort_order') || "asc"
+  );
+
+  // Save sort state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('invoice_search_sort_orderBy', orderBy);
+    localStorage.setItem('invoice_search_sort_order', order);
+  }, [orderBy, order]);
 
   const closepopup = () => {
     setOpen(false);
@@ -59,21 +75,58 @@ const InvoiceSearch = ({ onViewInvoice }) => {
     setSearchTriggered(true);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedSearch = useCallback(
-    debounce((searchParams) => {
-      getAllData(searchParams);
-    }, 500),
-    []
+  const buildQueryParams = useCallback((searchParams = {}) => {
+    const baseParams = {
+      limit: 10,
+      fromDate: formData.fromDate ? dayjs(formData.fromDate).format("YYYY-MM-DD") : undefined,
+      toDate: formData.toDate ? dayjs(formData.toDate).format("YYYY-MM-DD") : undefined,
+      phone: formData.phone || undefined,
+      email: formData.email || undefined,
+      sortBy: orderBy,
+      sortOrder: order,
+      ...searchParams,
+    };
+
+    return Object.keys(baseParams)
+      .filter(key => baseParams[key] !== undefined && baseParams[key] !== "")
+      .map(key => `${key}=${encodeURIComponent(baseParams[key])}`)
+      .join("&");
+  }, [formData, orderBy, order]);
+
+  const getAllData = useCallback(async (searchParams = {}) => {
+    setLoading(true);
+    try {
+      const queryString = buildQueryParams(searchParams);
+      const url = `/api/invoices/all/${page}${queryString ? `?${queryString}` : ""}`;
+      console.log('Invoice Search API Call:', { url, searchParams });
+      
+      const res = await Api.get(url);
+      setData(res.data.data || []);
+      setCount(res.data.totalPages || 0);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      setData([]);
+      setCount(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, buildQueryParams]);
+
+  const debouncedSearch = useMemo(
+    () => debounce((searchParams) => getAllData(searchParams), 500),
+    [getAllData]
   );
 
-  const searchSubmit = () => {
-    setSearchTriggered(true);
+  const handleSort = useCallback((property) => {
+    const isAsc = orderBy === property && order === "asc";
+    const newOrder = isAsc ? "desc" : "asc";
+    setOrderBy(property);
+    setOrder(newOrder);
     setPage(1);
-    getAllData();
-  };
+    setSearchTriggered(true);
+  }, [orderBy, order]);
 
-  const handleClearFilter = () => {
+  const handleClearFilter = useCallback(() => {
     setFormData({
       fromDate: null,
       toDate: null,
@@ -84,47 +137,11 @@ const InvoiceSearch = ({ onViewInvoice }) => {
     setEmailInputValue("");
     setPage(1);
     setSearchTriggered(true);
-    getAllData();
-  };
+    setOrderBy("id");
+    setOrder("asc");
+  }, []);
 
-  const getAllData = async (searchParams = {}) => {
-    setLoading(true);
-    try {
-      const queryParams = {
-        limit: 10,
-        fromDate: formData.fromDate
-          ? dayjs(formData.fromDate).format("YYYY-MM-DD")
-          : undefined,
-        toDate: formData.toDate
-          ? dayjs(formData.toDate).format("YYYY-MM-DD")
-          : undefined,
-        phone: formData.phone || undefined,
-        email: formData.email || undefined,
-        ...searchParams,
-      };
-
-      const queryString = Object.keys(queryParams)
-        .filter(
-          (key) => queryParams[key] !== undefined && queryParams[key] !== ""
-        )
-        .map((key) => `${key}=${encodeURIComponent(queryParams[key])}`)
-        .join("&");
-
-      const url = `/api/invoices/all/${page}${queryString ? `?${queryString}` : ""}`;
-      const res = await Api.get(url);
-
-      setData(res.data.data || []);
-      setCount(res.data.totalPages || 0);
-    } catch (error) {
-      console.error("Error fetching invoices:", error);
-      setData([]);
-      setCount(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleViewInvoice = async (invoiceId) => {
+  const handleViewInvoice = useCallback(async (invoiceId) => {
     try {
       const response = await Api.get(`/api/invoices/${invoiceId}`);
       onViewInvoice(response.data);
@@ -132,42 +149,37 @@ const InvoiceSearch = ({ onViewInvoice }) => {
     } catch (error) {
       console.error("Error fetching invoice details:", error);
     }
-  };
+  }, [onViewInvoice]);
 
-  const handlePhoneChange = (e) => {
-    const value = e.target.value;
-    setPhoneInputValue(value);
-    setFormData((prev) => ({ ...prev, phone: value }));
+  const handleInputChange = useCallback((field, value) => {
+    if (field === 'phone') setPhoneInputValue(value);
+    if (field === 'email') setEmailInputValue(value);
+    
+    setFormData(prev => ({ ...prev, [field]: value }));
     setSearchTriggered(true);
     setPage(1);
-    debouncedSearch({ phone: value });
-  };
+    debouncedSearch({ [field]: value, sortBy: orderBy, sortOrder: order });
+  }, [orderBy, order, debouncedSearch]);
 
-  const handleEmailChange = (e) => {
-    const value = e.target.value;
-    setEmailInputValue(value);
-    setFormData((prev) => ({ ...prev, email: value }));
-    setSearchTriggered(true);
-    setPage(1);
-    debouncedSearch({ email: value });
-  };
-
-  const handleDateChange = (date, field) => {
-    setFormData((prev) => ({ ...prev, [field]: date }));
+  const handleDateChange = useCallback((date, field) => {
+    setFormData(prev => ({ ...prev, [field]: date }));
     setSearchTriggered(true);
     setPage(1);
     debouncedSearch({
       [field]: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+      sortBy: orderBy,
+      sortOrder: order,
     });
-  };
+  }, [orderBy, order, debouncedSearch]);
 
+  // Fetch data when necessary conditions are met
   useEffect(() => {
     if (open && searchTriggered) {
       getAllData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, open, searchTriggered]);
+  }, [open, searchTriggered, page, orderBy, order, getAllData]);
 
+  // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
@@ -179,9 +191,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
       <Button
         onClick={showpopup}
         variant="outlined"
-        sx={{
-          gap: "3px",
-        }}
+        sx={{ gap: "3px" }}
         startIcon={<Search />}
       >
         {t("Invoice.InvoiceSearch")}
@@ -214,7 +224,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                 label={t("Invoice.Phone")}
                 name="phone"
                 value={phoneInputValue}
-                onChange={handlePhoneChange}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder={t("Invoice.PhonePlaceholder")}
               />
 
@@ -223,7 +233,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                 label={t("Invoice.Email")}
                 name="email"
                 value={emailInputValue}
-                onChange={handleEmailChange}
+                onChange={(e) => handleInputChange('email', e.target.value)}
                 placeholder={t("Invoice.EmailPlaceholder")}
               />
 
@@ -253,7 +263,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
               >
                 <IconButton
                   sx={{ color: "background.default" }}
-                  onClick={searchSubmit}
+                  onClick={() => setSearchTriggered(true)}
                   title={t("Invoice.SearchNow")}
                 >
                   <Search />
@@ -319,6 +329,9 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                       invoice={invoice}
                       onViewInvoice={handleViewInvoice}
                       t={t}
+                      orderBy={orderBy}
+                      order={order}
+                      handleSort={handleSort}
                     />
                   ))}
                 </Box>
@@ -327,25 +340,74 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                   <TableHead>
                     <TableRow>
                       <StyledTableCell align="center">
-                        {t("Invoice.ID")}
+                        <TableSortLabel
+                          active={orderBy === "id"}
+                          direction={orderBy === "id" ? order : "asc"}
+                          onClick={() => handleSort("id")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.ID")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {t("Invoice.Customer")}
+                        <TableSortLabel
+                          active={orderBy === "user.name"}
+                          direction={orderBy === "user.name" ? order : "asc"}
+                          onClick={() => handleSort("user.name")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.Customer")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {t("Invoice.Phone")}
+                        <TableSortLabel
+                          active={orderBy === "phone"}
+                          direction={orderBy === "phone" ? order : "asc"}
+                          onClick={() => handleSort("phone")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.Phone")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {t("Invoice.Email")}
+                        <TableSortLabel
+                          active={orderBy === "email"}
+                          direction={orderBy === "email" ? order : "asc"}
+                          onClick={() => handleSort("email")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.Email")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {t("Invoice.Total")}
+                        <TableSortLabel
+                          active={orderBy === "totalPrice"}
+                          direction={orderBy === "totalPrice" ? order : "asc"}
+                          onClick={() => handleSort("totalPrice")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.Total")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {t("Invoice.Points")}
+                        <TableSortLabel
+                          active={orderBy === "points"}
+                          direction={orderBy === "points" ? order : "asc"}
+                          onClick={() => handleSort("points")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.Points")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {t("Invoice.Date")}
+                        <TableSortLabel
+                          active={orderBy === "createdAt"}
+                          direction={orderBy === "createdAt" ? order : "asc"}
+                          onClick={() => handleSort("createdAt")}
+                          sx={{ color: "white !important" }}
+                        >
+                          {t("Invoice.Date")}
+                        </TableSortLabel>
                       </StyledTableCell>
                       <StyledTableCell align="center">
                         {t("Invoice.Actions")}
@@ -372,7 +434,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                           {invoice.email || "-"}
                         </StyledTableCell>
                         <StyledTableCell align="center">
-                        {formatAmount(invoice.totalPrice, invoice.currency)}
+                          {formatAmount(invoice.totalPrice, invoice.currency)}
                         </StyledTableCell>
                         <StyledTableCell align="center">
                           {invoice.points}
@@ -413,6 +475,13 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                   }}
                   color="primary"
                 />
+                <IconButton
+                  sx={{ color: "background.default" }}
+                  onClick={handleClearFilter}
+                  title={t("Invoice.ClearFilters")}
+                >
+                  <RestartAltOutlined />
+                </IconButton>
               </Stack>
             )}
           </Box>

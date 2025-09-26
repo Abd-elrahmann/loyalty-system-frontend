@@ -7,6 +7,7 @@ import {
   Chip,
   Checkbox,
   Paper,
+  TableSortLabel,
 } from "@mui/material";
 import { CheckCircleOutlined, CloseOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -25,6 +26,9 @@ const RewardCard = ({
   profile,
   i18n,
   t,
+  orderBy,
+  order,
+  handleSort,
 }) => {
   const statusMap = {
     PENDING: { label: "PENDING", color: "warning" },
@@ -48,9 +52,18 @@ const RewardCard = ({
         {/* Header with ID and Checkbox */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {profile.role === "ADMIN" && (
-            <Typography variant="subtitle2" color="text.secondary">
-              ID: {reward.id}
-            </Typography>
+            <Box>
+              <TableSortLabel
+                active={orderBy === "id"}
+                direction={orderBy === "id" ? order : "asc"}
+                onClick={() => handleSort("id")}
+                sx={{ color: "primary.main !important" }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  ID: {reward.id}
+                </Typography>
+              </TableSortLabel>
+            </Box>
           )}
           {isAllChecked && (
             <Checkbox
@@ -63,9 +76,16 @@ const RewardCard = ({
         {/* Customer Info */}
         {profile.role === "ADMIN" && (
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Rewards.Customer")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "user.name"}
+              direction={orderBy === "user.name" ? order : "asc"}
+              onClick={() => handleSort("user.name")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Rewards.Customer")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1">
               {i18n.language === "ar" ? reward.user?.arName : reward.user?.enName}
             </Typography>
@@ -80,9 +100,16 @@ const RewardCard = ({
             style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "4px" }}
           />
           <Box flex={1}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Rewards.Product")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "product.name"}
+              direction={orderBy === "product.name" ? order : "asc"}
+              onClick={() => handleSort("product.name")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Rewards.Product")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1">
               {reward.cafeProduct
                 ? i18n.language === "ar"
@@ -100,16 +127,30 @@ const RewardCard = ({
         {/* Points and Type */}
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Rewards.Points")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "points"}
+              direction={orderBy === "points" ? order : "asc"}
+              onClick={() => handleSort("points")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Rewards.Points")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body1">{reward.points}</Typography>
           </Box>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Rewards.Type")}:
-            </Typography>
-            <Typography 
+            <TableSortLabel
+              active={orderBy === "type"}
+              direction={orderBy === "type" ? order : "asc"}
+              onClick={() => handleSort("type")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Rewards.Type")}:
+              </Typography>
+            </TableSortLabel>
+            <Typography
               variant="body1"
               sx={{
                 color: reward.type === "cafe" ? "#8B4513" : "inherit",
@@ -123,9 +164,16 @@ const RewardCard = ({
         {/* Status and Date */}
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Box>
-            <Typography variant="subtitle2" color="text.secondary" mb={1}>
-              {t("Rewards.Status")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "status"}
+              direction={orderBy === "status" ? order : "asc"}
+              onClick={() => handleSort("status")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                {t("Rewards.Status")}:
+              </Typography>
+            </TableSortLabel>
             <Chip
               label={reward.status}
               color={statusMap[reward.status]?.color || "default"}
@@ -133,9 +181,16 @@ const RewardCard = ({
             />
           </Box>
           <Box>
-            <Typography variant="subtitle2" color="text.secondary">
-              {t("Rewards.Date")}:
-            </Typography>
+            <TableSortLabel
+              active={orderBy === "date"}
+              direction={orderBy === "date" ? order : "asc"}
+              onClick={() => handleSort("date")}
+              sx={{ color: "primary.main !important" }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("Rewards.Date")}:
+              </Typography>
+            </TableSortLabel>
             <Typography variant="body2">
               {dayjs(reward.date).format('DD/MM/YYYY hh:mm')}
             </Typography>

@@ -46,7 +46,6 @@ const Customers = () => {
   const [openShowQR, setOpenShowQR] = useState(false);
   const [customerToShowQR, setCustomerToShowQR] = useState(null);
 
-  // Sorting state with persistence
   const [orderBy, setOrderBy] = useState(() => {
     const saved = localStorage.getItem('customers_sort_orderBy');
     return saved || "id";
@@ -56,7 +55,6 @@ const Customers = () => {
     return saved || "asc";
   });
 
-  // Persist sorting state to localStorage
   useEffect(() => {
     localStorage.setItem('customers_sort_orderBy', orderBy);
   }, [orderBy]);
@@ -68,12 +66,11 @@ const Customers = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 400px)');
   
-  // Handle sorting request
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
-    setPage(1); // Reset to first page when sorting changes
+    setPage(1);
   };
 
   const createSortHandler = (property) => () => {

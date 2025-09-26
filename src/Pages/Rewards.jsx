@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import Api from "../Config/Api";
 import {
@@ -10,6 +10,7 @@ import {
   Stack,
   useMediaQuery,
 } from "@mui/material";
+import { TableSortLabel } from "@mui/material";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import RewardsSearchModal from "../Components/Modals/RewardsSearchModal";
 import RewardsScanModal from "../Components/Modals/RewardsScanModal";
@@ -40,9 +41,26 @@ const Rewards = () => {
   const [selectedRewards, setSelectedRewards] = useState([]);
   const [rewardToDelete, setRewardToDelete] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [orderBy, setOrderBy] = useState(() => {
+    const saved = localStorage.getItem('rewards_sort_orderBy');
+    return saved || "id";
+  });
+  const [order, setOrder] = useState(() => {
+    const saved = localStorage.getItem('rewards_sort_order');
+    return saved || "asc";
+  });
   const isMobile = useMediaQuery("(max-width: 600px)");
   const profile = useUser();
   const queryClient = useQueryClient();
+
+  // Save sorting state to localStorage
+  useEffect(() => {
+    localStorage.setItem('rewards_sort_orderBy', orderBy);
+  }, [orderBy]);
+
+  useEffect(() => {
+    localStorage.setItem('rewards_sort_order', order);
+  }, [order]);
 
   const fetchRewards = async () => {
     const queryParams = new URLSearchParams();
@@ -53,13 +71,15 @@ const Rewards = () => {
     if (filters.toDate) queryParams.append("toDate", filters.toDate);
     if (filters.type) queryParams.append("type", filters.type);
     if (filters.minPoints) queryParams.append("minPoints", filters.minPoints);
+    queryParams.append("sortBy", orderBy);
+    queryParams.append("sortOrder", order);
 
     const response = await Api.get(`/api/rewards/${page}?${queryParams}`);
     return response.data;
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['rewards', page, tabValue, filters],
+    queryKey: ['rewards', page, tabValue, filters, orderBy, order],
     queryFn: fetchRewards,
     keepPreviousData: true,
     staleTime: 5000
@@ -184,6 +204,12 @@ const Rewards = () => {
   const handleSearch = (searchFilters) => {
     setFilters(searchFilters);
     setPage(1);
+  };
+
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrderBy(property);
+    setOrder(isAsc ? "desc" : "asc");
   };
 
   const filteredRewards = rewards.filter(
@@ -401,6 +427,9 @@ const Rewards = () => {
         setOpenDeleteDialog={setOpenDeleteDialog}
         profile={profile}
         i18n={i18n}
+        orderBy={orderBy}
+        order={order}
+        handleSort={handleSort}
       />
 
       <RewardsSearchModal

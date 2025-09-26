@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
@@ -20,6 +20,7 @@ import {
   Typography,
   Card,
   CardContent,
+  TableSortLabel,
 } from "@mui/material";
 
 import {
@@ -53,12 +54,25 @@ const Transactions = () => {
   });
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
-  const [openCancelModal, setOpenCancelModal] = useState(false); // New state for cancel modal
-  const [transactionToCancel, setTransactionToCancel] = useState(null); // New state for transaction to cancel
+  const [openCancelModal, setOpenCancelModal] = useState(false);
+  const [transactionToCancel, setTransactionToCancel] = useState(null); 
   const profile = useUser();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  
-  
+  const [orderBy, setOrderBy] = useState(() => {
+    const saved = localStorage.getItem('transactions_sort_orderBy');
+    return saved || "id";
+  });
+  const [order, setOrder] = useState(() => {
+    const saved = localStorage.getItem('transactions_sort_order');
+    return saved || "asc";
+  });
+  useEffect(() => {
+    localStorage.setItem('transactions_sort_orderBy', orderBy);
+  }, [orderBy]);
+  useEffect(() => {
+    localStorage.setItem('transactions_sort_order', order);
+  }, [order]);
+    
   const fetchTransactions = async () => {
     const queryParams = new URLSearchParams();
     if (filters.type) queryParams.append("type", filters.type);
@@ -72,13 +86,14 @@ const Transactions = () => {
     if (customerId) queryParams.append("userId", customerId);
     queryParams.append("limit", rowsPerPage);
     queryParams.append("page", page);
-
+    queryParams.append("sortBy", orderBy);
+    queryParams.append("sortOrder", order);
     const response = await Api.get(`/api/transactions/${page}?${queryParams}`);
     return response.data;
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ["transactions", page, filters, customerId, rowsPerPage],
+    queryKey: ["transactions", page, filters, customerId, rowsPerPage, orderBy, order],
     queryFn: fetchTransactions,
     keepPreviousData: true,
     staleTime: 5000,
@@ -114,7 +129,6 @@ const Transactions = () => {
     },
   });
 
-  // New mutation for canceling transactions
   const cancelMutation = useMutation({
     mutationFn: (transactionId) =>
       Api.post(`/api/transactions/${transactionId}/cancel`),
@@ -139,7 +153,6 @@ const Transactions = () => {
     deleteMutation.mutate(transactionToDelete.id);
   };
 
-  // New function to handle transaction cancellation
   const handleCancel = () => {
     if (!transactionToCancel?.id) return;
     cancelMutation.mutate(transactionToCancel.id);
@@ -150,13 +163,26 @@ const Transactions = () => {
     setPage(1);
   };
 
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrderBy(property);
+    setOrder(isAsc ? "desc" : "asc");
+  };
+
   const renderTransactionCard = (transaction) => (
     <Card key={transaction.id} sx={{ mb: 2, p: 2 }}>
       <CardContent>
         <Stack spacing={1}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {t("Transactions.ID")}:
+              <TableSortLabel
+                active={orderBy === "id"}
+                direction={orderBy === "id" ? order : "asc"}
+                onClick={() => handleSort("id")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Transactions.ID")}:
+              </TableSortLabel>
             </Typography>
             <Typography variant="body2">{transaction.id}</Typography>
           </Box>
@@ -164,8 +190,15 @@ const Transactions = () => {
           {!customerId && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="subtitle2" fontWeight="bold">
-                {t("Transactions.CustomerName")}:
-              </Typography>
+                <TableSortLabel
+                  active={orderBy === "user.name"}
+                  direction={orderBy === "user.name" ? order : "asc"}
+                  onClick={() => handleSort("user.name")}
+                  sx={{ color: "white !important" }}
+                >
+                  {t("Transactions.CustomerName")}:
+                </TableSortLabel>
+              </Typography> 
               <Typography variant="body2">
                 {i18n.language === "ar"
                   ? transaction.user?.arName
@@ -176,14 +209,28 @@ const Transactions = () => {
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {t("Transactions.Points")}:
+              <TableSortLabel
+                active={orderBy === "points"}
+                direction={orderBy === "points" ? order : "asc"}
+                onClick={() => handleSort("points")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Transactions.Points")}:
+              </TableSortLabel>
             </Typography>
             <Typography variant="body2">{transaction.points}</Typography>
           </Box>
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {t("Transactions.Currency")}:
+              <TableSortLabel
+                active={orderBy === "currency.arCurrency"}
+                direction={orderBy === "currency.arCurrency" ? order : "asc"}
+                onClick={() => handleSort("currency.arCurrency")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Transactions.Currency")}:
+              </TableSortLabel>
             </Typography>
             <Typography variant="body2" sx={{ color: "#1976d2", fontWeight: "bold" }}>
               {i18n.language === "ar"
@@ -194,7 +241,14 @@ const Transactions = () => {
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {t("Transactions.Type")}:
+              <TableSortLabel
+                active={orderBy === "type"}
+                direction={orderBy === "type" ? order : "asc"}
+                onClick={() => handleSort("type")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Transactions.Type")}:
+              </TableSortLabel>
             </Typography>
             <Chip
               label={t(`Transactions.${transaction.type}`)}
@@ -205,7 +259,14 @@ const Transactions = () => {
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {t("Transactions.Status")}:
+              <TableSortLabel
+                active={orderBy === "status"}
+                direction={orderBy === "status" ? order : "asc"}
+                onClick={() => handleSort("status")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Transactions.Status")}:
+              </TableSortLabel>
             </Typography>
             <Chip
               label={transaction.status}
@@ -216,7 +277,14 @@ const Transactions = () => {
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle2" fontWeight="bold">
-              {t("Transactions.Date")}:
+              <TableSortLabel
+                active={orderBy === "date"}
+                direction={orderBy === "date" ? order : "asc"}
+                onClick={() => handleSort("date")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Transactions.Date")}:
+              </TableSortLabel>
             </Typography>
             <Typography variant="body2">
               {dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")}
@@ -265,8 +333,7 @@ const Transactions = () => {
           content={t("Transactions.TransactionsDescription")}
         />
       </Helmet>
-      
-      {/* Back button and customer info for customer-specific view */}
+
       {customerId && (
         <Box
           sx={{
@@ -380,34 +447,83 @@ const Transactions = () => {
         </Box>
       </Box>
 
-      {/* عرض الجدول للشاشات الكبيرة والبطاقات للشاشات الصغيرة */}
+          
       {!isMobile ? (
         <TableContainer component={Paper} sx={{ maxHeight: 650, width: "100%" }}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                  {t("Transactions.ID")}
+                  <TableSortLabel
+                    active={orderBy === "id"}
+                    direction={orderBy === "id" ? order : "asc"}
+                    onClick={() => handleSort("id")}
+                    sx={{ color: "white !important" }}
+                  >
+                    {t("Transactions.ID")}
+                  </TableSortLabel>
                 </StyledTableCell>
                 {!customerId && (
                   <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                    {t("Transactions.CustomerName")}
+                    <TableSortLabel
+                      active={orderBy === "user.name"}
+                      direction={orderBy === "user.name" ? order : "asc"}
+                      onClick={() => handleSort("user.name")}
+                      sx={{ color: "white !important" }}
+                    >
+                      {t("Transactions.CustomerName")}
+                    </TableSortLabel>
                   </StyledTableCell>
                 )}
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                  {t("Transactions.Points")}
+                  <TableSortLabel
+                    active={orderBy === "points"}
+                    direction={orderBy === "points" ? order : "asc"}
+                    onClick={() => handleSort("points")}
+                    sx={{ color: "white !important" }}
+                  >
+                    {t("Transactions.Points")}
+                  </TableSortLabel>
                 </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                  {t("Transactions.Currency")}
+                  <TableSortLabel
+                    active={orderBy === "currency.arCurrency"}
+                    direction={orderBy === "currency.arCurrency" ? order : "asc"}
+                    onClick={() => handleSort("currency.arCurrency")}
+                    sx={{ color: "white !important" }}
+                  >
+                    {t("Transactions.Currency")}
+                  </TableSortLabel>
                 </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                  {t("Transactions.Type")}
+                  <TableSortLabel
+                    active={orderBy === "type"}
+                    direction={orderBy === "type" ? order : "asc"}
+                    onClick={() => handleSort("type")}
+                    sx={{ color: "white !important" }}
+                  >
+                    {t("Transactions.Type")}
+                  </TableSortLabel>
                 </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                  {t("Transactions.Status")}
+                  <TableSortLabel
+                    active={orderBy === "status"}
+                    direction={orderBy === "status" ? order : "asc"}
+                    onClick={() => handleSort("status")}
+                    sx={{ color: "white !important" }}
+                  >
+                    {t("Transactions.Status")}
+                  </TableSortLabel>
                 </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
-                  {t("Transactions.Date")}
+                  <TableSortLabel
+                    active={orderBy === "date"}
+                    direction={orderBy === "date" ? order : "asc"}
+                    onClick={() => handleSort("date")}
+                    sx={{ color: "white !important" }}
+                  >
+                    {t("Transactions.Date")}
+                  </TableSortLabel>
                 </StyledTableCell>
                 <StyledTableCell
                   align="center"
@@ -590,7 +706,6 @@ const Transactions = () => {
         isLoading={deleteMutation.isLoading}
       />
 
-      {/* Cancel Transaction Modal */}
       <DeleteModal
         open={openCancelModal}
         ButtonText={t("Transactions.Cancel")}

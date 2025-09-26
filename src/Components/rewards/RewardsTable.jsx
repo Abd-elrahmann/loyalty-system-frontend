@@ -14,6 +14,7 @@ import {
   Box,
   useMediaQuery,
   useTheme,
+  TableSortLabel,
 } from "@mui/material";
 import {
   StyledTableCell,
@@ -42,7 +43,10 @@ const RewardsTable = ({
   setRewardToDelete,
   setOpenDeleteDialog,
   profile,
-  i18n
+  i18n,
+  orderBy,
+  order,
+  handleSort
 }) => {
   const { t } = useTranslation();
 
@@ -85,6 +89,9 @@ const RewardsTable = ({
                   profile={profile}
                   i18n={i18n}
                   t={t}
+                  orderBy={orderBy}
+                  order={order}
+                  handleSort={handleSort}
                 />
               ))}
             </Stack>
@@ -124,25 +131,74 @@ const RewardsTable = ({
               </StyledTableCell>
             )}
             <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
-              {t("Rewards.ID")}
+              <TableSortLabel
+                active={orderBy === "id"}
+                direction={orderBy === "id" ? order : "asc"}
+                onClick={() => handleSort("id")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.ID")}
+              </TableSortLabel>
             </StyledTableCell>
             <StyledTableCell align="center" sx={{ display: profile.role === "ADMIN" ? "" : "none" }}>
-              {t("Rewards.Customer")}
+              <TableSortLabel
+                active={orderBy === "user.name"}
+                direction={orderBy === "user.name" ? order : "asc"}
+                onClick={() => handleSort("user.name")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.Customer")}
+              </TableSortLabel>
             </StyledTableCell>
             <StyledTableCell align="center">
-              {t("Rewards.Product")}
+              <TableSortLabel
+                active={orderBy === "product.name"}
+                direction={orderBy === "product.name" ? order : "asc"}
+                onClick={() => handleSort("product.name")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.Product")}
+              </TableSortLabel>
             </StyledTableCell>
             <StyledTableCell align="center">
-              {t("Rewards.Points")}
+              <TableSortLabel
+                active={orderBy === "points"}
+                direction={orderBy === "points" ? order : "asc"}
+                onClick={() => handleSort("points")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.Points")}
+              </TableSortLabel>
             </StyledTableCell>
             <StyledTableCell align="center">
-              {t("Rewards.Type")}
+              <TableSortLabel
+                active={orderBy === "type"}
+                direction={orderBy === "type" ? order : "asc"}
+                onClick={() => handleSort("type")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.Type")}
+              </TableSortLabel>
             </StyledTableCell>
             <StyledTableCell align="center">
-              {t("Rewards.Status")}
+              <TableSortLabel
+                active={orderBy === "status"}
+                direction={orderBy === "status" ? order : "asc"}
+                onClick={() => handleSort("status")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.Status")}
+              </TableSortLabel>
             </StyledTableCell>
             <StyledTableCell align="center">
-              {t("Rewards.Date")}
+              <TableSortLabel
+                active={orderBy === "date"}
+                direction={orderBy === "date" ? order : "asc"}
+                onClick={() => handleSort("date")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Rewards.Date")}
+              </TableSortLabel>
             </StyledTableCell>
             {tabValue === 0 && !isAllChecked && profile.role === "ADMIN" && (
               <StyledTableCell align="center">
