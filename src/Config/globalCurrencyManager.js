@@ -2,7 +2,6 @@ import React from 'react';
 import Api from '../Config/Api';
 import { useSettings } from '../hooks/useSettings';
 
-// Default settings in case nothing saved
 const DEFAULT_SETTINGS = {
   enCurrency: '',
   arCurrency: '',
@@ -17,7 +16,6 @@ class GlobalCurrencyManager {
     this.listeners = new Set();
     this.isInitialized = false;
 
-    // Load saved settings from localStorage
     const savedSettings = localStorage.getItem('currencySettings');
     if (savedSettings) {
       try {
@@ -28,7 +26,6 @@ class GlobalCurrencyManager {
     }
   }
 
-  // Initialize with API settings
   async initialize() {
     if (this.isInitialized) return;
 
@@ -52,12 +49,10 @@ class GlobalCurrencyManager {
     }
   }
 
-  // Get selected display currency
   getCurrentDisplayCurrency() {
     return this.currentSettings.enCurrency || DEFAULT_SETTINGS.enCurrency;
   }
 
-  // Calculate exchange rate
   getExchangeRate(fromCurrency, toCurrency) {
     if (fromCurrency === toCurrency) return 1;
 
@@ -71,42 +66,45 @@ class GlobalCurrencyManager {
 
     return 1;
   }
-
-// Convert value from one currency to another
+  
 convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
   const targetCurrency = toCurrency || this.getCurrentDisplayCurrency();
-
+  
   if (fromCurrency === targetCurrency) return amount;
   if (typeof amount !== 'number' || isNaN(amount)) return amount;
 
-  if (fromCurrency === this.currentSettings.enCurrency && targetCurrency === 'USD') {
-    const rate = this.currentSettings.usdToIqd;
-    return rate && rate > 0 ? amount / rate : amount;
-  }
-
-  if (fromCurrency === 'USD' && targetCurrency === this.currentSettings.enCurrency) {
+  if (fromCurrency === 'USD' && targetCurrency === 'IQD') {
     const rate = this.currentSettings.usdToIqd;
     return rate && rate > 0 ? amount * rate : amount;
+  }
+
+
+  if (fromCurrency === 'IQD' && targetCurrency === 'USD') {
+    const rate = this.currentSettings.usdToIqd;
+    return rate && rate > 0 ? amount / rate : amount;
   }
 
   return amount;
 }
 
-  // Format value to readable currency string
-  formatAmount(amount, originalCurrency = 'USD', targetCurrency = null) {
-    const displayCurrency = targetCurrency || this.getCurrentDisplayCurrency();
-    const convertedAmount = this.convertAmount(amount, originalCurrency, displayCurrency);
+formatAmount(amount, originalCurrency = 'USD', targetCurrency = null) {
+  const displayCurrency = targetCurrency || this.getCurrentDisplayCurrency();
+  
 
-    const formatted = convertedAmount.toLocaleString('en-US', {
-      minimumFractionDigits: displayCurrency === 'USD' ? 2 : 0,
-      maximumFractionDigits: displayCurrency === 'USD' ? 2 : 0
-    });
+  const convertedAmount = this.convertAmount(amount, originalCurrency, displayCurrency);
 
-    const symbol = this.getCurrencySymbol(displayCurrency);
-    return `${formatted} ${symbol}`;
-  }
+  const formatted = convertedAmount.toLocaleString('en-US', {
+    minimumFractionDigits: displayCurrency === 'USD' ? 2 : 0,
+    maximumFractionDigits: displayCurrency === 'USD' ? 2 : 0
+  });
 
-  // Currency symbols
+  const symbol = this.getCurrencySymbol(displayCurrency);
+  return `${formatted} ${symbol}`;
+}
+
+getCurrentCurrency() {
+  return this.getCurrentDisplayCurrency();
+}
   getCurrencySymbol(currency) {
     if (currency === 'USD') {
       return '$';
@@ -117,7 +115,6 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
     return currency;
   }
 
-  // Update settings (API + localStorage)
   async updateSettings(newSettings) {
     try {
       const response = await Api.post('/api/settings', {
@@ -147,7 +144,6 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
     }
   }
 
-  // Subscribe to settings changes
   addListener(callback) {
     this.listeners.add(callback);
     return () => {
@@ -155,7 +151,6 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
     };
   }
 
-  // Notify all listeners
   notifyListeners() {
     this.listeners.forEach(callback => {
       try {
@@ -166,7 +161,6 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
     });
   }
 
-  // Force refresh
   refreshPage() {
     this.notifyListeners();
     setTimeout(() => {
@@ -181,7 +175,6 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
 
 export const globalCurrencyManager = new GlobalCurrencyManager();
 
-// React hook for using currency manager
 export const useCurrencyManager = () => {
   const { data: settings } = useSettings();
   const [currencySettings, setCurrencySettings] = React.useState(globalCurrencyManager.getSettings());
@@ -220,7 +213,6 @@ export const useCurrencyManager = () => {
   };
 };
 
-// Utility functions
 export const formatCurrency = (amount, originalCurrency = 'USD') => {
   return globalCurrencyManager.formatAmount(amount, originalCurrency);
 };

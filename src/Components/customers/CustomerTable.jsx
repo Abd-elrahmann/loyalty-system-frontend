@@ -11,6 +11,7 @@ import {
   Link,
   Chip,
   Box,
+  TableSortLabel,
 } from "@mui/material";
 import { EyeOutlined, EditOutlined, DeleteOutlined, QrcodeOutlined, PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -30,22 +31,81 @@ const CustomerTable = ({
   onAddPoints,
   onEdit,
   onDelete,
-  onViewTransactions
+  onViewTransactions,
+  orderBy,
+  order,
+  createSortHandler
 }) => {
   const { t, i18n } = useTranslation();
+
+  const nameField = i18n.language === "ar" ? "arName" : "enName";
 
   return (
     <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
       <Table stickyHeader>
         <TableHead>
           <TableRow>
-            <StyledTableCell align="center">{t("Customers.ID")}</StyledTableCell>
-            <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Customers.Name")}</StyledTableCell>
-            <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>{t("Customers.Email")}</StyledTableCell>
-            <StyledTableCell align="center">{t("Customers.Phone")}</StyledTableCell>
-            <StyledTableCell align="center">{t("Customers.Points")}</StyledTableCell>
+            <StyledTableCell align="center">
+              <TableSortLabel
+                active={orderBy === "id"}
+                direction={orderBy === "id" ? order : "asc"}
+                onClick={createSortHandler("id")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Customers.ID")}
+              </TableSortLabel>
+            </StyledTableCell>
+            <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>
+              <TableSortLabel
+                active={orderBy === nameField}
+                direction={orderBy === nameField ? order : "asc"}
+                onClick={createSortHandler(nameField)}
+                sx={{ color: "white !important" }}
+              >
+                {t("Customers.Name")}
+              </TableSortLabel>
+            </StyledTableCell>
+            <StyledTableCell align="center" sx={{ maxWidth: '200px' }}>
+              <TableSortLabel
+                active={orderBy === "email"}
+                direction={orderBy === "email" ? order : "asc"}
+                onClick={createSortHandler("email")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Customers.Email")}
+              </TableSortLabel>
+            </StyledTableCell>
+            <StyledTableCell align="center">
+              <TableSortLabel
+                active={orderBy === "phone"}
+                direction={orderBy === "phone" ? order : "asc"}
+                onClick={createSortHandler("phone")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Customers.Phone")}
+              </TableSortLabel>
+            </StyledTableCell>
+            <StyledTableCell align="center">
+              <TableSortLabel
+                active={orderBy === "points"}
+                direction={orderBy === "points" ? order : "asc"}
+                onClick={createSortHandler("points")}
+                sx={{ color: "white !important" }}
+              >
+                {t("Customers.Points")}
+              </TableSortLabel>
+            </StyledTableCell>
             <StyledTableCell align="center">{t("Customers.QRCode")}</StyledTableCell>
-            <StyledTableCell align="center">{t("Customers.CreatedAt")}</StyledTableCell>
+            <StyledTableCell align="center">
+              <TableSortLabel
+                active={orderBy === "createdAt"}
+                direction={orderBy === "createdAt" ? order : "asc"}
+                onClick={createSortHandler("createdAt")}
+                sx={{ color: "white !important" }}
+                >
+                {t("Customers.CreatedAt")}
+              </TableSortLabel>
+            </StyledTableCell>
             <StyledTableCell align="center">{t("Customers.AddPoints")}</StyledTableCell>
             <StyledTableCell align="center">{t("Customers.Actions")}</StyledTableCell>
           </TableRow>

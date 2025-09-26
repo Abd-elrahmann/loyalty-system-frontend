@@ -26,16 +26,17 @@ import debounce from "lodash.debounce";
 import { Spin } from "antd";
 import { DatePicker } from "@mui/x-date-pickers";
 import InvoiceCard from "./InvoiceCard";
-
+import { useCurrencyManager } from "../../Config/globalCurrencyManager";
 const InvoiceSearch = ({ onViewInvoice }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
+  const { formatAmount } = useCurrencyManager();
   const [formData, setFormData] = useState({
     fromDate: null,
     toDate: null,
@@ -371,9 +372,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                           {invoice.email || "-"}
                         </StyledTableCell>
                         <StyledTableCell align="center">
-                          {invoice.totalPrice} {i18n.language === "ar" ? 
-                            invoice.currency === "USD" ? "دولار امريكي" : "دينار عراقي" 
-                            : invoice.currency}
+                        {formatAmount(invoice.totalPrice, invoice.currency)}
                         </StyledTableCell>
                         <StyledTableCell align="center">
                           {invoice.points}

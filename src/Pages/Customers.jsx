@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Api from "../Config/Api";
 import { useTranslation } from "react-i18next";
@@ -46,10 +46,40 @@ const Customers = () => {
   const [openShowQR, setOpenShowQR] = useState(false);
   const [customerToShowQR, setCustomerToShowQR] = useState(null);
 
+  // Sorting state with persistence
+  const [orderBy, setOrderBy] = useState(() => {
+    const saved = localStorage.getItem('customers_sort_orderBy');
+    return saved || "id";
+  });
+  const [order, setOrder] = useState(() => {
+    const saved = localStorage.getItem('customers_sort_order');
+    return saved || "asc";
+  });
+
+  // Persist sorting state to localStorage
+  useEffect(() => {
+    localStorage.setItem('customers_sort_orderBy', orderBy);
+  }, [orderBy]);
+
+  useEffect(() => {
+    localStorage.setItem('customers_sort_order', order);
+  }, [order]);
 
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 400px)');
   
+  // Handle sorting request
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+    setPage(1); // Reset to first page when sorting changes
+  };
+
+  const createSortHandler = (property) => () => {
+    handleRequestSort(property);
+  };
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -71,14 +101,15 @@ const Customers = () => {
     if (scannedEmail) queryParams.append("email", scannedEmail);
     if (searchFilters.qrCode) queryParams.append("qrCode", searchFilters.qrCode);
     queryParams.append('limit', rowsPerPage);
+    queryParams.append('sortBy', orderBy);
+    queryParams.append('sortOrder', order);
 
     const response = await Api.get(`/api/users/${page}?${queryParams}`);
     return response.data;
   };
 
-
   const { data, isLoading } = useQuery({
-    queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail, searchFilters.qrCode],
+    queryKey: ['customers', page, searchFilters, rowsPerPage, scannedEmail, searchFilters.qrCode, orderBy, order],
     queryFn: fetchCustomers,
     keepPreviousData: true,
     staleTime: 5000,
@@ -135,8 +166,6 @@ const Customers = () => {
     setPage(1);
     notifySuccess(t("Customers.qrScanSuccess") + `: ${email}`);
   };
-
- 
 
   const handleShowQR = (customer) => {
     setCustomerToShowQR(customer);
@@ -210,6 +239,9 @@ const Customers = () => {
           onEdit={handleEdit}
           onDelete={handleDeleteCustomer}
           onViewTransactions={handleViewTransactions}
+          orderBy={orderBy}
+          order={order}
+          createSortHandler={createSortHandler}
         />
       ) : (
         <Box>

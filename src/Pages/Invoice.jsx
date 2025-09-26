@@ -40,21 +40,16 @@ import {
 } from "@mui/icons-material";
 import {
   useCurrencyManager,
-  formatCurrency,
 } from "../Config/globalCurrencyManager";
 
 const Invoice = () => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
-  // eslint-disable-next-line no-unused-vars
   const { formatAmount } = useCurrencyManager();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceItems, setInvoiceItems] = useState([]);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const formatPrice = (price) => {
-    return formatCurrency(price);
-  };
 
   const handleViewInvoice = (invoiceData) => {
     setSelectedInvoice(invoiceData);
@@ -208,7 +203,7 @@ const Invoice = () => {
 
                 <TextField
                   label={t("Invoice.totalPrice")}
-                  value={`${selectedInvoice.totalPrice} ${i18n.language === "ar" ? selectedInvoice.currency === "USD" ? "دولار امريكي" : "دينار عراقي" : selectedInvoice.currency}`}
+                  value={formatAmount(selectedInvoice.totalPrice, selectedInvoice.currency)}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -317,7 +312,7 @@ const Invoice = () => {
                               <Typography color="text.secondary">
                                 {t("Invoice.price")}:
                               </Typography>
-                              <Typography>{formatPrice(item.price)}</Typography>
+                              <Typography>{formatAmount(item.price, selectedInvoice.currency)}</Typography>
                             </Box>
                             <Box
                               sx={{
@@ -340,7 +335,7 @@ const Invoice = () => {
                                 {t("Invoice.total")}:
                               </Typography>
                               <Typography color="primary.main" fontWeight={600}>
-                                {formatPrice(item.total)}
+                                {formatAmount(item.total, selectedInvoice.currency)}
                               </Typography>
                             </Box>
                           </Stack>
@@ -387,12 +382,14 @@ const Invoice = () => {
                           >
                             {t("Invoice.total")}
                           </StyledTableCell>
+                          {selectedInvoice.discount > 0 && (  
                           <StyledTableCell
                             align="center"
-                            sx={{ fontWeight: 600 }}
+                              sx={{ fontWeight: 600 }}
                           >
-                            {t("Invoice.PriceAfterDiscount")}
-                          </StyledTableCell>
+                              {t("Invoice.PriceAfterDiscount")}
+                            </StyledTableCell>
+                          )}
                         </StyledTableRow>
                       </TableHead>
                       <TableBody>
@@ -447,54 +444,56 @@ const Invoice = () => {
                                 </Box>
                               </StyledTableCell>
                               <StyledTableCell align="center">
-                                {`${item.price} ${
-                                  selectedInvoice.currency === "USD"
-                                    ? "$"
-                                    : selectedInvoice.currency === "IQD"
-                                    ? "د.ع"
-                                    : selectedInvoice.currency
-                                }`}
+                                {formatAmount(item.price, selectedInvoice.currency)}
                               </StyledTableCell>
                               <StyledTableCell align="center">
                                 {item.quantity}
                               </StyledTableCell>
-                              <StyledTableCell
-                                align="center"
-                                sx={{
-                                  fontWeight: 600,
-                                  color:
-                                    item.total > 100
-                                      ? "error.main"
-                                      : "primary.main",
-                                  textDecoration: "line-through",
-                                }}
-                              >
-                                {`${item.total} ${
-                                  selectedInvoice.currency === "USD"
-                                    ? "$"
-                                    : selectedInvoice.currency === "IQD"
-                                    ? "د.ع"
-                                    : selectedInvoice.currency
-                                }`}
-                              </StyledTableCell>
-                              <StyledTableCell align="center" sx={{
-                                  fontWeight: 600,
-                                  color:
-                                    item.total > 100
-                                      ? "error.main"
-                                      : "primary.main",
-                                }}>
-                                {`${
-                                  item.total -
-                                  item.total * (selectedInvoice.discount / 100)
-                                } ${
-                                  selectedInvoice.currency === "USD"
-                                    ? "$"
-                                    : selectedInvoice.currency === "IQD"
-                                    ? "د.ع"
-                                    : selectedInvoice.currency
-                                }`}
-                              </StyledTableCell>
+                              {selectedInvoice.discount > 0 ? (
+                                <>
+                                  <StyledTableCell
+                                    align="center"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color:
+                                        item.total > 100
+                                          ? "error.main"
+                                          : "primary.main",
+                                      textDecoration: "line-through",
+                                    }}
+                                  >
+                                    {formatAmount(item.total, selectedInvoice.currency)}
+                                  </StyledTableCell>
+                                  <StyledTableCell 
+                                    align="center" 
+                                    sx={{
+                                      fontWeight: 600,
+                                      color:
+                                        item.total > 100
+                                          ? "error.main" 
+                                          : "primary.main",
+                                    }}
+                                  >
+                                    {formatAmount(
+                                      item.total - item.total * (selectedInvoice.discount / 100),
+                                      selectedInvoice.currency
+                                    )}
+                                  </StyledTableCell>
+                                </>
+                              ) : (
+                                <StyledTableCell
+                                  align="center"
+                                  sx={{
+                                    fontWeight: 600,
+                                    color:
+                                      item.total > 100
+                                        ? "error.main"
+                                        : "primary.main",
+                                  }}
+                                >
+                                  {formatAmount(item.total, selectedInvoice.currency)}
+                                </StyledTableCell>
+                              )}
                             </StyledTableRow>
                           );
                         })}

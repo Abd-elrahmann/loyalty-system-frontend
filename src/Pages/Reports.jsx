@@ -38,18 +38,16 @@ import {
 } from '../utilities/reportExporter';
 import Api from '../Config/Api';
 import { Helmet } from "react-helmet-async";
-import {useSettings} from '../hooks/useSettings'; 
 
 import { StyledTableRow, StyledTableCell } from '../Components/Shared/tableLayout';
 import { useTranslation } from 'react-i18next';
 import { notifyError } from '../utilities/Toastify';
-import { formatCurrency } from '../Config/globalCurrencyManager';
+import { useCurrencyManager } from '../Config/globalCurrencyManager';
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const Reports = () => {
   const { t, i18n } = useTranslation();
-  const { data: settings } = useSettings();
   const [reportType, setReportType] = useState('');
   // eslint-disable-next-line no-unused-vars
   const [managers, setManagers] = useState([]);
@@ -60,10 +58,8 @@ const Reports = () => {
   const [reportData, setReportData] = useState([]);
   const [previewLoading, setPreviewLoading] = useState(false);
   const printRef = useRef();
+  const { formatAmount } = useCurrencyManager();
 
-  const formatPrice = (price, currency) => {
-    return formatCurrency(price, currency);
-  };
 
   useEffect(() => {
     fetchManagers();
@@ -667,7 +663,7 @@ const Reports = () => {
                   <StyledTableRow key={product.id}>
                       <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.id}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? product.arName : product.enName}</StyledTableCell>
-                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.price ? formatPrice(product.price, i18n.language === 'ar' ? settings?.arCurrency : settings?.enCurrency) : '-'}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.price ? formatAmount(product.price, product.currency) : '-'}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.points}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
                       {product.type}
@@ -735,7 +731,7 @@ const Reports = () => {
                       {t('Invoice.id')}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
-                      {t('Invoice.InvoiceName')}
+                      {t('Invoice.CustomerName')}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('Invoice.phone')}
@@ -743,9 +739,11 @@ const Reports = () => {
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.totalPrice')}
                   </StyledTableCell>
+                  {reportData.discount && (
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.discount')}
                   </StyledTableCell>
+                  )}
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('Invoice.points')}
                   </StyledTableCell>
@@ -763,8 +761,10 @@ const Reports = () => {
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.id}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? (invoice.user?.arName || 'Guest') : (invoice.user?.enName || 'Guest')}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.phone}</StyledTableCell>
-                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{formatPrice(invoice.totalPrice, i18n.language === 'ar' ? settings?.arCurrency : settings?.enCurrency)}</StyledTableCell>
-                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.discount}%</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{formatAmount(invoice.totalPrice, invoice.currency)}</StyledTableCell>
+                    {reportData.discount && (
+                      <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.discount}%</StyledTableCell>
+                    )}
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{invoice.points}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
                       {i18n.language === 'ar' ? 
