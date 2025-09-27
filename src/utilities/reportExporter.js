@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import i18n from '../Config/translationConfig';
 import dayjs from 'dayjs';
-import { formatCurrency } from '../Config/globalCurrencyManager';
+import { formatAmount } from '../Config/globalCurrencyManager';
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [
@@ -13,13 +13,6 @@ const hexToRgb = (hex) => {
 
 const headerColor = hexToRgb('#800080');
 
-const formatTransactionType = (type) => {
-  switch (type) {
-    case 'earn': return i18n.language === 'ar' ? 'كسب نقاط' : 'Earn Points';
-    case 'redeem': return i18n.language === 'ar' ? 'استبدال نقاط' : 'Redeem Points';
-    default: return type;
-  }
-};
 
 // Translation helper function
 const t = (key) => {
@@ -61,19 +54,22 @@ export const exportManagersToPDF = async (data) => {
     doc.text(t('report.managers'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
 
     const headers = [
-      isRTL() ? t('manager.arName') : t('manager.enName'),
-      t('manager.email'),
+      t('manager.managerName'),
+      t('manager.email'), 
       t('manager.phone'),
-      t('manager.role'),
-      t('manager.createdAt')
+      t('manager.role')
     ];
     
     const rows = data.map(manager => [
       isRTL() ? manager.arName : manager.enName,
       manager.email,
       manager.phone,
-      manager.role,
-      manager.createdAt ? dayjs(manager.createdAt).format("DD/MM/YYYY hh:mm A") : ''
+      isRTL() ? 
+        manager.role === 'ADMIN' ? 'مدير عام' :
+        manager.role === 'ACCOUNTANT' ? 'محاسب' :
+        manager.role === 'CASHIER' ? 'كاشير' :
+        manager.role
+        : manager.role
     ]);
 
     autoTableModule.default(doc, {
@@ -88,7 +84,8 @@ export const exportManagersToPDF = async (data) => {
         fontStyle: 'bold',
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
         halign: fontSettings.align,
@@ -125,7 +122,7 @@ export const exportCustomersToPDF = async (data) => {
     doc.text(t('report.customers'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
 
     const headers = [
-      isRTL() ? t('customer.arName') : t('customer.enName'),
+      t('customer.customerName'),
       t('customer.email'),
       t('customer.phone'),
       t('customer.points'),
@@ -148,16 +145,18 @@ export const exportCustomersToPDF = async (data) => {
       startY: 30,
       theme: 'grid',
       headStyles: {
-        fillColor: headerColor,
-        textColor: 255,
+        fillColor: '#800080',
+        textColor: 'white',
         font: fontSettings.font,
         fontStyle: 'bold',
+        fontSize: isRTL() ? 16 : 14
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
-        halign: fontSettings.align,
+        halign: 'center',
         font: fontSettings.font
       }
     });
@@ -197,7 +196,7 @@ export const exportIndividualCustomerToPDF = async (data) => {
 
     // Customer Info
     const infoHeaders = [
-      isRTL() ? t('customer.arName') : t('customer.enName'),
+      t('customer.customerName'),
       t('customer.email'),
       t('customer.phone'),
       t('customer.points')
@@ -215,16 +214,18 @@ export const exportIndividualCustomerToPDF = async (data) => {
       startY: startY,
       theme: 'grid',
       headStyles: {
-        fillColor: headerColor,
-        textColor: 255,
+        fillColor: '#800080',
+        textColor: 'white',
         font: fontSettings.font,
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        fontSize: isRTL() ? 16 : 14
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
-        halign: fontSettings.align,
+        halign: 'center',
         font: fontSettings.font
       }
     });
@@ -234,7 +235,7 @@ export const exportIndividualCustomerToPDF = async (data) => {
       startY = doc.lastAutoTable.finalY + 20;
       
       doc.setFontSize(14);
-      doc.text(t('customer.transactions'), 20, startY, { align: 'center' });
+      doc.text(t('customer.transactions'), doc.internal.pageSize.width / 2, startY, { align: 'center' });
       startY += 10;
 
       const transHeaders = [
@@ -246,10 +247,17 @@ export const exportIndividualCustomerToPDF = async (data) => {
       ];
       const transRows = data.transactions.map(transaction => [
         transaction.id,
-        formatTransactionType(transaction.type),
+        transaction.type === 'earn' ? t('Transactions.earn') : transaction.type === 'redeem' ? t('Transactions.redeem') : transaction.type,
         transaction.points,
-        isRTL() ? transaction.currency?.arCurrency : transaction.currency?.enCurrency,  
-        dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")
+        isRTL() ? transaction.currency?.arCurrency : transaction.currency?.enCurrency,
+        new Date(transaction.date).toLocaleString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }).replace(',','')
       ]);
 
       autoTableModule.default(doc, {
@@ -258,16 +266,18 @@ export const exportIndividualCustomerToPDF = async (data) => {
         startY: startY,
         theme: 'grid',
         headStyles: {
-          fillColor: headerColor,
-          textColor: 255,
+          fillColor: '#800080',
+          textColor: 'white',
           font: fontSettings.font,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          fontSize: isRTL() ? 16 : 14
         },
         bodyStyles: {
-          font: fontSettings.font
+          font: fontSettings.font,
+          fontSize: isRTL() ? 16 : 14
         },
         styles: {
-          halign: fontSettings.align,
+          halign: 'center',
           font: fontSettings.font
         }
       });
@@ -278,22 +288,27 @@ export const exportIndividualCustomerToPDF = async (data) => {
       startY = doc.lastAutoTable.finalY + 20;
       
       doc.setFontSize(14);
-      doc.text(t('customer.rewards'), 20, startY, { align: 'center' });
+      doc.text(t('customer.rewards'), doc.internal.pageSize.width / 2, startY, { align: 'center' });
       startY += 10;
 
       const rewardHeaders = [
         t('customer.rewardId'),
         t('customer.type'),
         t('customer.points'),
-        t('customer.status'),
-        t('customer.date'),
+        t('customer.date')
       ];
       const rewardRows = data.myRewards.map(reward => [
         reward.id,
         reward.type,
         reward.points,
-        reward.status,
-        dayjs(reward.date).format("DD/MM/YYYY hh:mm A"),
+        new Date(reward.date).toLocaleString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }).replace(',','')
       ]);
 
       autoTableModule.default(doc, {
@@ -302,16 +317,18 @@ export const exportIndividualCustomerToPDF = async (data) => {
         startY: startY,
         theme: 'grid',
         headStyles: {
-          fillColor: headerColor,
-          textColor: 255,
+          fillColor: '#800080',
+          textColor: 'white',
           font: fontSettings.font,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          fontSize: isRTL() ? 16 : 14
         },
         bodyStyles: {
-          font: fontSettings.font
+          font: fontSettings.font,
+          fontSize: isRTL() ? 16 : 14
         },
         styles: {
-          halign: fontSettings.align,
+          halign: 'center',
           font: fontSettings.font
         }
       });
@@ -350,7 +367,7 @@ export const exportTransactionsToPDF = async (data) => {
 
     const headers = [
       t('customer.transactionId'),
-      isRTL() ? t('customer.arName') : t('customer.enName'),
+      t('customer.customerName'),
       t('customer.type'),
       t('customer.points'),
       t('customer.currency'),
@@ -359,10 +376,17 @@ export const exportTransactionsToPDF = async (data) => {
     const rows = data.map(transaction => [
       transaction.id,
       isRTL() ? transaction.user?.arName : transaction.user?.enName,
-      formatTransactionType(transaction.type),
+      transaction.type === 'earn' ? t('Transactions.earn') : transaction.type === 'redeem' ? t('Transactions.redeem') : transaction.type,
       transaction.points,
       isRTL() ? transaction.currency?.arCurrency : transaction.currency?.enCurrency,
-      dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")
+      new Date(transaction.date).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).replace(',','')
     ]);
 
     autoTableModule.default(doc, {
@@ -371,16 +395,18 @@ export const exportTransactionsToPDF = async (data) => {
       startY: 30,
       theme: 'grid',
       headStyles: {
-        fillColor: headerColor,
-        textColor: 255,
+        fillColor: '#800080',
+        textColor: 'white',
         font: fontSettings.font,
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        fontSize: isRTL() ? 16 : 14
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
-        halign: fontSettings.align,
+        halign: 'center',
         font: fontSettings.font
       }
     });
@@ -415,7 +441,7 @@ export const exportProductsToPDF = async (data) => {
 
     const headers = [
       t('product.id'),
-      isRTL() ? t('product.arName') : t('product.enName'),
+      t('product.ProductName'),
       t('product.price'),
       t('product.points'),
       t('product.type'),
@@ -424,7 +450,7 @@ export const exportProductsToPDF = async (data) => {
     const rows = data.map(product => [
       product.id,
       isRTL() ? product.arName : product.enName,
-      formatCurrency(product.price),
+      product.price ? formatAmount(product.price, product.currency) : '-',
       product.points,
       product.type,
       isRTL() ? product.category?.arName : product.category?.enName
@@ -436,16 +462,18 @@ export const exportProductsToPDF = async (data) => {
       startY: 30,
       theme: 'grid',
       headStyles: {
-        fillColor: headerColor,
-        textColor: 255,
+        fillColor: '#800080',
+        textColor: 'white',
         font: fontSettings.font,
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        fontSize: isRTL() ? 16 : 14
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
-        halign: fontSettings.align,
+        halign: 'center',
         font: fontSettings.font
       }
     });
@@ -480,7 +508,7 @@ export const exportRewardsToPDF = async (data) => {
 
     const headers = [
       t('reward.id'),
-      isRTL() ? t('reward.arName') : t('reward.enName'),
+      t('reward.rewardName'),
       t('reward.type'),
       t('reward.points'),
       t('reward.date')
@@ -490,7 +518,14 @@ export const exportRewardsToPDF = async (data) => {
       isRTL() ? reward.user?.arName : reward.user?.enName,
       reward.type,
       reward.points,
-      dayjs(reward.date).format("DD/MM/YYYY hh:mm A"),
+      new Date(reward.date).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).replace(',','')
     ]);
 
     autoTableModule.default(doc, {
@@ -499,16 +534,18 @@ export const exportRewardsToPDF = async (data) => {
       startY: 30,
       theme: 'grid',
       headStyles: {
-        fillColor: headerColor,
-        textColor: 255,
+        fillColor: '#800080',
+        textColor: 'white',
         font: fontSettings.font,
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        fontSize: isRTL() ? 16 : 14
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
-        halign: fontSettings.align,
+        halign: 'center',
         font: fontSettings.font
       }
     });
@@ -543,7 +580,7 @@ export const exportInvoicesToPDF = async (data) => {
 
     const headers = [
       t('Invoice.id'),
-      isRTL() ? t('Invoice.arName') : t('Invoice.enName'),
+      t('Invoice.CustomerName'),
       t('Invoice.phone'),
       t('Invoice.totalPrice'),
       t('Invoice.discount'),
@@ -553,13 +590,20 @@ export const exportInvoicesToPDF = async (data) => {
     ];
     const rows = data.map(invoice => [
       invoice.id,
-      isRTL() ? invoice.user?.arName : invoice.user?.enName||'Guest',
+      isRTL() ? invoice.user?.arName || 'Guest' : invoice.user?.enName || 'Guest',
       invoice.phone,
-      invoice.totalPrice,
-      invoice.discount,
+      formatAmount(invoice.totalPrice, invoice.currency),
+      `${invoice.discount}%`,
       invoice.points,
-      isRTL() ? invoice.currency==='USD' ? 'دولار' : 'دينار' : invoice.currency,
-      dayjs(invoice.createdAt).format("DD/MM/YYYY hh:mm A")
+      isRTL() ? invoice.currency === 'USD' ? 'دولار' : 'دينار' : invoice.currency,
+      new Date(invoice.createdAt).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).replace(',','')
     ]);
 
     autoTableModule.default(doc, {
@@ -568,16 +612,18 @@ export const exportInvoicesToPDF = async (data) => {
       startY: 30,
       theme: 'grid',
       headStyles: {
-        fillColor: headerColor,
-        textColor: 255,
+        fillColor: '#800080',
+        textColor: 'white',
         font: fontSettings.font,
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        fontSize: isRTL() ? 16 : 14
       },
       bodyStyles: {
-        font: fontSettings.font
+        font: fontSettings.font,
+        fontSize: isRTL() ? 16 : 14
       },
       styles: {
-        halign: fontSettings.align,
+        halign: 'center',
         font: fontSettings.font
       }
     });
@@ -619,14 +665,14 @@ export const exportToExcel = (data, reportType) => {
       filename = isRTL() ? 'تقرير-المديرين.xlsx' : 'managers-report.xlsx';
       worksheetData = [
         createStyledHeader([
-          isRTL() ? t('manager.arName') : t('manager.enName'),
+          t('manager.managerName'),
           t('manager.email'),
           t('manager.phone'),
           t('manager.role'),
           t('manager.createdAt')
         ]),
         ...data.map(manager => [
-        isRTL() ? manager.arName : manager.enName,
+          manager.managerName,
           manager.email,
           manager.phone,
           manager.role,
@@ -639,7 +685,7 @@ export const exportToExcel = (data, reportType) => {
       filename = isRTL() ? 'تقرير-العملاء.xlsx' : 'customers-report.xlsx';
       worksheetData = [
         createStyledHeader([
-          isRTL() ? t('customer.arName') : t('customer.enName'),
+          t('customer.customerName'),
           t('customer.email'),
           t('customer.phone'),
           t('customer.points'),
@@ -647,7 +693,7 @@ export const exportToExcel = (data, reportType) => {
           t('customer.rewards')
         ]),
         ...data.map(customer => [
-          isRTL() ? customer.arName : customer.enName,
+          customer.customerName,
           customer.email,
           customer.phone,
           customer.points,
@@ -658,7 +704,7 @@ export const exportToExcel = (data, reportType) => {
       break;
 
     case 'individual-customer': {
-      const customerName = data.arName || data.enName || 'customer';
+      const customerName = isRTL() ? data.arName : data.enName || 'customer';
       filename = isRTL() 
         ? `تقرير-العميل-${customerName.replace(/\s+/g, '-')}.xlsx`
         : `individual-customer-${customerName.replace(/\s+/g, '-')}.xlsx`;
@@ -666,7 +712,7 @@ export const exportToExcel = (data, reportType) => {
       // Customer Info
       worksheetData = [
         createStyledHeader([
-          isRTL() ? t('customer.arName') : t('customer.enName'),
+          t('customer.customerName'),
           t('customer.email'),
           t('customer.phone'),
           t('customer.points')
@@ -693,7 +739,7 @@ export const exportToExcel = (data, reportType) => {
           ]),
           ...data.transactions.map(transaction => [
             transaction.id,
-            formatTransactionType(transaction.type),
+            transaction.type === 'earn' ? t('Transactions.earn') : transaction.type === 'redeem' ? t('Transactions.redeem') : transaction.type,
             transaction.points,
             isRTL() ? transaction.currency?.arCurrency : transaction.currency?.enCurrency,
             dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")
@@ -728,7 +774,7 @@ export const exportToExcel = (data, reportType) => {
       worksheetData = [
         createStyledHeader([
           t('customer.transactionId'),
-          isRTL() ? t('customer.arName') : t('customer.enName'),
+          t('customer.customerName'),
           t('customer.type'),
           t('customer.points'),
           t('customer.currency'),
@@ -737,7 +783,7 @@ export const exportToExcel = (data, reportType) => {
         ...data.map(transaction => [
           transaction.id,
           isRTL() ? transaction.user?.arName : transaction.user?.enName,
-          formatTransactionType(transaction.type),
+          transaction.type === 'earn' ? t('Transactions.earn') : transaction.type === 'redeem' ? t('Transactions.redeem') : transaction.type,
           transaction.points,
           isRTL() ? transaction.currency?.arCurrency : transaction.currency?.enCurrency,
           dayjs(transaction.date).format("DD/MM/YYYY hh:mm A")  
@@ -750,7 +796,7 @@ export const exportToExcel = (data, reportType) => {
       worksheetData = [
         createStyledHeader([
           t('product.id'),
-          isRTL() ? t('product.arName') : t('product.enName'),
+          t('product.ProductName'),
           t('product.price'),
           t('product.points'),
           t('product.type'),
@@ -758,8 +804,8 @@ export const exportToExcel = (data, reportType) => {
         ]),
         ...data.map(product => [
           product.id,
-          isRTL() ? product.arName : product.enName,
-          formatCurrency(product.price),
+          isRTL() ? product.arName : product.enName || 'product',
+          formatAmount(product.price, product.currency),
           product.points,
           product.type,
           isRTL() ? product.category?.arName : product.category?.enName
@@ -772,7 +818,7 @@ export const exportToExcel = (data, reportType) => {
       worksheetData = [
         createStyledHeader([
           t('reward.id'),
-          isRTL() ? t('reward.arName') : t('reward.enName'),
+          t('reward.rewardName'),
           t('reward.type'),
           t('reward.points'),
           t('reward.date')
@@ -792,7 +838,7 @@ export const exportToExcel = (data, reportType) => {
       worksheetData = [
         createStyledHeader([
           t('Invoice.id'),
-          isRTL() ? t('Invoice.arName') : t('Invoice.enName'),
+          t('Invoice.CustomerName'),
           t('Invoice.phone'),
           t('Invoice.totalPrice'),
           t('Invoice.discount'),
@@ -802,9 +848,9 @@ export const exportToExcel = (data, reportType) => {
         ]),
         ...data.map(invoice => [
           invoice.id,
-          isRTL() ? invoice.user?.arName : invoice.user?.enName||'Guest',
+          isRTL() ? invoice.user?.arName || 'Guest' : invoice.user?.enName || 'Guest',
           invoice.phone,
-          formatCurrency(invoice.totalPrice),
+          formatAmount(invoice.totalPrice, invoice.currency),
           invoice.discount,
           invoice.points,
           isRTL() ? invoice.currency==='USD' ? 'دولار' : 'دينار' : invoice.currency,
