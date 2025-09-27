@@ -88,9 +88,12 @@ convertAmount(amount, fromCurrency = 'USD', toCurrency = null) {
 }
 
 formatAmount(amount, originalCurrency = 'USD', targetCurrency = null) {
+  if (amount === undefined || amount === null || typeof amount !== 'number' || isNaN(amount)) {
+    return '-'; 
+  }
+  
   const displayCurrency = targetCurrency || this.getCurrentDisplayCurrency();
   
-
   const convertedAmount = this.convertAmount(amount, originalCurrency, displayCurrency);
 
   const formatted = convertedAmount.toLocaleString('en-US', {

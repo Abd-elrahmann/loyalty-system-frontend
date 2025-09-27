@@ -12,6 +12,7 @@ import {
   Chip,
   Box,
   TableSortLabel,
+  Checkbox
 } from "@mui/material";
 import { EyeOutlined, EditOutlined, DeleteOutlined, QrcodeOutlined, PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -34,7 +35,11 @@ const CustomerTable = ({
   onViewTransactions,
   orderBy,
   order,
-  createSortHandler
+  createSortHandler,
+  selectedCustomers,
+  onSelectCustomer,
+  onSelectAll,
+  isAllSelected
 }) => {
   const { t, i18n } = useTranslation();
 
@@ -45,6 +50,14 @@ const CustomerTable = ({
       <Table stickyHeader>
         <TableHead>
           <TableRow>
+            <StyledTableCell padding="checkbox">
+              <Checkbox
+                indeterminate={selectedCustomers.length > 0 && selectedCustomers.length < customers.length}
+                checked={isAllSelected}
+                onChange={onSelectAll}
+                sx={{ color: "white !important" }}
+              />
+            </StyledTableCell>
             <StyledTableCell align="center">
               <TableSortLabel
                 active={orderBy === "id"}
@@ -113,19 +126,25 @@ const CustomerTable = ({
         <TableBody>
           {isLoading ? (
             <StyledTableRow>
-              <StyledTableCell colSpan={10} align="center">
+              <StyledTableCell colSpan={11} align="center">
                 <Spin size="large" />
               </StyledTableCell>
             </StyledTableRow>
           ) : !customers || customers.length === 0 ? (
             <StyledTableRow>
-              <StyledTableCell colSpan={10} align="center">
+              <StyledTableCell colSpan={11} align="center">
                 {t("Customers.NoCustomers")}
               </StyledTableCell>
             </StyledTableRow>
           ) : (
             customers.slice(0, rowsPerPage).map((customer) => (
               <StyledTableRow key={customer.id}>
+                <StyledTableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectedCustomers.includes(customer.id)}
+                    onChange={() => onSelectCustomer(customer.id)}
+                  />
+                </StyledTableCell>
                 <StyledTableCell align="center">{customer.id}</StyledTableCell>
                 <StyledTableCell align="center">{i18n.language === 'ar' ? customer.arName : customer.enName}</StyledTableCell>
                 <StyledTableCell align="center" sx={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

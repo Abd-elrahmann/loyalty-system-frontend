@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import i18n from '../Config/translationConfig';
 import dayjs from 'dayjs';
-import { formatAmount } from '../Config/globalCurrencyManager';
+import globalCurrencyManager from '../Config/globalCurrencyManager';
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [
@@ -299,7 +299,7 @@ export const exportIndividualCustomerToPDF = async (data) => {
       ];
       const rewardRows = data.myRewards.map(reward => [
         reward.id,
-        reward.type,
+        isRTL() ? reward.type === 'cafe' ? 'كافيه' : 'مطعم' : reward.type === 'cafe' ? 'cafe' : 'restaurant',
         reward.points,
         new Date(reward.date).toLocaleString('en-GB', {
           day: '2-digit',
@@ -450,9 +450,9 @@ export const exportProductsToPDF = async (data) => {
     const rows = data.map(product => [
       product.id,
       isRTL() ? product.arName : product.enName,
-      product.price ? formatAmount(product.price, product.currency) : '-',
+      product.price ? globalCurrencyManager.formatAmount(product.price, product.currency) : '-',
       product.points,
-      product.type,
+      isRTL() ? product.type === 'cafe' ? 'كافيه' : 'مطعم' : product.type === 'cafe' ? 'cafe' : 'restaurant',
       isRTL() ? product.category?.arName : product.category?.enName
     ]);
 
@@ -516,7 +516,7 @@ export const exportRewardsToPDF = async (data) => {
     const rows = data.map(reward => [
       reward.id,
       isRTL() ? reward.user?.arName : reward.user?.enName,
-      reward.type,
+      isRTL() ? reward.type === 'cafe' ? 'كافيه' : 'مطعم' : reward.type === 'cafe' ? 'cafe' : 'restaurant',
       reward.points,
       new Date(reward.date).toLocaleString('en-GB', {
         day: '2-digit',
@@ -592,7 +592,7 @@ export const exportInvoicesToPDF = async (data) => {
       invoice.id,
       isRTL() ? invoice.user?.arName || 'Guest' : invoice.user?.enName || 'Guest',
       invoice.phone,
-      formatAmount(invoice.totalPrice, invoice.currency),
+      globalCurrencyManager.formatAmount(invoice.totalPrice, invoice.currency),
       `${invoice.discount}%`,
       invoice.points,
       isRTL() ? invoice.currency === 'USD' ? 'دولار' : 'دينار' : invoice.currency,
@@ -732,7 +732,7 @@ export const exportToExcel = (data, reportType) => {
           [{ v: t('customer.transactions'), s: { font: { bold: true } } }],
           createStyledHeader([
             t('customer.transactionId'),
-            t('customer.type'),
+            isRTL() ? t('customer.type') === 'earn' ? 'ربح نقاط' : t('customer.type') === 'redeem' ? 'مستبدل ب نقاط' : t('customer.type') : t('customer.type'),
             t('customer.points'),
             t('customer.currency'),
             t('customer.date')
@@ -754,13 +754,13 @@ export const exportToExcel = (data, reportType) => {
           [{ v: t('customer.rewards'), s: { font: { bold: true } } }],
           createStyledHeader([
             t('customer.rewardId'),
-            t('customer.type'),
+            isRTL() ? t('customer.type') === 'cafe' ? 'كافيه' : t('customer.type') === 'restaurant' ? 'مطعم' : t('customer.type') : t('customer.type'),
             t('customer.points'),
             t('customer.date')
           ]),
           ...data.myRewards.map(reward => [
             reward.id,
-            reward.type,
+            isRTL() ? reward.type === 'cafe' ? 'كافيه' : 'مطعم' : reward.type === 'cafe' ? 'cafe' : 'restaurant',
             reward.points,
             dayjs(reward.date).format("DD/MM/YYYY hh:mm A"),
           ])
@@ -805,7 +805,7 @@ export const exportToExcel = (data, reportType) => {
         ...data.map(product => [
           product.id,
           isRTL() ? product.arName : product.enName || 'product',
-          formatAmount(product.price, product.currency),
+          globalCurrencyManager.formatAmount(product.price, product.currency),
           product.points,
           product.type,
           isRTL() ? product.category?.arName : product.category?.enName
@@ -826,7 +826,7 @@ export const exportToExcel = (data, reportType) => {
         ...data.map(reward => [
           reward.id,
           isRTL() ? reward.user?.arName : reward.user?.enName,
-          reward.type,
+          isRTL() ? reward.type === 'cafe' ? 'كافيه' : 'مطعم' : reward.type === 'cafe' ? 'cafe' : 'restaurant',
           reward.points,
           dayjs(reward.date).format("DD/MM/YYYY hh:mm A"),
         ])
@@ -850,7 +850,7 @@ export const exportToExcel = (data, reportType) => {
           invoice.id,
           isRTL() ? invoice.user?.arName || 'Guest' : invoice.user?.enName || 'Guest',
           invoice.phone,
-          formatAmount(invoice.totalPrice, invoice.currency),
+          globalCurrencyManager.formatAmount(invoice.totalPrice, invoice.currency),
           invoice.discount,
           invoice.points,
           isRTL() ? invoice.currency==='USD' ? 'دولار' : 'دينار' : invoice.currency,

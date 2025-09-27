@@ -45,6 +45,9 @@ const Customers = () => {
   const [searchValue, setSearchValue] = useState("");
   const [openShowQR, setOpenShowQR] = useState(false);
   const [customerToShowQR, setCustomerToShowQR] = useState(null);
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [openBulkDeleteModal, setOpenBulkDeleteModal] = useState(false);
 
   const [orderBy, setOrderBy] = useState(() => {
     const saved = localStorage.getItem('customers_sort_orderBy');
@@ -126,6 +129,49 @@ const Customers = () => {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
   });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (customerIds) => Api.delete('/api/users', { data: { ids: customerIds } }),
+    onSuccess: () => {
+      notifySuccess(t("Customers.CustomersDeleted"));
+      queryClient.invalidateQueries(['customers']);
+      setSelectedCustomers([]);
+      setIsAllSelected(false);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  });
+
+  // Selection handlers
+  const handleSelectCustomer = (customerId) => {
+    setSelectedCustomers(prev => 
+      prev.includes(customerId)
+        ? prev.filter(id => id !== customerId)
+        : [...prev, customerId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedCustomers([]);
+      setIsAllSelected(false);
+    } else {
+      const allCustomerIds = customers.map(customer => customer.id);
+      setSelectedCustomers(allCustomerIds);
+      setIsAllSelected(true);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedCustomers.length === 0) return;
+    setOpenBulkDeleteModal(true);
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    bulkDeleteMutation.mutate(selectedCustomers);
+    setOpenBulkDeleteModal(false);
+  };
 
   const handleSearch = (e) => {
     debouncedSearch(e.target.value);
@@ -220,6 +266,8 @@ const Customers = () => {
         onClearFilter={handleClearFilter}
         onAddCustomer={handleAddCustomer}
         isSmallMobile={isSmallMobile}
+        selectedCount={selectedCustomers.length}
+        onBulkDelete={handleBulkDelete}
       />
 
       {!isMobile ? (
@@ -239,6 +287,10 @@ const Customers = () => {
           orderBy={orderBy}
           order={order}
           createSortHandler={createSortHandler}
+          selectedCustomers={selectedCustomers}
+          onSelectCustomer={handleSelectCustomer}
+          onSelectAll={handleSelectAll}
+          isAllSelected={isAllSelected}
         />
       ) : (
         <Box>
@@ -335,6 +387,16 @@ const Customers = () => {
             setCustomerToShowQR(null);
           }}
           customer={customerToShowQR}
+        />
+      )}
+      {openBulkDeleteModal && (
+        <DeleteModal
+          open={openBulkDeleteModal}
+          onClose={() => setOpenBulkDeleteModal(false)}
+          message={t("Customers.DeleteCustomerMessage")}
+          title={t("Customers.DeleteSelected") + ` (${selectedCustomers.length})`}
+          onConfirm={handleConfirmBulkDelete}
+          isLoading={bulkDeleteMutation.isLoading}
         />
       )}
     </Box>

@@ -21,6 +21,7 @@ import {
   Card,
   CardContent,
   TableSortLabel,
+  Checkbox
 } from "@mui/material";
 
 import {
@@ -324,6 +325,54 @@ const Transactions = () => {
     </Card>
   );
 
+  const [selectedTransactions, setSelectedTransactions] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [openBulkDeleteModal, setOpenBulkDeleteModal] = useState(false);
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (transactionIds) => Api.delete('/api/transactions', { data: { ids: transactionIds } }),
+    onSuccess: () => {
+      notifySuccess(t("Transactions.TransactionsDeleted"));
+      queryClient.invalidateQueries(['transactions']);
+      setSelectedTransactions([]);
+      setIsAllSelected(false);
+    },
+    onError: (error) => {
+      notifyError(error.response?.data?.message || t("Errors.generalError"));
+    }
+  });
+
+  // Selection handlers
+  const handleSelectTransaction = (transactionId) => {
+    setSelectedTransactions(prev => 
+      prev.includes(transactionId)
+        ? prev.filter(id => id !== transactionId)
+        : [...prev, transactionId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedTransactions([]);
+      setIsAllSelected(false);
+    } else {
+      const allTransactionIds = transactions.map(transaction => transaction.id);
+      setSelectedTransactions(allTransactionIds);
+      setIsAllSelected(true);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedTransactions.length === 0) return;
+    setOpenBulkDeleteModal(true);
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    bulkDeleteMutation.mutate(selectedTransactions);
+    setOpenBulkDeleteModal(false);
+  };
+
   return (
     <Box sx={{ p: { xs: 1, sm: 3 } }}>
       <Helmet>
@@ -443,6 +492,15 @@ const Transactions = () => {
             gap: 1,
             width: { xs: "100%", sm: "auto" }
           }}>
+            {selectedTransactions.length > 0 && (
+              <IconButton
+                size="small"
+                color="error"
+                onClick={handleBulkDelete}
+              >
+                <DeleteOutlined /> ({selectedTransactions.length})
+              </IconButton>
+            )}
           </Stack>
         </Box>
       </Box>
@@ -453,6 +511,14 @@ const Transactions = () => {
           <Table stickyHeader>
             <TableHead>
               <TableRow>
+                <StyledTableCell padding="checkbox" sx={{ whiteSpace: "nowrap" }}>
+                  <Checkbox
+                    indeterminate={selectedTransactions.length > 0 && selectedTransactions.length < transactions.length}
+                    checked={isAllSelected}
+                    onChange={handleSelectAll}
+                    sx={{ color: "white !important" }}
+                  />
+                </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                   <TableSortLabel
                     active={orderBy === "id"}
@@ -539,19 +605,25 @@ const Transactions = () => {
             <TableBody>
               {isLoading ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={customerId ? 8 : 9} align="center">
+                  <StyledTableCell colSpan={customerId ? 9 : 10} align="center">
                     <Spin size="large" />
                   </StyledTableCell>
                 </StyledTableRow>
               ) : !transactions || transactions.length === 0 ? (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={customerId ? 8 : 9} align="center">
+                  <StyledTableCell colSpan={customerId ? 9 : 10} align="center">
                     {t("Transactions.NoTransactions")}
                   </StyledTableCell>
                 </StyledTableRow>
               ) : (
                 transactions.map((transaction) => (
                   <StyledTableRow key={transaction.id}>
+                    <StyledTableCell padding="checkbox" sx={{ whiteSpace: "nowrap" }}>
+                      <Checkbox
+                        checked={selectedTransactions.includes(transaction.id)}
+                        onChange={() => handleSelectTransaction(transaction.id)}
+                      />
+                    </StyledTableCell>
                     <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                       {transaction.id}
                     </StyledTableCell>
@@ -720,6 +792,17 @@ const Transactions = () => {
         onConfirm={handleCancel}
         isLoading={cancelMutation.isLoading}
       />
+
+      {openBulkDeleteModal && (
+        <DeleteModal
+          open={openBulkDeleteModal}
+          onClose={() => setOpenBulkDeleteModal(false)}
+          message={t("Transactions.DeleteTransactionMessage")}
+          title={t("Transactions.DeleteSelected") + ` (${selectedTransactions.length})`}
+          onConfirm={handleConfirmBulkDelete}
+          isLoading={bulkDeleteMutation.isLoading}
+        />
+      )}
     </Box>
   );
 };

@@ -194,7 +194,9 @@
     "Download": "Download",
     "Share": "Share",
     "ShowQR": "Show QR",
-    "QRDownloadSuccess": "QR code downloaded successfully"
+    "QRDownloadSuccess": "QR code downloaded successfully",
+    "CustomersDeleted": "Customers deleted successfully",
+    "DeleteSelected": "Delete Selected"
   },
   "Products": {
     "Products": "Products",
@@ -312,7 +314,9 @@
     "CancelTransactionFailed": "Transaction not cancelled",
     "Cancel": "Cancel",
     "CancelNo": "No",
-    "CancelYes": "Yes"
+    "CancelYes": "Yes",
+    "TransactionsDeleted": "Transactions deleted successfully",
+    "DeleteSelected": "Delete Selected"
   },
   "Settings": {
     "Settings": "Settings",
@@ -576,8 +580,8 @@
     "email": "Email",
     "phone": "Phone",
     "points": "Points",
-    "transactions": "Transactions",
-    "rewards": "Rewards",
+    "transactions": "Transactions Count",
+    "rewards": "Rewards Count",
     "information": "Customer Information",
     "transactionId": "Transaction ID",
     "type": "Type",

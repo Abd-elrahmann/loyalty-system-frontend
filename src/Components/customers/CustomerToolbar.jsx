@@ -8,7 +8,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { SearchOutlined, FileExcelOutlined, FilePdfOutlined, QrcodeOutlined } from "@ant-design/icons";
+import { SearchOutlined, FileExcelOutlined, FilePdfOutlined, QrcodeOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddIcon from "@mui/icons-material/Add";
 import { useTranslation } from "react-i18next";
 
@@ -20,7 +20,9 @@ const CustomerToolbar = ({
   scannedEmail,
   onClearFilter,
   onAddCustomer,
-  isSmallMobile
+  isSmallMobile,
+  selectedCount,
+  onBulkDelete
 }) => {
   const { t } = useTranslation();
 
@@ -83,6 +85,15 @@ const CustomerToolbar = ({
           justifyContent: 'center',
           gap: 1
         }}>
+          {selectedCount > 0 && (
+            <IconButton
+              size="small"
+              color="error"
+              onClick={onBulkDelete}
+            >
+              <DeleteOutlined /> ({selectedCount})
+            </IconButton>
+          )}
           <Button
             variant="outlined"
             startIcon={<AddIcon />}

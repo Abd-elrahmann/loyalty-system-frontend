@@ -192,7 +192,9 @@
     "Download": "تحميل",
     "Share": "مشاركة",
     "ShowQR": "عرض كود الاستجابة السريعة",
-    "QRDownloadSuccess": "تم تحميل كود الاستجابة السريعة بنجاح"
+    "QRDownloadSuccess": "تم تحميل كود الاستجابة السريعة بنجاح",
+    "CustomersDeleted": "تم حذف العملاء بنجاح",
+    "DeleteSelected": "حذف المختار"
   },
   "Products": {
     "Products": "المنتجات",
@@ -278,7 +280,7 @@
     "ToDate": "إلى تاريخ",
     "SearchTransactions": "بحث عن تحويلات",
     "Earn": "ربح نقاط",
-    "Redeem": "استرجاع نقاط",
+    "Redeem": "مستبدل ب نقاط",
     "earn": "ربح نقاط",
     "redeem": "  مستبدل ب نقاط",
     "DeleteTransaction": "حذف التحويل",
@@ -309,7 +311,9 @@
     "CancelTransactionFailed": "فشل إلغاء التحويل",
     "Cancel": "إلغاء",
     "CancelNo": "لا",
-    "CancelYes": "نعم"
+    "CancelYes": "نعم",
+    "TransactionsDeleted": "تم حذف المعاملات بنجاح",
+    "DeleteSelected": "حذف المختار"
   },
   "Settings": {
     "Settings": "الإعدادات",
@@ -561,7 +565,7 @@
     "customerFound": "تم العثور على العميل بنجاح"
   },
   "manager": {
-    "managerName": "اسم المدير",
+    "ManagerName": "اسم المدير",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "role": "الدور",
@@ -572,8 +576,8 @@
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "points": "النقاط",
-    "transactions": "المعاملات",
-    "rewards": "المكافآت",
+    "transactions": "  عدد المعاملات",
+    "rewards": "عدد المكافآت",
     "information": "معلومات العميل",
     "transactionId": "رقم المعاملة",
     "type": "النوع",

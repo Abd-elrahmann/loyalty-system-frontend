@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Card,
   Row,
@@ -49,7 +49,6 @@ const { RangePicker } = DatePicker;
 const Reports = () => {
   const { t, i18n } = useTranslation();
   const [reportType, setReportType] = useState('');
-  // eslint-disable-next-line no-unused-vars
   const [managers, setManagers] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -60,21 +59,7 @@ const Reports = () => {
   const printRef = useRef();
   const { formatAmount } = useCurrencyManager();
 
-
-  useEffect(() => {
-    fetchManagers();
-    fetchCustomers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setReportData([]);
-    setSelectedCustomer(null);
-    setDateRange([]);
-    setType('');
-  }, [reportType]);
-
-  const fetchManagers = async () => {
+  const fetchManagers = useCallback(async () => {
     try {
       const response = await Api.get('/api/managers');
       setManagers(response.data || []);
@@ -82,9 +67,9 @@ const Reports = () => {
       console.error('Error fetching managers:', error);
       notifyError(t('error.fetchingManagers'));
     }
-  };
+  }, [t]);
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       const response = await Api.get('/api/users/all-users');
       setCustomers(response.data?.users || []);
@@ -92,7 +77,26 @@ const Reports = () => {
       console.error('Error fetching customers:', error);
       notifyError(t('error.fetchingCustomers'));
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    if (reportType === 'managers' && managers.length === 0) {
+      fetchManagers();
+    }
+  }, [reportType, managers.length, fetchManagers]);
+
+  useEffect(() => {
+    if (reportType === 'individual-customer' && customers.length === 0) {
+      fetchCustomers();
+    }
+  }, [reportType, customers.length, fetchCustomers]);
+
+  useEffect(() => {
+    setReportData([]);
+    setSelectedCustomer(null);
+    setDateRange([]);
+    setType('');
+  }, [reportType]);
 
   const generateReport = async () => {
     setPreviewLoading(true);
@@ -363,7 +367,7 @@ const Reports = () => {
               <TableHead>
                 <TableRow>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
-                    {t('manager.managerName')}
+                    {t('manager.ManagerName')}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                     {t('manager.email')}
@@ -494,7 +498,7 @@ const Reports = () => {
                           {t('customer.transactionId')}
                         </StyledTableCell>
                         <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
-                          {t('customer.type')}
+                          {i18n.language === 'ar' ? t('customer.type') === 'cafe' ? 'كافيه' : 'مطعم' : t('customer.type') === 'cafe' ? 'cafe' : 'restaurant'}
                         </StyledTableCell>
                         <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                             {t('customer.points')}
@@ -592,7 +596,7 @@ const Reports = () => {
                       {t('customer.customerName')}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
-                      {t('customer.type')}
+                      {i18n.language === 'ar' ? t('customer.type') === 'earn' ? 'ربح نقاط' : t('customer.type') === 'redeem' ? 'مستبدل ب نقاط' : t('customer.type') : t('customer.type')}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('customer.points')}
@@ -666,7 +670,7 @@ const Reports = () => {
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.price ? formatAmount(product.price, product.currency) : '-'}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{product.points}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
-                      {product.type}
+                      {i18n.language === 'ar' ? product.type === 'cafe' ? 'كافيه' : 'مطعم' : product.type === 'cafe' ? 'cafe' : 'restaurant'}
                     </StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? product.category?.arName : product.category?.enName}</StyledTableCell>
                   </StyledTableRow>
@@ -689,7 +693,7 @@ const Reports = () => {
                       {t('reward.rewardName')}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
-                      {t('reward.type')}
+                      {i18n.language === 'ar' ? t('reward.type') === 'cafe' ? 'كافيه' : 'مطعم' : t('reward.type') === 'cafe' ? 'cafe' : 'restaurant'}
                   </StyledTableCell>
                   <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
                       {t('reward.points')}
@@ -704,7 +708,12 @@ const Reports = () => {
                   <StyledTableRow key={reward.id}>
                     <StyledTableCell align="center" style={{ fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.id}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{i18n.language === 'ar' ? reward.user?.arName : reward.user?.enName}</StyledTableCell>
-                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.type}</StyledTableCell>
+                    <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>
+                      {i18n.language === 'ar' 
+                        ? reward.type === 'cafe' ? 'كافيه' : 'مطعم'
+                        : reward.type === 'cafe' ? 'cafe' : 'restaurant'
+                      }
+                    </StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{reward.points}</StyledTableCell>
                     <StyledTableCell align="center" style={{fontSize: i18n.language === 'ar' ? '16px' : '14px'}}>{new Date(reward.date).toLocaleString('en-GB', {
                       day: '2-digit',
@@ -838,7 +847,10 @@ const Reports = () => {
             <Card
               hoverable
               style={cardStyle(reportType === 'managers')}
-              onClick={() => setReportType('managers')}
+              onClick={() => {
+                setReportType('managers');
+                setReportData([]);
+              }}
             >
               <TeamOutlined style={iconStyle} />
               <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
@@ -862,7 +874,10 @@ const Reports = () => {
             <Card
               hoverable
               style={cardStyle(reportType === 'individual-customer')}
-              onClick={() => setReportType('individual-customer')}
+              onClick={() => {
+                setReportType('individual-customer');
+                setReportData([]);
+              }}
             >
               <UserOutlined style={iconStyle} />
               <Title level={5} style={{ margin: 0, fontSize: '16px' }}>
