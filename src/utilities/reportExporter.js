@@ -2,13 +2,14 @@ import * as XLSX from 'xlsx';
 import i18n from '../Config/translationConfig';
 import dayjs from 'dayjs';
 import globalCurrencyManager from '../Config/globalCurrencyManager';
+import Logo from '/assets/images/logo.webp';
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [
     parseInt(result[1], 16),
     parseInt(result[2], 16), 
     parseInt(result[3], 16)
-  ] : [128, 0, 128]; // Default to #800080 (purple)
+  ] : [128, 0, 128];
 };
 
 const headerColor = hexToRgb('#800080');
@@ -50,42 +51,84 @@ export const exportManagersToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.managers'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+    doc.text(t('report.managers'), pageWidth / 2, 28, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 35, pageWidth - margin, 35);
+
+    // ===== Table =====
     const headers = [
-      t('manager.managerName'),
-      t('manager.email'), 
+      t('manager.ManagerName'),
+      t('manager.email'),
       t('manager.phone'),
       t('manager.role')
     ];
-    
+
     const rows = data.map(manager => [
       isRTL() ? manager.arName : manager.enName,
       manager.email,
       manager.phone,
-      isRTL() ? 
-        manager.role === 'ADMIN' ? 'مدير عام' :
-        manager.role === 'ACCOUNTANT' ? 'محاسب' :
-        manager.role === 'CASHIER' ? 'كاشير' :
-        manager.role
+      isRTL()
+        ? manager.role === 'ADMIN' ? 'مدير عام' :
+          manager.role === 'ACCOUNTANT' ? 'محاسب' :
+          manager.role === 'CASHIER' ? 'كاشير' :
+          manager.role
         : manager.role
     ]);
 
     autoTableModule.default(doc, {
       head: [headers],
       body: rows,
-      startY: 30,
+      startY: 40,
       theme: 'grid',
       headStyles: {
         fillColor: headerColor,
         textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
         halign: fontSettings.align,
@@ -93,6 +136,19 @@ export const exportManagersToPDF = async (data) => {
       }
     });
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const filename = isRTL() ? 'تقرير-المديرين.pdf' : 'managers-report.pdf';
     doc.save(filename);
   } catch (error) {
@@ -100,6 +156,7 @@ export const exportManagersToPDF = async (data) => {
     throw error;
   }
 };
+
 
 export const exportCustomersToPDF = async (data) => {
   try {
@@ -118,11 +175,48 @@ export const exportCustomersToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.customers'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+    doc.text(t('report.customers'), pageWidth / 2, 28, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 35, pageWidth - margin, 35);
+
+    // ===== Table =====
     const headers = [
-      t('customer.customerName'),
+      t('customer.CustomerName'),
       t('customer.email'),
       t('customer.phone'),
       t('customer.points'),
@@ -142,25 +236,42 @@ export const exportCustomersToPDF = async (data) => {
     autoTableModule.default(doc, {
       head: [headers],
       body: rows,
-      startY: 30,
+      startY: 40,
       theme: 'grid',
       headStyles: {
-        fillColor: '#800080',
-        textColor: 'white',
+        fillColor: headerColor,
+        textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
-        fontSize: isRTL() ? 16 : 14
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
-        halign: 'center',
+        halign: fontSettings.align,
         font: fontSettings.font
       }
     });
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const filename = isRTL() ? 'تقرير-العملاء.pdf' : 'customers-report.pdf';
     doc.save(filename);
   } catch (error) {
@@ -186,17 +297,53 @@ export const exportIndividualCustomerToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.individualCustomer'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
-    doc.setFontSize(14);
-    const customerLabel = isRTL() ? `العميل: ${data.arName}` : `Customer: ${data.enName || data.arName}`;
-    doc.text(customerLabel, doc.internal.pageSize.width / 2, 30, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
-    let startY = 40;
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+
+    // Customer name
+    const customerLabel = isRTL() ? `العميل: ${data.arName}` : `Customer: ${data.enName || data.arName}`;
+    doc.text(customerLabel, pageWidth / 2, 38, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 45, pageWidth - margin, 45);
+
+    let startY = 50;
 
     // Customer Info
     const infoHeaders = [
-      t('customer.customerName'),
+      t('customer.CustomerName'),
       t('customer.email'),
       t('customer.phone'),
       t('customer.points')
@@ -214,18 +361,22 @@ export const exportIndividualCustomerToPDF = async (data) => {
       startY: startY,
       theme: 'grid',
       headStyles: {
-        fillColor: '#800080',
-        textColor: 'white',
+        fillColor: headerColor,
+        textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
-        fontSize: isRTL() ? 16 : 14
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
-        halign: 'center',
+        halign: fontSettings.align,
         font: fontSettings.font
       }
     });
@@ -234,8 +385,9 @@ export const exportIndividualCustomerToPDF = async (data) => {
     if (data.transactions && data.transactions.length > 0) {
       startY = doc.lastAutoTable.finalY + 20;
       
-      doc.setFontSize(14);
-      doc.text(t('customer.transactions'), doc.internal.pageSize.width / 2, startY, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setFont(fontSettings.font, 'bold');
+      doc.text(t('customer.Transactions'), pageWidth / 2, startY, { align: 'center' });
       startY += 10;
 
       const transHeaders = [
@@ -266,18 +418,22 @@ export const exportIndividualCustomerToPDF = async (data) => {
         startY: startY,
         theme: 'grid',
         headStyles: {
-          fillColor: '#800080',
-          textColor: 'white',
+          fillColor: headerColor,
+          textColor: 255,
           font: fontSettings.font,
           fontStyle: 'bold',
-          fontSize: isRTL() ? 16 : 14
+          halign: 'center',
         },
         bodyStyles: {
           font: fontSettings.font,
-          fontSize: isRTL() ? 16 : 14
+          fontSize: isRTL() ? 12 : 10,
+          halign: 'center'
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240]
         },
         styles: {
-          halign: 'center',
+          halign: fontSettings.align,
           font: fontSettings.font
         }
       });
@@ -287,8 +443,9 @@ export const exportIndividualCustomerToPDF = async (data) => {
     if (data.myRewards && data.myRewards.length > 0) {
       startY = doc.lastAutoTable.finalY + 20;
       
-      doc.setFontSize(14);
-      doc.text(t('customer.rewards'), doc.internal.pageSize.width / 2, startY, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setFont(fontSettings.font, 'bold');
+      doc.text(t('customer.Rewards'), pageWidth / 2, startY, { align: 'center' });
       startY += 10;
 
       const rewardHeaders = [
@@ -317,23 +474,40 @@ export const exportIndividualCustomerToPDF = async (data) => {
         startY: startY,
         theme: 'grid',
         headStyles: {
-          fillColor: '#800080',
-          textColor: 'white',
+          fillColor: headerColor,
+          textColor: 255,
           font: fontSettings.font,
           fontStyle: 'bold',
-          fontSize: isRTL() ? 16 : 14
+          halign: 'center',
         },
         bodyStyles: {
           font: fontSettings.font,
-          fontSize: isRTL() ? 16 : 14
+          fontSize: isRTL() ? 12 : 10,
+          halign: 'center'
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240]
         },
         styles: {
-          halign: 'center',
+          halign: fontSettings.align,
           font: fontSettings.font
         }
       });
     }
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const customerName = data.arName || data.enName || 'customer';
     const filename = isRTL() 
       ? `تقرير-العميل-${customerName.replace(/\s+/g, '-')}.pdf`
@@ -362,17 +536,55 @@ export const exportTransactionsToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.transactions'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+    doc.text(t('report.transactions'), pageWidth / 2, 28, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 35, pageWidth - margin, 35);
+
+    // ===== Table =====
     const headers = [
       t('customer.transactionId'),
-      t('customer.customerName'),
+      t('customer.CustomerName'), 
       t('customer.type'),
       t('customer.points'),
       t('customer.currency'),
       t('customer.date')
     ];
+
     const rows = data.map(transaction => [
       transaction.id,
       isRTL() ? transaction.user?.arName : transaction.user?.enName,
@@ -392,25 +604,42 @@ export const exportTransactionsToPDF = async (data) => {
     autoTableModule.default(doc, {
       head: [headers],
       body: rows,
-      startY: 30,
+      startY: 40,
       theme: 'grid',
       headStyles: {
-        fillColor: '#800080',
-        textColor: 'white',
+        fillColor: headerColor,
+        textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
-        fontSize: isRTL() ? 16 : 14
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
-        halign: 'center',
+        halign: fontSettings.align,
         font: fontSettings.font
       }
     });
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const filename = isRTL() ? 'تقرير-المعاملات.pdf' : 'transactions-report.pdf';
     doc.save(filename);
   } catch (error) {
@@ -436,9 +665,46 @@ export const exportProductsToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.products'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+    doc.text(t('report.products'), pageWidth / 2, 28, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 35, pageWidth - margin, 35);
+
+    // ===== Table =====
     const headers = [
       t('product.id'),
       t('product.ProductName'),
@@ -447,6 +713,7 @@ export const exportProductsToPDF = async (data) => {
       t('product.type'),
       t('product.category')
     ];
+
     const rows = data.map(product => [
       product.id,
       isRTL() ? product.arName : product.enName,
@@ -459,25 +726,42 @@ export const exportProductsToPDF = async (data) => {
     autoTableModule.default(doc, {
       head: [headers],
       body: rows,
-      startY: 30,
+      startY: 40,
       theme: 'grid',
       headStyles: {
-        fillColor: '#800080',
-        textColor: 'white',
+        fillColor: headerColor,
+        textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
-        fontSize: isRTL() ? 16 : 14
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
-        halign: 'center',
+        halign: fontSettings.align,
         font: fontSettings.font
       }
     });
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const filename = isRTL() ? 'تقرير-المنتجات.pdf' : 'products-report.pdf';
     doc.save(filename);
   } catch (error) {
@@ -503,16 +787,54 @@ export const exportRewardsToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.rewards'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+    doc.text(t('report.rewards'), pageWidth / 2, 28, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 35, pageWidth - margin, 35);
+
+    // ===== Table =====
     const headers = [
       t('reward.id'),
-      t('reward.rewardName'),
+      t('reward.RewardName'),
       t('reward.type'),
       t('reward.points'),
       t('reward.date')
     ];
+
     const rows = data.map(reward => [
       reward.id,
       isRTL() ? reward.user?.arName : reward.user?.enName,
@@ -531,25 +853,42 @@ export const exportRewardsToPDF = async (data) => {
     autoTableModule.default(doc, {
       head: [headers],
       body: rows,
-      startY: 30,
+      startY: 40,
       theme: 'grid',
       headStyles: {
-        fillColor: '#800080',
-        textColor: 'white',
+        fillColor: headerColor,
+        textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
-        fontSize: isRTL() ? 16 : 14
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
-        halign: 'center',
+        halign: fontSettings.align,
         font: fontSettings.font
       }
     });
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const filename = isRTL() ? 'تقرير-المكافآت.pdf' : 'rewards-report.pdf';
     doc.save(filename);
   } catch (error) {
@@ -575,9 +914,46 @@ export const exportInvoicesToPDF = async (data) => {
     }
     doc.setFont(fontSettings.font);
 
-    doc.setFontSize(18);
-    doc.text(t('report.invoices'), doc.internal.pageSize.width / 2, 20, { align: 'center' });
+    // ===== Header =====
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 15;
 
+    // Add logo
+    const logoUrl = Logo;
+    const imgSize = 12;
+
+    if (isRTL()) {
+      doc.addImage(logoUrl, 'WEBP', pageWidth - margin - imgSize, 10, imgSize, imgSize);
+    } else {
+      doc.addImage(logoUrl, 'WEBP', margin, 10, imgSize, imgSize);
+    }
+
+    // Title
+    doc.setFontSize(14);
+    doc.setFont(fontSettings.font, 'bold');
+    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Report name
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'bold');
+    doc.text(t('report.invoices'), pageWidth / 2, 28, { align: 'center' });
+
+    // Date: left if EN, right if AR
+    const dateText = dayjs().format("DD/MM/YYYY hh:mm A");
+    doc.setFontSize(10);
+    doc.setFont(fontSettings.font, 'normal');
+    if (isRTL()) {
+      doc.text(dateText, margin, 18, { align: 'left' });
+    } else {
+      doc.text(dateText, pageWidth - margin, 18, { align: 'right' });
+    }
+
+    // Divider line
+    doc.setDrawColor(150);
+    doc.line(margin, 35, pageWidth - margin, 35);
+
+    // ===== Table =====
     const headers = [
       t('Invoice.id'),
       t('Invoice.CustomerName'),
@@ -588,6 +964,7 @@ export const exportInvoicesToPDF = async (data) => {
       t('Invoice.currency'),
       t('Invoice.date')
     ];
+
     const rows = data.map(invoice => [
       invoice.id,
       isRTL() ? invoice.user?.arName || 'Guest' : invoice.user?.enName || 'Guest',
@@ -609,25 +986,42 @@ export const exportInvoicesToPDF = async (data) => {
     autoTableModule.default(doc, {
       head: [headers],
       body: rows,
-      startY: 30,
+      startY: 40,
       theme: 'grid',
       headStyles: {
-        fillColor: '#800080',
-        textColor: 'white',
+        fillColor: headerColor,
+        textColor: 255,
         font: fontSettings.font,
         fontStyle: 'bold',
-        fontSize: isRTL() ? 16 : 14
+        halign: 'center',
       },
       bodyStyles: {
         font: fontSettings.font,
-        fontSize: isRTL() ? 16 : 14
+        fontSize: isRTL() ? 12 : 10,
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
       },
       styles: {
-        halign: 'center',
+        halign: fontSettings.align,
         font: fontSettings.font
       }
     });
 
+    // ===== Footer =====
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const footerText = isRTL()
+        ? `صفحة ${i} من ${pageCount}`
+        : `Page ${i} of ${pageCount}`;
+      doc.text(footerText, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+    }
+
+    // Save
     const filename = isRTL() ? 'تقرير-الفواتير.pdf' : 'invoices-report.pdf';
     doc.save(filename);
   } catch (error) {
@@ -665,7 +1059,7 @@ export const exportToExcel = (data, reportType) => {
       filename = isRTL() ? 'تقرير-المديرين.xlsx' : 'managers-report.xlsx';
       worksheetData = [
         createStyledHeader([
-          t('manager.managerName'),
+          t('manager.ManagerName'),
           t('manager.email'),
           t('manager.phone'),
           t('manager.role'),
@@ -685,7 +1079,7 @@ export const exportToExcel = (data, reportType) => {
       filename = isRTL() ? 'تقرير-العملاء.xlsx' : 'customers-report.xlsx';
       worksheetData = [
         createStyledHeader([
-          t('customer.customerName'),
+          t('customer.CustomerName'),
           t('customer.email'),
           t('customer.phone'),
           t('customer.points'),
@@ -712,7 +1106,7 @@ export const exportToExcel = (data, reportType) => {
       // Customer Info
       worksheetData = [
         createStyledHeader([
-          t('customer.customerName'),
+          t('customer.CustomerName'),
           t('customer.email'),
           t('customer.phone'),
           t('customer.points')
@@ -729,10 +1123,10 @@ export const exportToExcel = (data, reportType) => {
       if (data.transactions && data.transactions.length > 0) {
         worksheetData.push(
           [], // Empty row for spacing
-          [{ v: t('customer.transactions'), s: { font: { bold: true } } }],
+          [{ v: t('customer.Transactions'), s: { font: { bold: true } } }],
           createStyledHeader([
             t('customer.transactionId'),
-            isRTL() ? t('customer.type') === 'earn' ? 'ربح نقاط' : t('customer.type') === 'redeem' ? 'مستبدل ب نقاط' : t('customer.type') : t('customer.type'),
+            t('customer.type'),
             t('customer.points'),
             t('customer.currency'),
             t('customer.date')
@@ -751,10 +1145,10 @@ export const exportToExcel = (data, reportType) => {
       if (data.myRewards && data.myRewards.length > 0) {
         worksheetData.push(
           [], // Empty row for spacing
-          [{ v: t('customer.rewards'), s: { font: { bold: true } } }],
+          [{ v: t('customer.Rewards'), s: { font: { bold: true } } }],
           createStyledHeader([
             t('customer.rewardId'),
-            isRTL() ? t('customer.type') === 'cafe' ? 'كافيه' : t('customer.type') === 'restaurant' ? 'مطعم' : t('customer.type') : t('customer.type'),
+            t('customer.type'),
             t('customer.points'),
             t('customer.date')
           ]),
@@ -774,7 +1168,7 @@ export const exportToExcel = (data, reportType) => {
       worksheetData = [
         createStyledHeader([
           t('customer.transactionId'),
-          t('customer.customerName'),
+          t('customer.CustomerName'),
           t('customer.type'),
           t('customer.points'),
           t('customer.currency'),
@@ -818,7 +1212,7 @@ export const exportToExcel = (data, reportType) => {
       worksheetData = [
         createStyledHeader([
           t('reward.id'),
-          t('reward.rewardName'),
+          t('reward.RewardName'),
           t('reward.type'),
           t('reward.points'),
           t('reward.date')

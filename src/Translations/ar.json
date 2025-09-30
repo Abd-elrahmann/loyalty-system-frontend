@@ -572,11 +572,13 @@
     "createdAt": "تاريخ الإنشاء"
   },
   "customer": {
-    "customerName": "اسم العميل",
+    "CustomerName": "اسم العميل",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "points": "النقاط",
+    "Rewards": "المكافآت",
     "transactions": "  عدد المعاملات",
+    "Transactions": "المعاملات",
     "rewards": "عدد المكافآت",
     "information": "معلومات العميل",
     "transactionId": "رقم المعاملة",

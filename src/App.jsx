@@ -36,7 +36,7 @@ const routeComponents = {
   '/rewards': React.lazy(() => import('./Pages/Rewards')),
   '/point-of-sale': React.lazy(() => import('./Pages/PointOfSale')),
   '/invoice': React.lazy(() => import('./Pages/Invoice')),
-  '/reports': React.lazy(() => import('./Pages/Reports'))
+  '/reports': React.lazy(() => import('./Pages/Reports/Reports'))
 };
 
 const queryClient = new QueryClient();
