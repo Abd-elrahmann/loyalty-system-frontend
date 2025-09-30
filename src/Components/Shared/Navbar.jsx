@@ -20,7 +20,11 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const user = useUser(); 
   const [anchorEl, setAnchorEl] = useState(null);
   const [profile, setProfile] = useState(user);
-  const [settings, setSettings] = useState({ title: '', imgUrl: '' });
+  const [settings, setSettings] = useState({ 
+    arTitle: '', 
+    enTitle: '', 
+    imgUrl: '' 
+  });
   const queryClient = useQueryClient();
 
   const { data: settingsData } = useQuery({
@@ -36,7 +40,8 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   useEffect(() => {
     if (settingsData) {
       setSettings({
-        title: settingsData.title || '',
+        arTitle: settingsData.arTitle || '',
+        enTitle: settingsData.enTitle || '',
         imgUrl: settingsData.imgUrl || ''
       });
     }
@@ -138,7 +143,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
               <MenuOutlined color='primary' style={{fontSize: isMobile ? '20px' : '21px'}} />
             </IconButton>
           )}
-          {settings.title && (
+          {settings.arTitle && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
               {settings.imgUrl && (
                 <img 
@@ -160,7 +165,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                   fontSize: isMobile ? '14px' : '16px'
                 }}
               >
-                {settings.title}
+                {i18n.language === 'ar' ? settings.arTitle : settings.enTitle}
               </Typography>
             </Box>
           )}

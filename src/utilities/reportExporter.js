@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import i18n from '../Config/translationConfig';
 import dayjs from 'dayjs';
 import globalCurrencyManager from '../Config/globalCurrencyManager';
-import Logo from '/assets/images/logo.webp';
+import Api from '../Config/Api';
 const hexToRgb = (hex) => {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [
@@ -13,7 +13,10 @@ const hexToRgb = (hex) => {
 };
 
 const headerColor = hexToRgb('#800080');
-
+ const fetchSettings = async () => {
+  const response = await Api.get('/api/settings');
+  return response.data;
+};
 
 // Translation helper function
 const t = (key) => {
@@ -56,7 +59,8 @@ export const exportManagersToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -68,8 +72,20 @@ export const exportManagersToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+  // Description
+doc.setFontSize(12);
+doc.setFont(fontSettings.font, 'normal');
+const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+
+if (isRTL()) {
+  doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+} else {
+  doc.text(descriptionText, margin, 28, { align: 'left' });
+}
+
 
     // Report name
     doc.setFontSize(12);
@@ -180,7 +196,8 @@ export const exportCustomersToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -192,9 +209,18 @@ export const exportCustomersToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
 
+    // Description
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'normal');
+    const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+    if (isRTL()) {
+      doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+    } else {
+      doc.text(descriptionText, margin, 28, { align: 'left' });
+    }
     // Report name
     doc.setFontSize(12);
     doc.setFont(fontSettings.font, 'bold');
@@ -302,7 +328,8 @@ export const exportIndividualCustomerToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -314,8 +341,18 @@ export const exportIndividualCustomerToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Description
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'normal');
+    const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+    if (isRTL()) {
+      doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+    } else {
+      doc.text(descriptionText, margin, 28, { align: 'left' });
+    }
 
     // Report name
     doc.setFontSize(12);
@@ -541,7 +578,8 @@ export const exportTransactionsToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -553,8 +591,18 @@ export const exportTransactionsToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Description
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'normal');
+    const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+    if (isRTL()) {
+      doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+    } else {
+      doc.text(descriptionText, margin, 28, { align: 'left' });
+    }
 
     // Report name
     doc.setFontSize(12);
@@ -670,7 +718,8 @@ export const exportProductsToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -682,8 +731,18 @@ export const exportProductsToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Description
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'normal');
+    const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+    if (isRTL()) {
+        doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+    } else {
+      doc.text(descriptionText, margin, 28, { align: 'left' });
+    }
 
     // Report name
     doc.setFontSize(12);
@@ -792,7 +851,8 @@ export const exportRewardsToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -804,8 +864,18 @@ export const exportRewardsToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Description
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'normal');
+    const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+    if (isRTL()) {
+      doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+    } else {
+      doc.text(descriptionText, margin, 28, { align: 'left' });
+    }
 
     // Report name
     doc.setFontSize(12);
@@ -919,7 +989,8 @@ export const exportInvoicesToPDF = async (data) => {
     const margin = 15;
 
     // Add logo
-    const logoUrl = Logo;
+    const settings = await fetchSettings();
+    const logoUrl = settings.imgUrl;
     const imgSize = 12;
 
     if (isRTL()) {
@@ -931,8 +1002,18 @@ export const exportInvoicesToPDF = async (data) => {
     // Title
     doc.setFontSize(14);
     doc.setFont(fontSettings.font, 'bold');
-    const titleText = isRTL() ? 'نظام الولاء' : 'Loyalty System';
+    const titleText = isRTL() ? settings.arTitle : settings.enTitle;
     doc.text(titleText, pageWidth / 2, 18, { align: 'center' });
+
+    // Description
+    doc.setFontSize(12);
+    doc.setFont(fontSettings.font, 'normal');
+    const descriptionText = isRTL() ? settings.arDescription : settings.enDescription;
+    if (isRTL()) {
+      doc.text(descriptionText, pageWidth - margin, 28, { align: 'right' });
+    } else {
+      doc.text(descriptionText, margin, 28, { align: 'left' });
+    }
 
     // Report name
     doc.setFontSize(12);

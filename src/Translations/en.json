@@ -341,9 +341,13 @@
     "PrinterIP": "Printer IP",
     "USDtoIQDRate": "USD to IQD Rate",
     "GeneralSettings": "General Settings",
-    "Title": "Title",
+    "enTitle": "English Title",
+    "arTitle": "Arabic Title",
+    "enDescription": "English Description",
+    "arDescription": "Arabic Description",
     "Description": "Description",
-    "UploadImage": "Upload Image"
+    "UploadImage": "Upload Image",
+    "RemoveImage": "Remove Image"
   },
   "Rewards": {
     "Rewards": "Rewards",

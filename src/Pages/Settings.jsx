@@ -7,10 +7,12 @@ import { useUser } from '../utilities/user';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Skeleton, Upload } from "antd";
-import { SaveOutlined, UploadOutlined } from '@ant-design/icons';
+import { SaveOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Button from '@mui/material/Button';
 import { useCurrencyManager } from '../Config/globalCurrencyManager';
+import IconButton from '@mui/material/IconButton';
+import { CloseOutlined } from '@ant-design/icons';
 
 const Settings = () => {
   const queryClient = useQueryClient();
@@ -19,6 +21,7 @@ const Settings = () => {
   const { t, i18n } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   
   const { currentSettings: currencySettings, updateSettings: updateCurrencySettings } = useCurrencyManager();
 
@@ -28,7 +31,10 @@ const Settings = () => {
   ];
 
   const [settings, setSettings] = useState({
-    title: '',
+    arTitle: '',
+    enTitle: '',
+    arDescription: '',
+    enDescription: '',
     description: '',
     imgUrl: '',
     enCurrency: null,
@@ -52,13 +58,20 @@ const Settings = () => {
   });
 
   useEffect(() => {
-    if (data && !settingsMutation.isLoading) {
+    if (data && !settingsMutation.isPending) {
       const currencyObj = currencies.find(c => c.enValue === data.enCurrency);
-      setSettings({
-        ...data,
-        title: data.title || '',
-        description: data.description || '',
-        imgUrl: data.imgUrl || '',
+      
+      // Only update image if we don't have a new image selected
+      const shouldUpdateImage = !imageFile && !imagePreview;
+      
+      setSettings(prev => ({
+        ...prev,
+        arTitle: data.arTitle || '',
+        enTitle: data.enTitle || '',
+        arDescription: data.arDescription || '',
+        enDescription: data.enDescription || '',
+        // Only update imgUrl if we don't have a new image
+        imgUrl: shouldUpdateImage ? (data.imgUrl || '') : prev.imgUrl,
         pointsPerDollar: parseFloat(data.pointsPerDollar) || 0,
         pointsPerIQD: parseFloat(data.pointsPerIQD) || 0,
         usdToIqd: parseFloat(data.usdToIqd) || 0,
@@ -66,7 +79,7 @@ const Settings = () => {
         arCurrency: currencyObj?.arValue || null,
         printerType: data.printerType || 'USB',
         printerIp: data.printerIp || null
-      });
+      }));
       
       if (data.enCurrency && data.usdToIqd !== undefined) {
         updateCurrencySettings({
@@ -108,7 +121,19 @@ const Settings = () => {
         USDtoIQD: variables.usdToIqd
       });
       
-      queryClient.setQueryData(['settings'], response.data || variables);
+      // Create updated data with the new image preview
+      const updatedData = {
+        ...response.data,
+        // Use the new image preview if available, otherwise use the response image
+        imgUrl: imagePreview || response.data.imgUrl
+      };
+      
+      queryClient.setQueryData(['settings'], updatedData);
+      
+      // Clear image state after successful save
+      setImageFile(null);
+      setImagePreview(null);
+      
       // Trigger event to update navbar immediately
       window.dispatchEvent(new CustomEvent('settingsUpdated'));
     },
@@ -127,16 +152,52 @@ const Settings = () => {
 
   const handleTextChange = (e) => {
     const { name, value } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    if (name === 'title') {
+      setSettings(prev => ({
+        ...prev,
+        [i18n.language === 'ar' ? 'arTitle' : 'enTitle']: value
+      }));
+    } else if (name === 'description') {
+      setSettings(prev => ({
+        ...prev,
+        [i18n.language === 'ar' ? 'arDescription' : 'enDescription']: value
+      }));
+    } else {
+      setSettings(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleImageChange = (info) => {
-    if (info.file.status === 'done') {
-      setImageFile(info.file.originFileObj);
+    const file = info.file.originFileObj;
+    if (file) {
+      setImageFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      
+      // Immediately update the settings to show the new image preview
+      setSettings(prev => ({ ...prev, imgUrl: previewUrl }));
+    } else {
+      // If no new file, clear the preview
+      setImagePreview(null);
     }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    // Also clear the current image URL if we want to remove the existing image
+    setSettings(prev => ({ ...prev, imgUrl: '' }));
+    
+    // Update the query cache to reflect the image removal
+    queryClient.setQueryData(['settings'], (oldData) => ({
+      ...oldData,
+      imgUrl: ''
+    }));
   };
 
   const handlePrinterChange = (e) => {
@@ -175,8 +236,10 @@ const Settings = () => {
     if (user.role !== 'USER') {
       settingsToSave = {
         ...settings,
-        title: settings.title,
-        description: settings.description,
+        arTitle: settings.arTitle,
+        enTitle: settings.enTitle,
+        arDescription: settings.arDescription,
+        enDescription: settings.enDescription,
         pointsPerDollar: parseFloat(settings.pointsPerDollar) || 0,
         pointsPerIQD: parseFloat(settings.pointsPerIQD) || 0,
         usdToIqd: parseFloat(settings.usdToIqd) || 0,
@@ -233,17 +296,18 @@ const Settings = () => {
               size="small"
               name="title"
               label={t('Settings.Title')}
-              value={settings.title}
+              value={i18n.language === 'ar' ? settings.arTitle : settings.enTitle}
               onChange={handleTextChange}
               sx={{ mb: 2 }}
             />
+
 
             <TextField
               fullWidth
               size="small"
               name="description"
               label={t('Settings.Description')}
-              value={settings.description}
+              value={i18n.language === 'ar' ? settings.arDescription : settings.enDescription}
               onChange={handleTextChange}
               multiline
               rows={3}
@@ -254,6 +318,10 @@ const Settings = () => {
               name="image"
               onChange={handleImageChange}
               maxCount={1}
+              beforeUpload={(file) => {
+                console.log(file);
+                return false;
+              }}
               accept="image/*"
               showUploadList={true}
             >
@@ -266,6 +334,45 @@ const Settings = () => {
                 {t('Settings.UploadImage')}
               </Button>
             </Upload>
+            
+            {/* Image Preview */}
+            {(imagePreview || settings.imgUrl) && (
+              <Box sx={{ mt: 2, textAlign: 'center', position: 'relative', display: 'inline-block' }}>
+                <IconButton
+                  size="small"
+                  onClick={handleRemoveImage}
+                  sx={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -1,
+                    backgroundColor: 'error.main',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: 'error.dark',
+                    },
+                    zIndex: 1,
+                    width: 20,
+                    height: 20,
+                    minWidth: 'auto',
+                    padding: '4px'
+                  }}
+                >
+                  <CloseOutlined style={{ fontSize: '14px' }} />
+                </IconButton>
+                <img 
+                  src={imagePreview || settings.imgUrl} 
+                  alt="Preview" 
+                  style={{ 
+                    maxWidth: '50%', 
+                    maxHeight: '100px', 
+                    objectFit: 'contain',
+                    borderRadius: '4px',
+                    position: 'relative',
+                    zIndex: 0
+                  }} 
+                />
+              </Box>
+            )}
           </Box>
         )}
 

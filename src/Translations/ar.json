@@ -337,10 +337,15 @@
     "PrinterType": "نوع الطابعة",
     "PrinterIP": "عنوان IP الطابعة",
     "USDtoIQDRate": "سعر الدولار بالدينار",
-    "GeneralSettings": "الإعدادات العامة",
     "Title": "العنوان",
+    "GeneralSettings": "الإعدادات العامة",
+    "enTitle": "العنوان الانجليزي",
+    "arTitle": "العنوان العربي",
+    "enDescription": "الوصف الانجليزي",
+    "arDescription": "الوصف العربي",
     "Description": "الوصف",
-    "UploadImage": "رفع صورة"
+    "UploadImage": "رفع صورة",
+    "RemoveImage": "إزالة الصورة"
   },
   "Rewards": {
     "Rewards": "المكافآت",
