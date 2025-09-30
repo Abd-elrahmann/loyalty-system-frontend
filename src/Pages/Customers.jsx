@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import { Helmet } from 'react-helmet-async';
 import { Box, Stack, Typography, TablePagination } from '@mui/material';
-import { Spin } from "antd";
+import { Skeleton } from "antd";
 import AddCustomer from "../Components/Modals/AddCustomer";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import AddPointsModal from "../Components/Modals/AddPointsModal";
@@ -268,6 +268,7 @@ const Customers = () => {
         isSmallMobile={isSmallMobile}
         selectedCount={selectedCustomers.length}
         onBulkDelete={handleBulkDelete}
+        isLoading={isLoading}
       />
 
       {!isMobile ? (
@@ -296,7 +297,7 @@ const Customers = () => {
         <Box>
           {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-              <Spin size="large" />
+              <Skeleton active />
             </Box>
           ) : !customers || customers.length === 0 ? (
             <Typography variant="body1" align="center" sx={{ p: 3 }}>
@@ -313,6 +314,7 @@ const Customers = () => {
                   onEdit={handleEdit}
                   onDelete={handleDeleteCustomer}
                   onViewTransactions={handleViewTransactions}
+                  isLoading={isLoading}
                 />
               ))}
             </Stack>

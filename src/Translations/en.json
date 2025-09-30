@@ -339,7 +339,11 @@
     "PrinterSettings": "Printer Settings",
     "PrinterType": "Printer Type",
     "PrinterIP": "Printer IP",
-    "USDtoIQDRate": "USD to IQD Rate"
+    "USDtoIQDRate": "USD to IQD Rate",
+    "GeneralSettings": "General Settings",
+    "Title": "Title",
+    "Description": "Description",
+    "UploadImage": "Upload Image"
   },
   "Rewards": {
     "Rewards": "Rewards",
@@ -452,6 +456,9 @@
     "Search": "Search",
     "ID": "ID",
     "ManagerName": "Manager Name",
+    "UpdateManager": "Update Manager",
+    "ArabicName": "Arabic Name",
+    "EnglishName": "English Name",
     "Email": "Email",
     "Phone": "Phone",
     "Role": "Role",

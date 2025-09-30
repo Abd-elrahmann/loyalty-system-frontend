@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { notifyError, notifySuccess } from "../utilities/Toastify";
 import { Helmet } from 'react-helmet-async';
 import { Box, Stack, Typography, TablePagination } from '@mui/material';
-import { Spin } from "antd";
+import { Skeleton } from "antd";
 import DeleteModal from "../Components/Modals/DeleteModal";
 import ManagersTable from "../Components/Mangers/ManagersTable";
 import ManagersCard from "../Components/Mangers/ManagersCard";
@@ -152,6 +152,7 @@ const Mangers = () => {
         onClearFilter={handleClearFilter}
         onAddManager={handleAddManager}
         isSmallMobile={isSmallMobile}
+        isLoading={isLoading}
       />
 
       {!isMobile ? (
@@ -171,7 +172,7 @@ const Mangers = () => {
         <Box>
           {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-              <Spin size="large" />
+              <Skeleton active />
             </Box>
           ) : !managers || managers.length === 0 ? (
             <Typography variant="body1" align="center" sx={{ p: 3 }}>

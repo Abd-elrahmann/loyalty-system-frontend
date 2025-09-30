@@ -14,7 +14,7 @@ import {
 import { EditOutlined, DeleteOutlined,SecurityScanOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { StyledTableCell, StyledTableRow } from "../Shared/tableLayout";
-import { Spin } from "antd";
+import { Spin, Skeleton } from "antd";
 import dayjs from "dayjs";
 
 const ManagersTable = ({
@@ -52,6 +52,37 @@ const ManagersTable = ({
     }
   };
 
+  // Skeleton rows for loading state
+  const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
+    <StyledTableRow key={`skeleton-${index}`}>
+      <StyledTableCell align="center">
+        <Skeleton.Input active size="small" style={{ width: 40, height: 20 }} />
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Skeleton.Input active style={{ width: 120, height: 20 }} />
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Skeleton.Input active style={{ width: 80, height: 24 }} />
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Skeleton.Input active style={{ width: 150, height: 20 }} />
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Skeleton.Input active style={{ width: 100, height: 20 }} />
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Skeleton.Input active style={{ width: 120, height: 20 }} />
+      </StyledTableCell>
+      <StyledTableCell align="center">
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+          <Skeleton.Avatar active size="small" shape="circle" />
+          <Skeleton.Avatar active size="small" shape="circle" />
+          <Skeleton.Avatar active size="small" shape="circle" />
+        </Box>
+      </StyledTableCell>
+    </StyledTableRow>
+  ));
+
   return (
     <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
       <Table stickyHeader>
@@ -68,11 +99,7 @@ const ManagersTable = ({
         </TableHead>
         <TableBody>
           {isLoading ? (
-            <StyledTableRow>
-              <StyledTableCell colSpan={7} align="center">
-                <Spin size="large" />
-              </StyledTableCell>
-            </StyledTableRow>
+            skeletonRows
           ) : !managers || managers.length === 0 ? (
             <StyledTableRow>
               <StyledTableCell colSpan={7} align="center">

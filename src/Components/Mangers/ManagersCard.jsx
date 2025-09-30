@@ -10,9 +10,10 @@ import {
 } from "@mui/material";
 import { EditOutlined, DeleteOutlined, SecurityScanOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { Skeleton } from "antd";
 import dayjs from "dayjs";
 
-const ManagersCard = ({ manager, onEdit, onDelete, onPermissions }) => {
+const ManagersCard = ({ manager, onEdit, onDelete, onPermissions, isLoading }) => {
   const { t, i18n } = useTranslation();
 
   const getRoleLabel = (role) => {
@@ -35,6 +36,59 @@ const ManagersCard = ({ manager, onEdit, onDelete, onPermissions }) => {
       default: return '#4CAF50';
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card sx={{ mb: 2, p: 2 }}>
+        <CardContent>
+          <Stack spacing={1}>
+            {/* ID Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Skeleton.Input active size="small" style={{ width: 60, height: 20 }} />
+              <Skeleton.Input active size="small" style={{ width: 40, height: 20 }} />
+            </Box>
+            
+            {/* Name Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Skeleton.Input active size="small" style={{ width: 100, height: 20 }} />
+              <Skeleton.Input active size="small" style={{ width: 80, height: 20 }} />
+            </Box>
+            
+            {/* Role Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Skeleton.Input active size="small" style={{ width: 60, height: 20 }} />
+              <Skeleton.Input active style={{ width: 70, height: 24 }} />
+            </Box>
+            
+            {/* Email Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Skeleton.Input active size="small" style={{ width: 60, height: 20 }} />
+              <Skeleton.Input active size="small" style={{ width: 120, height: 20 }} />
+            </Box>
+            
+            {/* Phone Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Skeleton.Input active size="small" style={{ width: 60, height: 20 }} />
+              <Skeleton.Input active size="small" style={{ width: 80, height: 20 }} />
+            </Box>
+            
+            {/* Created At Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Skeleton.Input active size="small" style={{ width: 80, height: 20 }} />
+              <Skeleton.Input active size="small" style={{ width: 100, height: 20 }} />
+            </Box>
+            
+            {/* Buttons Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 1 }}>
+              <Skeleton.Avatar active size="small" shape="circle" />
+              <Skeleton.Avatar active size="small" shape="circle" />
+              <Skeleton.Avatar active size="small" shape="circle" />
+            </Box>
+          </Stack>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card sx={{ mb: 2, p: 2 }}>

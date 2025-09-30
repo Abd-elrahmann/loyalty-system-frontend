@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Container, Autocomplete, Tabs, Tab, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, TextField, Container, Autocomplete, Tabs, Tab, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import moment from 'moment-timezone';
 import Api from '../Config/Api';
 import { notifySuccess, notifyError } from '../utilities/Toastify';
 import { useUser } from '../utilities/user';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { Spin } from "antd";
-import { SaveOutlined } from '@ant-design/icons';
+import { Skeleton, Upload } from "antd";
+import { SaveOutlined, UploadOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Button from '@mui/material/Button';
 import { useCurrencyManager } from '../Config/globalCurrencyManager';
@@ -18,8 +18,8 @@ const Settings = () => {
   const timezones = moment.tz.names();
   const { t, i18n } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
+  const [imageFile, setImageFile] = useState(null);
   
-  // Use Global Currency Manager
   const { currentSettings: currencySettings, updateSettings: updateCurrencySettings } = useCurrencyManager();
 
   const currencies = [
@@ -28,6 +28,9 @@ const Settings = () => {
   ];
 
   const [settings, setSettings] = useState({
+    title: '',
+    description: '',
+    imgUrl: '',
     enCurrency: null,
     arCurrency: null,
     timezone: 'Asia/Baghdad',
@@ -53,6 +56,9 @@ const Settings = () => {
       const currencyObj = currencies.find(c => c.enValue === data.enCurrency);
       setSettings({
         ...data,
+        title: data.title || '',
+        description: data.description || '',
+        imgUrl: data.imgUrl || '',
         pointsPerDollar: parseFloat(data.pointsPerDollar) || 0,
         pointsPerIQD: parseFloat(data.pointsPerIQD) || 0,
         usdToIqd: parseFloat(data.usdToIqd) || 0,
@@ -72,9 +78,27 @@ const Settings = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const settingsMutation = useMutation({
     mutationFn: async (settingsToSave) => {
-      return await Api.post('/api/settings', settingsToSave);
+      const data = {
+        ...settingsToSave,
+        image: imageFile ? await convertFileToBase64(imageFile) : null
+      };
+      
+      return await Api.post('/api/settings', data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     },
     onSuccess: (response, variables) => {
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
@@ -85,6 +109,8 @@ const Settings = () => {
       });
       
       queryClient.setQueryData(['settings'], response.data || variables);
+      // Trigger event to update navbar immediately
+      window.dispatchEvent(new CustomEvent('settingsUpdated'));
     },
     onError: (error) => {
       notifyError(error.response?.data?.message || t('Errors.generalError'));
@@ -97,6 +123,20 @@ const Settings = () => {
       ...prev,
       [name]: value === "" ? 0 : parseFloat(value)
     }));
+  };
+
+  const handleTextChange = (e) => {
+    const { name, value } = e.target;
+    setSettings(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleImageChange = (info) => {
+    if (info.file.status === 'done') {
+      setImageFile(info.file.originFileObj);
+    }
   };
 
   const handlePrinterChange = (e) => {
@@ -135,6 +175,8 @@ const Settings = () => {
     if (user.role !== 'USER') {
       settingsToSave = {
         ...settings,
+        title: settings.title,
+        description: settings.description,
         pointsPerDollar: parseFloat(settings.pointsPerDollar) || 0,
         pointsPerIQD: parseFloat(settings.pointsPerIQD) || 0,
         usdToIqd: parseFloat(settings.usdToIqd) || 0,
@@ -153,8 +195,12 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="500px">
-        <Spin size="large" />
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="500px" flexDirection="column" gap={2}>
+        <Skeleton.Input active style={{ width: 300, height: 40 }} />
+        <Skeleton.Input active style={{ width: 300, height: 40 }} />
+        <Skeleton.Input active style={{ width: 300, height: 40 }} />
+        <Skeleton.Input active style={{ width: 300, height: 40 }} />
+        <Skeleton.Button active style={{ width: 150, height: 40 }} />
       </Box>
     );
   }
@@ -166,21 +212,66 @@ const Settings = () => {
         <meta name="description" content={t('Settings.SettingsDescription')} />
       </Helmet>
 
-      <Container maxWidth="sm" sx={{ py: 4, mt: 6 }}>
+      <Container maxWidth="md" sx={{ py: 4, mt: 6 }}>
         <Tabs
           value={tabIndex}
           onChange={(e, newValue) => setTabIndex(newValue)}
           centered
           sx={{ mb: 3 }}
         >
+          {user.role !== 'USER' && <Tab label={t('Settings.GeneralSettings')} />}
           {user.role !== 'USER' && <Tab label={t('Settings.CurrencySettings')} />}
           <Tab label={t('Settings.TimezoneSettings')} />
           {user.role !== 'USER' && <Tab label={t('Settings.PrinterSettings')} />}
         </Tabs>
 
-        {/* Currency Tab */}
+        {/* General Settings Tab */}
         {user.role !== 'USER' && tabIndex === 0 && (
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ p: 2, maxWidth: '500px', mx: 'auto' }}>
+            <TextField
+              fullWidth
+              size="small"
+              name="title"
+              label={t('Settings.Title')}
+              value={settings.title}
+              onChange={handleTextChange}
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              fullWidth
+              size="small"
+              name="description"
+              label={t('Settings.Description')}
+              value={settings.description}
+              onChange={handleTextChange}
+              multiline
+              rows={3}
+              sx={{ mb: 2 }}
+            />
+
+            <Upload
+              name="image"
+              onChange={handleImageChange}
+              maxCount={1}
+              accept="image/*"
+              showUploadList={true}
+            >
+              <Button
+                variant="outlined"
+                startIcon={<UploadOutlined />}
+                component="span"
+                fullWidth
+              >
+                {t('Settings.UploadImage')}
+              </Button>
+            </Upload>
+          </Box>
+        )}
+
+        {/* Currency Tab */}
+        {user.role !== 'USER' && tabIndex === 1 && (
+          <Box sx={{ p: 2, maxWidth: '500px', mx: 'auto' }}>
             <Autocomplete
               fullWidth
               name="currency"
@@ -239,8 +330,8 @@ const Settings = () => {
         )}
 
         {/* Timezone Tab */}
-        {(user.role !== 'USER' ? tabIndex === 1 : tabIndex === 0) && (
-          <Box sx={{ p: 2 }}>
+        {(user.role !== 'USER' ? tabIndex === 2 : tabIndex === 0) && (
+          <Box sx={{ p: 2, maxWidth: '500px', mx: 'auto' }}>
             <Autocomplete
               fullWidth
               name="timezone"
@@ -261,8 +352,8 @@ const Settings = () => {
         )}
 
         {/* Printer Settings Tab */}
-        {user.role !== 'USER' && tabIndex === 2 && (
-          <Box sx={{ p: 2 }}>
+        {user.role !== 'USER' && tabIndex === 3 && (
+          <Box sx={{ p: 2, maxWidth: '500px', mx: 'auto' }}>
             <FormControl fullWidth>
               <InputLabel>{t('Settings.PrinterType')}</InputLabel>
               <Select

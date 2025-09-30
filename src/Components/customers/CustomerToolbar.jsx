@@ -5,12 +5,11 @@ import {
   InputBase,
   IconButton,
   Button,
-  Menu,
-  MenuItem,
 } from "@mui/material";
-import { SearchOutlined, FileExcelOutlined, FilePdfOutlined, QrcodeOutlined, DeleteOutlined } from "@ant-design/icons";
+import { SearchOutlined, QrcodeOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddIcon from "@mui/icons-material/Add";
 import { useTranslation } from "react-i18next";
+import { Skeleton } from "antd";
 
 const CustomerToolbar = ({
   searchValue,
@@ -20,97 +19,160 @@ const CustomerToolbar = ({
   scannedEmail,
   onClearFilter,
   onAddCustomer,
-  isSmallMobile,
   selectedCount,
-  onBulkDelete
+  onBulkDelete,
+  isLoading
 }) => {
   const { t } = useTranslation();
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2 }, mb: 2 }}>
+    <Box sx={{ 
+      p: { xs: 1, sm: 2 }, 
+      mb: 2,
+      width: '100%'
+    }}>
       <Box
         sx={{
           display: "flex", 
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: { xs: "stretch", sm: "center" },
           gap: 2,
           flexDirection: { xs: "column", sm: "row" },
+          width: '100%'
         }}
       >
-        <Stack direction={"row"} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
-          <InputBase
-            value={searchValue}
-            onChange={onSearchChange}
-            placeholder={t("Customers.SearchEmail")}
-            sx={{
-              color: "text.primary",
-              textAlign: "center",
-              width: { xs: "100%", sm: "200px" },
-              borderRadius: 1,
-              px: 1,
-            }}
-          />
-          <IconButton
-            sx={{ color: "primary.main", padding: 0 }}
-            onClick={onSearchClick}
-          >
-            <SearchOutlined  />
-          </IconButton>
-          <Stack direction="row" spacing={1}>
-            <IconButton
-              sx={{ color: "primary.main", padding: 0 }}
-              onClick={onScanQR}
-              title={t("Customers.ScanQR")}
-            >
-              <QrcodeOutlined />
-            </IconButton>
-            {scannedEmail && (
+        {/* الجزء الأيسر - البحث */}
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: 1,
+          width: { xs: "100%", sm: "auto" },
+          order: { xs: 2, sm: 1 }
+        }}>
+          {isLoading ? (
+            <Skeleton.Input 
+              active 
+              style={{ 
+                width: "100%", 
+                height: "40px", 
+                borderRadius: "4px" 
+              }} 
+            />
+          ) : (
+            <>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                px: 1,
+                flex: 1,
+                maxWidth: { xs: '100%', sm: '300px' }
+              }}>
+                <InputBase
+                  value={searchValue}
+                  onChange={onSearchChange}
+                  placeholder={t("Customers.SearchEmail")}
+                  sx={{
+                    color: "text.primary",
+                    flex: 1,
+                    py: 1
+                  }}
+                />
+                <IconButton
+                  sx={{ color: "primary.main" }}
+                  onClick={onSearchClick}
+                  size="small"
+                >
+                  <SearchOutlined />
+                </IconButton>
+              </Box>
+              
+              <IconButton
+                sx={{ color: "primary.main" }}
+                onClick={onScanQR}
+                title={t("Customers.ScanQR")}
+                size="small"
+              >
+                <QrcodeOutlined />
+              </IconButton>
+
+              {scannedEmail && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={onClearFilter}
+                  sx={{
+                    whiteSpace: 'nowrap',
+                    fontSize: "12px",
+                  }}
+                >
+                  {t("Customers.ClearFilter")}
+                </Button>
+              )}
+            </>
+          )}
+        </Box>
+        
+        {/* الجزء الأيمن - الأزرار */}
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: 1,
+          width: { xs: "100%", sm: "auto" },
+          justifyContent: { xs: "flex-start", sm: "flex-end" },
+          order: { xs: 1, sm: 2 }
+        }}>
+          {isLoading ? (
+            <>
+              <Skeleton.Button 
+                active 
+                style={{ 
+                  width: "100px", 
+                  height: "40px", 
+                  borderRadius: "4px" 
+                }} 
+              />
+              <Skeleton.Button 
+                active 
+                style={{ 
+                  width: "140px", 
+                  height: "40px", 
+                  borderRadius: "4px" 
+                }} 
+              />
+            </>
+          ) : (
+            <>
+              {selectedCount > 0 && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<DeleteOutlined />}
+                  onClick={onBulkDelete}
+                  size="small"
+                  sx={{
+                    whiteSpace: 'nowrap',
+                    fontSize: "12px",
+                  }}
+                >
+                  {t("Customers.Delete")} ({selectedCount})
+                </Button>
+              )}
               <Button
-                variant="text"
-                onClick={onClearFilter}
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={onAddCustomer}
+                size="small"
                 sx={{
-                  width: isSmallMobile ? "100px" : "auto",
+                  whiteSpace: 'nowrap',
                   fontSize: "12px",
+                  minWidth: 'auto'
                 }}
               >
-                {t("Customers.ClearFilter")}
+                {t("Customers.AddCustomer")}
               </Button>
-            )}
-          </Stack>
-        </Stack>
-        
-        <Stack direction="row" spacing={1} sx={{ 
-          mt: { xs: 2, sm: 0 },
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: 1
-        }}>
-          {selectedCount > 0 && (
-            <IconButton
-              size="small"
-              color="error"
-              onClick={onBulkDelete}
-            >
-              <DeleteOutlined /> ({selectedCount})
-            </IconButton>
+            </>
           )}
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={onAddCustomer}
-            sx={{
-              width: { xs: "100%", sm: "auto" },
-              height: { xs: "40px", sm: "40px" },
-              fontSize: "12px",
-              "&:hover": {
-                backgroundColor: "primary.main",
-                color: "white",
-              },
-            }}
-          >
-            {t("Customers.AddCustomer")}
-          </Button>
-        </Stack>
+        </Box>
       </Box>
     </Box>
   );

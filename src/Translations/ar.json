@@ -336,7 +336,11 @@
     "PrinterSettings": "إعدادات الطابعة",
     "PrinterType": "نوع الطابعة",
     "PrinterIP": "عنوان IP الطابعة",
-    "USDtoIQDRate": "سعر الدولار بالدينار"
+    "USDtoIQDRate": "سعر الدولار بالدينار",
+    "GeneralSettings": "الإعدادات العامة",
+    "Title": "العنوان",
+    "Description": "الوصف",
+    "UploadImage": "رفع صورة"
   },
   "Rewards": {
     "Rewards": "المكافآت",
@@ -448,6 +452,9 @@
     "Search": "بحث",
     "ID": "المسلسل",
     "ManagerName": "اسم المدير",
+    "UpdateManager": "تحديث المدير",
+    "ArabicName": "الاسم العربي",
+    "EnglishName": "الاسم الانجليزي",
     "Email": "البريد الإلكتروني",
     "Phone": "الهاتف",
     "Role": "الدور",
@@ -472,6 +479,7 @@
     "ManagePermissions": "الصلاحيات",
     "ClearFilter": "مسح الفلتر",
     "SearchEmail": "بحث بالبريد الإلكتروني",
+
     "ManagerPermissions": "الصلاحيات",
     "SelectAll": "اختيار الكل",
     "DeselectAll": "إلغاء الاختيار",

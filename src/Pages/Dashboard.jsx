@@ -1,5 +1,5 @@
 import React, { useState, Suspense, useRef } from 'react';
-import { Layout, Card, Row, Col, DatePicker, Space, Spin, Typography, Select, Skeleton } from 'antd';
+import { Layout, Card, Row, Col, DatePicker, Space, Typography, Select, Skeleton } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Api from '../Config/Api';
 import {
@@ -151,9 +151,40 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Skeleton active />
-      </div>
+      <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
+        <Content style={{ padding: '24px' }}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            {/* Filter Section Skeleton */}
+            <Row justify="space-between" align="middle" gutter={[16, 16]}>
+              <Col>
+                <Space wrap>
+                  <Skeleton.Input active style={{ width: 120 }} />
+                  <Skeleton.Input active style={{ width: 120 }} />
+                </Space>
+              </Col>
+              <Col>
+                <Skeleton.Button active style={{ width: 150 }} />
+              </Col>
+            </Row>
+
+            {/* Stats Cards Skeleton */}
+            <Row gutter={[16, 16]}>
+              {[1, 2, 3, 4].map(key => (
+                <Col xs={24} sm={12} lg={6} key={key}>
+                  <Card>
+                    <Skeleton active paragraph={{ rows: 1 }} />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+            {/* Charts Skeleton */}
+            <Card>
+              <Skeleton.Input active block style={{ height: 400 }} />
+            </Card>
+          </Space>
+        </Content>
+      </Layout>
     );
   }
 
@@ -250,7 +281,7 @@ const Dashboard = () => {
           )}
 
           <Card>
-            <Suspense fallback={<div style={{ textAlign: 'center', padding: '40px' }}><Spin /></div>}>
+            <Suspense fallback={<div style={{ textAlign: 'center', padding: '40px' }}><Skeleton active /></div>}>
               <DashboardCharts dashboardData={dashboardData} />
             </Suspense>
           </Card>

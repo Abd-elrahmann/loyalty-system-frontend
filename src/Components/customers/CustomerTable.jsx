@@ -17,7 +17,7 @@ import {
 import { EyeOutlined, EditOutlined, DeleteOutlined, QrcodeOutlined, PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { StyledTableCell, StyledTableRow } from "../../Components/Shared/tableLayout";
-import { Spin } from "antd";
+import { Skeleton } from "antd";
 import dayjs from "dayjs";
 
 const CustomerTable = ({
@@ -39,15 +39,169 @@ const CustomerTable = ({
   selectedCustomers,
   onSelectCustomer,
   onSelectAll,
-  isAllSelected
+  isAllSelected,
+      
 }) => {
   const { t, i18n } = useTranslation();
 
   const nameField = i18n.language === "ar" ? "arName" : "enName";
 
+// Skeleton rows for loading state - معدلة
+const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
+  <StyledTableRow key={`skeleton-${index}`}>
+    <StyledTableCell padding="checkbox">
+      <Skeleton.Input 
+        active 
+        size="small" 
+        style={{ 
+          width: 20, 
+          height: 20,
+          display: 'block',
+          margin: '0 auto'
+        }} 
+      />
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small" 
+          style={{ 
+            width: 40, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 120, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 150, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 100, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 60, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 40, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 120, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Skeleton.Input 
+          active 
+          size="small"
+          style={{ 
+            width: 40, 
+            height: 20,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+    <StyledTableCell align="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+        <Skeleton.Button 
+          active 
+          size="small" 
+          style={{ 
+            width: 30, 
+            height: 30,
+            minWidth: 'auto'
+          }} 
+        />
+        <Skeleton.Button 
+          active 
+          size="small" 
+          style={{ 
+            width: 30, 
+            height: 30,
+            minWidth: 'auto'
+          }} 
+        />
+        <Skeleton.Button 
+          active 
+          size="small" 
+          style={{ 
+            width: 30, 
+            height: 30,
+            minWidth: 'auto'
+          }} 
+        />
+      </Box>
+    </StyledTableCell>
+  </StyledTableRow>
+));
+
   return (
-    <TableContainer component={Paper} sx={{ maxHeight: 650 }}>
-      <Table stickyHeader>
+    <TableContainer component={Paper} sx={{ maxHeight: 650, overflowX: 'auto', width: '100%' }}>
+      <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
             <StyledTableCell padding="checkbox">
@@ -55,7 +209,6 @@ const CustomerTable = ({
                 indeterminate={selectedCustomers.length > 0 && selectedCustomers.length < customers.length}
                 checked={isAllSelected}
                 onChange={onSelectAll}
-                sx={{ color: "white !important" }}
               />
             </StyledTableCell>
             <StyledTableCell align="center">
@@ -63,7 +216,6 @@ const CustomerTable = ({
                 active={orderBy === "id"}
                 direction={orderBy === "id" ? order : "asc"}
                 onClick={createSortHandler("id")}
-                sx={{ color: "white !important" }}
               >
                 {t("Customers.ID")}
               </TableSortLabel>
@@ -73,7 +225,6 @@ const CustomerTable = ({
                 active={orderBy === nameField}
                 direction={orderBy === nameField ? order : "asc"}
                 onClick={createSortHandler(nameField)}
-                sx={{ color: "white !important" }}
               >
                 {t("Customers.Name")}
               </TableSortLabel>
@@ -83,7 +234,6 @@ const CustomerTable = ({
                 active={orderBy === "email"}
                 direction={orderBy === "email" ? order : "asc"}
                 onClick={createSortHandler("email")}
-                sx={{ color: "white !important" }}
               >
                 {t("Customers.Email")}
               </TableSortLabel>
@@ -115,7 +265,7 @@ const CustomerTable = ({
                 direction={orderBy === "createdAt" ? order : "asc"}
                 onClick={createSortHandler("createdAt")}
                 sx={{ color: "white !important" }}
-                >
+              >
                 {t("Customers.CreatedAt")}
               </TableSortLabel>
             </StyledTableCell>
@@ -125,11 +275,7 @@ const CustomerTable = ({
         </TableHead>
         <TableBody>
           {isLoading ? (
-            <StyledTableRow>
-              <StyledTableCell colSpan={11} align="center">
-                <Spin size="large" />
-              </StyledTableCell>
-            </StyledTableRow>
+            skeletonRows
           ) : !customers || customers.length === 0 ? (
             <StyledTableRow>
               <StyledTableCell colSpan={11} align="center">
@@ -168,7 +314,8 @@ const CustomerTable = ({
                   <IconButton
                     size="small"
                     color="success"
-                    onClick={() => onAddPoints(customer)}>
+                    onClick={() => onAddPoints(customer)}
+                  >
                     <PlusOutlined />
                   </IconButton>
                 </StyledTableCell>

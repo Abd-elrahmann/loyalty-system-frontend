@@ -9,6 +9,7 @@ import Api from '../../Config/Api';
 import {MenuOutlined, LogoutOutlined, UserOutlined, SettingOutlined, GlobalOutlined} from '@ant-design/icons';
 import { FaCoins } from 'react-icons/fa';
 import { FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 
 const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
@@ -19,6 +20,27 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
   const user = useUser(); 
   const [anchorEl, setAnchorEl] = useState(null);
   const [profile, setProfile] = useState(user);
+  const [settings, setSettings] = useState({ title: '', imgUrl: '' });
+  const queryClient = useQueryClient();
+
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      const response = await Api.get('/api/settings');
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
+
+  useEffect(() => {
+    if (settingsData) {
+      setSettings({
+        title: settingsData.title || '',
+        imgUrl: settingsData.imgUrl || ''
+      });
+    }
+  }, [settingsData]);
 
   useEffect(() => {
     const fetchProfileIfNeeded = async () => {
@@ -55,6 +77,20 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('userProfileUpdate', handleStorageChange);
     };
+  }, []);
+
+  useEffect(() => {
+    const handleSettingsUpdate = () => {
+      // Invalidate the settings query to force refetch
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
+    };
+
+    window.addEventListener('settingsUpdated', handleSettingsUpdate);
+    
+    return () => {
+      window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleLanguage = () => {
@@ -102,7 +138,32 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
               <MenuOutlined color='primary' style={{fontSize: isMobile ? '20px' : '21px'}} />
             </IconButton>
           )}
-          
+          {settings.title && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
+              {settings.imgUrl && (
+                <img 
+                  src={settings.imgUrl} 
+                  alt="Logo" 
+                  style={{ 
+                    width: isMobile ? 30 : 40, 
+                    height: isMobile ? 30 : 40,
+                    objectFit: 'cover',
+                    borderRadius: '4px'
+                  }}
+                />
+              )}
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  color: 'text.primary', 
+                  fontWeight: 'bold',
+                  fontSize: isMobile ? '14px' : '16px'
+                }}
+              >
+                {settings.title}
+              </Typography>
+            </Box>
+          )}
         </Box>
 
         <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, alignItems: 'center' }}>

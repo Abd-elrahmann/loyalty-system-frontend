@@ -10,7 +10,7 @@ import DeleteModal from '../Components/Modals/DeleteModal';
 import Swal from 'sweetalert2';
 import { useUser, updateUserProfile } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
-import { Spin } from "antd";
+import { Skeleton } from "antd";
 import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash.debounce';
@@ -284,17 +284,17 @@ const Products = () => {
   };
 
   return (
-      <Box sx={{ p: isMobile ? 1 : 3, mt: isMobile ? 6 : 0 }}>
-        <Helmet>
-          <title>{t('Products.Products')}</title>
-          <meta name="description" content={t('Products.ProductsDescription')} />
-        </Helmet>
+    <Box sx={{ p: isMobile ? 1 : 3, mt: isMobile ? 6 : 0 }}>
+      <Helmet>
+        <title>{t('Products.Products')}</title>
+        <meta name="description" content={t('Products.ProductsDescription')} />
+      </Helmet>
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={activeTab} onChange={handleTabChange} textColor="primary" indicatorColor="primary" sx={{
-          '& .MuiTabs-flexContainer': {
-            flexWrap: 'wrap',
-            justifyContent: isMobile ? 'center' : 'flex-start',
-          },
+            '& .MuiTabs-flexContainer': {
+              flexWrap: 'wrap',
+              justifyContent: isMobile ? 'center' : 'flex-start',
+            },
         }}>
           <Tab label={t('Products.Cafe')} value="cafe"  />
           <Tab label={t('Products.Restaurant')} value="restaurant" />
