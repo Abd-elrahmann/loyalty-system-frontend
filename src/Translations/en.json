@@ -89,7 +89,10 @@
     "RecentUsers": "Recent Users",
     "User": "User",
     "JoinDate": "Join Date",
-    "RememberMe": "Remember Me"
+    "RememberMe": "Remember Me",
+    "YourPoints": "Your Points",
+    "YourTransactions": "Your Transactions",
+    "EarnedPoints": "Earned Points"
   },
   "Profile": {
     "Title": "Profile",

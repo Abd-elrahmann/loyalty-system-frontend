@@ -209,6 +209,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                 indeterminate={selectedCustomers.length > 0 && selectedCustomers.length < customers.length}
                 checked={isAllSelected}
                 onChange={onSelectAll}
+                sx={{ color: "white !important" }}
               />
             </StyledTableCell>
             <StyledTableCell align="center">
@@ -216,6 +217,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                 active={orderBy === "id"}
                 direction={orderBy === "id" ? order : "asc"}
                 onClick={createSortHandler("id")}
+                sx={{ color: "white !important" }}
               >
                 {t("Customers.ID")}
               </TableSortLabel>
@@ -225,6 +227,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                 active={orderBy === nameField}
                 direction={orderBy === nameField ? order : "asc"}
                 onClick={createSortHandler(nameField)}
+                sx={{ color: "white !important" }}
               >
                 {t("Customers.Name")}
               </TableSortLabel>
@@ -234,6 +237,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                 active={orderBy === "email"}
                 direction={orderBy === "email" ? order : "asc"}
                 onClick={createSortHandler("email")}
+                sx={{ color: "white !important" }}
               >
                 {t("Customers.Email")}
               </TableSortLabel>
@@ -333,6 +337,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                       size="small"
                       color="warning"
                       onClick={() => onEdit(customer)}
+                      title={t("Customers.Edit")}
                     >
                       <EditOutlined color="warning" />
                     </IconButton>
@@ -340,6 +345,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                       size="small" 
                       color="error" 
                       onClick={() => onDelete(customer)}
+                      title={t("Customers.Delete")}
                     >
                       <DeleteOutlined />
                     </IconButton>

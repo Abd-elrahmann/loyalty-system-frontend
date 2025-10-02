@@ -87,7 +87,10 @@
     "RecentUsers": "أحدث المستخدمين",
     "User": "المستخدم",
     "JoinDate": "تاريخ التسجيل",
-    "RememberMe": "تذكرني"
+    "RememberMe": "تذكرني",
+    "YourPoints": "نقاطك",
+    "YourTransactions": "المعاملات",
+    "EarnedPoints": "النقاط المكتسبة"
   },
   "Profile": {
     "Title": "الملف الشخصي",

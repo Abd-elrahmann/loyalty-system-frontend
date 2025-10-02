@@ -37,6 +37,7 @@ const Settings = () => {
     enDescription: '',
     description: '',
     imgUrl: '',
+    image: '',
     enCurrency: null,
     arCurrency: null,
     timezone: 'Asia/Baghdad',
@@ -61,17 +62,14 @@ const Settings = () => {
     if (data && !settingsMutation.isPending) {
       const currencyObj = currencies.find(c => c.enValue === data.enCurrency);
       
-      // Only update image if we don't have a new image selected
-      const shouldUpdateImage = !imageFile && !imagePreview;
-      
       setSettings(prev => ({
         ...prev,
         arTitle: data.arTitle || '',
         enTitle: data.enTitle || '',
         arDescription: data.arDescription || '',
         enDescription: data.enDescription || '',
-        // Only update imgUrl if we don't have a new image
-        imgUrl: shouldUpdateImage ? (data.imgUrl || '') : prev.imgUrl,
+        imgUrl: data.imgUrl || '',
+        image: data.imgUrl || '',
         pointsPerDollar: parseFloat(data.pointsPerDollar) || 0,
         pointsPerIQD: parseFloat(data.pointsPerIQD) || 0,
         usdToIqd: parseFloat(data.usdToIqd) || 0,
@@ -91,25 +89,29 @@ const Settings = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
-  };
 
   const settingsMutation = useMutation({
     mutationFn: async (settingsToSave) => {
-      const data = {
-        ...settingsToSave,
-        image: imageFile ? await convertFileToBase64(imageFile) : null
-      };
+      const formData = new FormData();
       
-      return await Api.post('/api/settings', data, {
+      Object.keys(settingsToSave).forEach((key) => {
+        const value = settingsToSave[key];
+        if (value !== null && value !== undefined) {
+          formData.append(key, typeof value === "object" ? JSON.stringify(value) : value);
+        }
+      });
+      
+
+      if (imageFile) {
+        formData.append("file", imageFile);
+      } else if (settings.imgUrl) {
+        formData.append("imgUrl", settings.imgUrl); 
+      }
+      
+      
+      return await Api.post('/api/settings', formData, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data'
         }
       });
     },
@@ -121,14 +123,7 @@ const Settings = () => {
         USDtoIQD: variables.usdToIqd
       });
       
-      // Create updated data with the new image preview
-      const updatedData = {
-        ...response.data,
-        // Use the new image preview if available, otherwise use the response image
-        imgUrl: imagePreview || response.data.imgUrl
-      };
-      
-      queryClient.setQueryData(['settings'], updatedData);
+      queryClient.setQueryData(['settings'], response.data);
       
       // Clear image state after successful save
       setImageFile(null);
@@ -179,8 +174,16 @@ const Settings = () => {
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
       
-      // Immediately update the settings to show the new image preview
-      setSettings(prev => ({ ...prev, imgUrl: previewUrl }));
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSettings(prev => ({ 
+          ...prev, 
+          imgUrl: previewUrl,
+          image: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
     } else {
       // If no new file, clear the preview
       setImagePreview(null);
@@ -191,7 +194,11 @@ const Settings = () => {
     setImageFile(null);
     setImagePreview(null);
     // Also clear the current image URL if we want to remove the existing image
-    setSettings(prev => ({ ...prev, imgUrl: '' }));
+    setSettings(prev => ({ 
+      ...prev, 
+      imgUrl: '',
+      image: ''
+    }));
     
     // Update the query cache to reflect the image removal
     queryClient.setQueryData(['settings'], (oldData) => ({

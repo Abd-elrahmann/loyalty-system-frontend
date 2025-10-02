@@ -1,5 +1,5 @@
 import 'react-toastify/dist/ReactToastify.css';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import React, { Suspense, useMemo, useEffect } from 'react';
 import { Spin } from 'antd';
 import Register from './Auth/Register';
@@ -16,27 +16,55 @@ import ResetPassword from './Auth/ResetPassword';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import MainRoutes from './Config/routes';
-import { getFirstAccessibleRoute } from './utilities/permissions.js';
+import { getFirstAccessibleRoute, hasRouteAccess } from './utilities/permissions.js';
+import OfflineAlert from './hooks/OfflineAlert.jsx';
 
 const Layout = React.lazy(() => import('./Layout'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 
+// أنشئ كومبوننت محمية لكل route
+const createProtectedComponent = (importFunc, routePath) => {
+  return function ProtectedComponentWrapper() {
+    
+  
+    const isAuthorized = React.useMemo(() => {
+      try {
+        const profile = localStorage.getItem('profile');
+        if (profile) {
+          const user = JSON.parse(profile);
+          if (user.role === 'ADMIN') return true;
+          return hasRouteAccess(user, routePath);
+        }
+      } catch (error) {
+        console.warn('Error checking permissions:', error);
+      }
+      return false;
+    }, []);
+
+    if (!isAuthorized) {
+      return <Navigate to={getDefaultRoute()} replace />;
+    }
+
+    const LazyComponent = React.lazy(importFunc);
+    return (
+      <Suspense fallback={<CenteredSpinner />}>
+        <LazyComponent />
+      </Suspense>
+    );
+  };
+};
+
 const routeComponents = {
-  '/dashboard': React.lazy(() => {
-    const component = import('./Pages/Dashboard');
-    import('./Pages/Transactions'); 
-    import('./Pages/Products');
-    return component;
-  }),
-  '/mangers': React.lazy(() => import('./Pages/Mangers')),
-  '/customers': React.lazy(() => import('./Pages/Customers')),
-  '/transactions': React.lazy(() => import('./Pages/Transactions')),
-  '/products': React.lazy(() => import('./Pages/Products')),
-  '/settings': React.lazy(() => import('./Pages/Settings')),
-  '/rewards': React.lazy(() => import('./Pages/Rewards')),
-  '/point-of-sale': React.lazy(() => import('./Pages/PointOfSale')),
-  '/invoice': React.lazy(() => import('./Pages/Invoice')),
-  '/reports': React.lazy(() => import('./Pages/Reports/Reports'))
+  '/dashboard': createProtectedComponent(() => import('./Pages/Dashboard'), '/dashboard'),
+  '/mangers': createProtectedComponent(() => import('./Pages/Mangers'), '/mangers'),
+  '/customers': createProtectedComponent(() => import('./Pages/Customers'), '/customers'),
+  '/transactions': createProtectedComponent(() => import('./Pages/Transactions'), '/transactions'),
+  '/products': createProtectedComponent(() => import('./Pages/Products'), '/products'),
+  '/settings': createProtectedComponent(() => import('./Pages/Settings'), '/settings'),
+  '/rewards': createProtectedComponent(() => import('./Pages/Rewards'), '/rewards'),
+  '/point-of-sale': createProtectedComponent(() => import('./Pages/PointOfSale'), '/point-of-sale'),
+  '/invoice': createProtectedComponent(() => import('./Pages/Invoice'), '/invoice'),
+  '/reports': createProtectedComponent(() => import('./Pages/Reports/Reports'), '/reports')
 };
 
 const queryClient = new QueryClient();
@@ -59,10 +87,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={<CenteredSpinner />}>
         <Layout>
           <CacheProvider value={cacheRtl}>
             <BrowserRouter>
+              <OfflineAlert />
               <Routes>
                 <Route
                   path="/"
@@ -109,9 +137,7 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <MainLayout>
-                            <Suspense fallback={<CenteredSpinner />}>
-                              <RouteComponent />
-                            </Suspense>
+                            {RouteComponent && <RouteComponent />}
                           </MainLayout>
                         </ProtectedRoute>
                       }
@@ -133,9 +159,7 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <MainLayout>
-                        <Suspense fallback={<CenteredSpinner />}>
-                          {React.createElement(routeComponents['/transactions'])}
-                        </Suspense>
+                        {routeComponents['/transactions'] && React.createElement(routeComponents['/transactions'])}
                       </MainLayout>
                     </ProtectedRoute>
                   }
@@ -145,7 +169,6 @@ function App() {
             </BrowserRouter>
           </CacheProvider>
         </Layout>
-      </Suspense>
     </QueryClientProvider>
   );
 }
@@ -158,7 +181,36 @@ const CenteredSpinner = () => (
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  const location = useLocation();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  try {
+    const profile = localStorage.getItem('profile');
+    if (profile) {
+      const user = JSON.parse(profile);
+      const currentPath = location.pathname;
+      
+      // إذا كان المستخدم ADMIN، يسمح له بالوصول إلى كل الصفحات
+      if (user.role === 'ADMIN') {
+        return children;
+      }
+      
+      // التحقق من صلاحيات المستخدم للصفحة الحالية
+      if (hasRouteAccess(user, currentPath)) {
+        return children;
+      } else {
+        // إذا لم يكن لديه صلاحية، إرجاعه إلى الصفحة الأولى المسموح له بها
+        return <Navigate to={getFirstAccessibleRoute(user)} replace />;
+      }
+    }
+  } catch (error) {
+    console.warn('Error checking route permissions:', error);
+  }
+  
+  return <Navigate to="/login" replace />;
 };
 
 const getDefaultRoute = () => {

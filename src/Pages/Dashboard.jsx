@@ -8,15 +8,10 @@ import {
   UserOutlined,
   BarChartOutlined,
 } from '@ant-design/icons';
-import {Button} from "@mui/material";
-import { FilePdfOutlined } from '@ant-design/icons';
 import { Helmet } from 'react-helmet-async';
 import { animate } from 'framer-motion';
 import { useUser } from '../utilities/user';
 import dayjs from 'dayjs';
-import Theme from '../utilities/Theme';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 const { Content } = Layout;
 import DashboardCharts from '../Components/Dashboard/DashboardCharts';
 import { useQuery } from '@tanstack/react-query';
@@ -60,7 +55,6 @@ const StatCard = React.memo(({ icon: Icon, title, value, trend, color = 'primary
 });
 
 const Dashboard = () => {
-  const theme = Theme;
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedPeriod, setSelectedPeriod] = useState('week');
@@ -94,60 +88,10 @@ const Dashboard = () => {
         ...response.data
       };
     },
-    staleTime: 5 * 1000,  // 5 seconds
-    cacheTime: 5 * 1000  // 5 seconds
+    staleTime: 5 * 1000,
+    cacheTime: 5 * 1000
   });
 
-  const exportToPDF = async () => {
-    try {
-      if (!contentRef.current) return;
-
-      if (filterSectionRef.current) {
-        filterSectionRef.current.style.display = 'none';
-      }
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const canvas = await html2canvas(contentRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        allowTaint: true,
-        backgroundColor: '#f0f2f5'
-      });
-
-      const imgWidth = pageWidth - 20;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 10;
-      
-      const imgData = canvas.toDataURL('image/png');
-
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      if (filterSectionRef.current) {
-        filterSectionRef.current.style.display = 'block';
-      }
-
-      pdf.save('dashboard_report.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      if (filterSectionRef.current) {
-        filterSectionRef.current.style.display = 'block';
-      }
-    }
-  };
 
   if (isLoading) {
     return (
@@ -221,29 +165,10 @@ const Dashboard = () => {
                   </Select>
                 </Space>
               </Col>
-              {user.role !== 'USER' && (
-                <Col>
-                  <Button
-                    variant="outlined"
-                    startIcon={<FilePdfOutlined />}
-                    onClick={exportToPDF}
-                    style={{
-                      backgroundColor: theme.palette.primary.main,
-                      color: theme.palette.primary.contrastText,
-                      "&:hover": {
-                        backgroundColor: "primary.main",
-                        color: "white",
-                      },
-                    }}
-                  >
-                    {t('Dashboard.DashboardReport')}
-                  </Button>
-                </Col>
-              )}
             </Row>
           </div>
 
-          {user.role !== 'USER' && (
+          {user.role !== 'USER' ? (
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} lg={6}>
                 <StatCard
@@ -275,6 +200,33 @@ const Dashboard = () => {
                   title={t('Dashboard.TransactionsCount')}
                   value={dashboardData.transactionsCount}
                   color="#13c2c2"
+                />
+              </Col>
+            </Row>
+          ) : (
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12} lg={8}>
+                <StatCard
+                  icon={GiftOutlined}
+                  title={t('Dashboard.YourPoints')}
+                  value={dashboardData.totalPoints}
+                  color="#52c41a"
+                />
+              </Col>
+              <Col xs={24} sm={12} lg={8}>
+                <StatCard
+                  icon={SwapOutlined}
+                  title={t('Dashboard.YourTransactions')}
+                  value={dashboardData.transactionsCount}
+                  color="#13c2c2"
+                />
+              </Col>
+              <Col xs={24} sm={12} lg={8}>
+                <StatCard
+                  icon={BarChartOutlined}
+                  title={t('Dashboard.EarnedPoints')}
+                  value={dashboardData.totalEarnPoints}
+                  color="#faad14"
                 />
               </Col>
             </Row>

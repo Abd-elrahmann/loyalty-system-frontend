@@ -10,7 +10,7 @@ import DeleteModal from '../Components/Modals/DeleteModal';
 import Swal from 'sweetalert2';
 import { useUser, updateUserProfile } from '../utilities/user';
 import { Helmet } from 'react-helmet-async';
-import { Skeleton } from "antd";
+import { Spin } from "antd";
 import { PlusOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash.debounce';

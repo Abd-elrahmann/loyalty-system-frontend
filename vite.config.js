@@ -22,7 +22,9 @@ export default defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
           'chart-vendor': ['chart.js', 'react-chartjs-2'],
-          'mui-vendor': ['@mui/material', '@mui/icons-material'],
+          'mui-core': ['@mui/material'],
+          'mui-icons': ['@mui/icons-material'],
+          'ant-icons': ['@ant-design/icons'],
           'utils-vendor': ['axios', 'lodash'],
         },
       },
