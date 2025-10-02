@@ -31,9 +31,9 @@ const ForgetPassword = () => {
     const errors = {};
 
     if (!values.email) {
-      errors.email = 'Email is required';
+      errors.email = t('ForgetPassword.emailRequired');
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-      errors.email = 'Invalid email address';
+      errors.email = t('ForgetPassword.invalidEmailAddress');
     }
 
     return errors;
@@ -52,7 +52,7 @@ const ForgetPassword = () => {
         });
         notifySuccess(response.data.message);
       } catch (err) {
-        notifyError(err.response?.data?.message || 'An error occurred');
+        notifyError(err.response?.data?.message || t('ForgetPassword.anErrorOccurred'));
       } finally {
         setLoading(false);
       }

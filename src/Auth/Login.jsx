@@ -75,22 +75,10 @@ const Login = () => {
           const loginUser = response.data.user;
           localStorage.setItem('profile', JSON.stringify(loginUser));
           
-          try {
-            const profileResponse = await Api.get('/api/auth/profile');
-            const profileData = profileResponse.data;
-            
-            localStorage.setItem('profile', JSON.stringify(profileData));
-            
-            const targetRoute = getFirstAccessibleRoute(profileData);
-            navigate(targetRoute);
-            notifySuccess('Login successful');
-            updateUserProfile();
-          } catch (profileError) {
-            console.warn('Could not fetch full profile, using login data:', profileError);
-            
-            const targetRoute = getFirstAccessibleRoute(loginUser);
-            navigate(targetRoute);
-          }
+          const targetRoute = getFirstAccessibleRoute(loginUser);
+          navigate(targetRoute);
+          notifySuccess(t('Login.loginSuccessful'));
+          updateUserProfile();
         }
 
       } catch (error) {
@@ -101,7 +89,7 @@ const Login = () => {
             notifyError(error.response.data.message);
           }
         } else {
-          notifyError('Login failed');
+          notifyError(t('Login.loginFailed'));
         }
       } finally {
         setLoading(false);

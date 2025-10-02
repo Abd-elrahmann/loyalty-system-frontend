@@ -16,7 +16,9 @@
     "forgotPassword": "هل نسيت كلمة المرور؟",
     "dontHaveAccount": "ليس لديك حساب؟",
     "signUp": "إنشاء حساب",
-    "loginDescription": "تسجيل الدخول إلى نظام النقاط والولاء الخاص بك"
+    "loginDescription": "تسجيل الدخول إلى نظام النقاط والولاء الخاص بك",
+    "loginSuccessful": "تم تسجيل الدخول بنجاح",
+    "loginFailed": "فشل تسجيل الدخول"
   },
   "Register": {
     "createNewAccount": "إنشاء حساب جديد",
@@ -33,7 +35,9 @@
     "weakPassword": "كلمة المرور ضعيفة",
     "mediumPassword": "كلمة المرور متوسطة",
     "strongPassword": "كلمة المرور قوية",
-    "register": "إنشاء حساب"
+    "register": "إنشاء حساب",
+    "accountCreatedSuccessfully": "تم إنشاء الحساب بنجاح",
+    "accountCreatedSuccessfullyPleaseLogin": "تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول."
   },
   "ForgetPassword": {
     "enterEmail": "أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور.",
@@ -41,7 +45,10 @@
     "sendResetLink": "إرسال رابط إعادة التعيين",
     "backToLogin": "العودة إلى تسجيل الدخول",
     "forgetPasswordDescription": "إرسال رابط إعادة التعيين لكلمة المرور",
-    "forgetPassword": "هل نسيت كلمة المرور؟"
+    "forgetPassword": "هل نسيت كلمة المرور؟",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "invalidEmailAddress": "البريد الإلكتروني غير صالح",
+    "anErrorOccurred": "حدث خطأ"
   },
   "ResetPassword": {
     "title": "إعادة تعيين كلمة المرور",
@@ -51,7 +58,9 @@
     "missMatchPassword": "كلمة المرور وتأكيد كلمة المرور لا تطابق بعضهما البعض",
     "passwordRequired": "كلمة المرور مطلوبة",
     "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
-    "resetPasswordDescription": "إعادة تعيين كلمة المرور"
+    "resetPasswordDescription": "إعادة تعيين كلمة المرور",
+    "invalidResetToken": "رمز إعادة التعيين غير صالح",
+    "anErrorOccurred": "حدث خطأ"
   },
   "Dashboard": {
     "Dashboard": "لوحة التحكم",

@@ -137,16 +137,11 @@ const Register = () => {
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('profile', JSON.stringify(response.data.user));
-          notifySuccess('Account created successfully');
-          setTimeout(() => {
-            navigate('/dashboard', { replace: true });
-          }, 1000);
-        } else {
-          notifySuccess('Account created successfully! Please login.');
-          setTimeout(() => {
-            navigate('/login', { replace: true });
-          }, 1000);
         }
+        notifySuccess(t('Register.accountCreatedSuccessfullyPleaseLogin'));
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 1000);
       } catch (error) {
         setShake(true);
         setTimeout(() => setShake(false), 500);

@@ -13,11 +13,11 @@ import { Helmet } from 'react-helmet-async';
 import { FaLock } from 'react-icons/fa';
 import ResetPasswordImage from '/assets/images/reset-passwoed.webp';
 import { motion } from 'framer-motion';
-
+import { GlobalOutlined } from '@ant-design/icons';
 const MotionPaper = motion(Paper);
 
 const ResetPassword = () => {
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
@@ -28,6 +28,11 @@ const ResetPassword = () => {
     const [isExiting, setIsExiting] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'en' ? 'ar' : 'en';
+        i18n.changeLanguage(newLang);
+    };
 
     const validate = values => {
         const errors = {};
@@ -51,7 +56,7 @@ const ResetPassword = () => {
         validate,
         onSubmit: async (values) => {
             if (!token) {
-                notifyError('Invalid reset token');
+                notifyError(t('ResetPassword.invalidResetToken'));
                 return;
             }
             try {
@@ -63,7 +68,7 @@ const ResetPassword = () => {
                 notifySuccess(response.data.message);
                 navigate('/login');
             } catch (err) {
-                notifyError(err.response?.data?.message || 'An error occurred');
+                notifyError(err.response?.data?.message || t('ResetPassword.anErrorOccurred'));
             } finally {
                 setLoading(false);
             }
@@ -80,7 +85,7 @@ const ResetPassword = () => {
             <Box sx={{ 
                 display: 'flex', 
                 minHeight: '100vh',
-                flexDirection: isMobile ? 'column' : 'row'
+                flexDirection: isMobile ? 'column' : 'row-reverse'
             }}>
                 {!isMobile && (
                     <Box sx={{
@@ -108,11 +113,11 @@ const ResetPassword = () => {
                         <Box sx={{
                             position: 'absolute',
                             top: 0,
-                            right: 0,
+                            left: 0,
                             width: '100px',
                             height: '100%',
-                            background: 'linear-gradient(to bottom right, transparent 50%, #f5f5f5 50%)',
-                            transform: isMobile ? 'none' : 'translateX(50%)',
+                            background: 'linear-gradient(to bottom left, transparent 50%, #f5f5f5 50%)',
+                            transform: isMobile ? 'none' : 'translateX(-50%)',
                             display: isMobile ? 'none' : 'block'
                         }} />
                     </Box>
@@ -155,9 +160,15 @@ const ResetPassword = () => {
                                 boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
                             }}
                         >
-                            <Typography component="h1" variant={isMobile ? 'h5' : 'h4'} color="primary" sx={{ mb: 3, fontWeight: 'bold' }}>
-                                {t('ResetPassword.resetPassword')}
-                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                <Typography component="h1" variant={isMobile ? 'h5' : 'h4'} color="primary" sx={{ mb: 3, fontWeight: 'bold' }}>
+                                    {t('ResetPassword.resetPassword')}
+                                </Typography>
+                                <Button onClick={toggleLanguage} sx={{ mb: 2, fontSize: '1rem', fontWeight: 'bold' }}>
+                                    <GlobalOutlined style={{marginRight: '8px', marginLeft: '8px', fontSize: '18px', color: '#800080'}} />
+                                    {i18n.language === 'en' ? 'Ar' : 'EN'}
+                                </Button>
+                            </Box>
 
                             <Box component="form" onSubmit={formik.handleSubmit} sx={{ width: '100%' }}>
                                 <TextField

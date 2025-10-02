@@ -16,7 +16,9 @@
     "forgotPassword": "Forgot Password?",
     "dontHaveAccount": "Don't have an account?",
     "signUp": "Sign Up",
-    "loginDescription": "Login to your account to manage your loyalty points and rewards"
+    "loginDescription": "Login to your account to manage your loyalty points and rewards",
+    "loginSuccessful": "Login successful",
+    "loginFailed": "Login failed"
   },
   "Register": {
     "createNewAccount": "Create New Account",
@@ -33,7 +35,9 @@
     "weakPassword": "Weak Password",
     "mediumPassword": "Medium Password",
     "strongPassword": "Strong Password",
-    "register": "Register"
+    "register": "Register",
+    "accountCreatedSuccessfully": "Account created successfully",
+    "accountCreatedSuccessfullyPleaseLogin": "Account created successfully! Please login."
   },
   "ForgetPassword": {
     "enterEmail": "Enter your email address and we'll send you a link to reset your password.",
@@ -41,7 +45,10 @@
     "sendResetLink": "Send Reset Link",
     "backToLogin": "Back to Login",
     "forgetPasswordDescription": "Send a reset link to your email",
-    "forgetPassword": "Forgot Password?"
+    "forgetPassword": "Forgot Password?",
+    "emailRequired": "Email is required",
+    "invalidEmailAddress": "Invalid email address",
+    "anErrorOccurred": "An error occurred"
   },
   "ResetPassword": {
     "title": "Reset Password",
@@ -51,7 +58,9 @@
     "missMatchPassword": "Password and confirm password do not match",
     "passwordRequired": "Password is required",
     "confirmPasswordRequired": "Confirm password is required",
-    "resetPasswordDescription": "Reset your password"
+    "resetPasswordDescription": "Reset your password",
+    "invalidResetToken": "Invalid reset token",
+    "anErrorOccurred": "An error occurred"
   },
   "Dashboard": {
     "Dashboard": "Dashboard",
