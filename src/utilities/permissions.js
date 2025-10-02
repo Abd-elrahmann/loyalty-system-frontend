@@ -1,7 +1,7 @@
 
 export const permissionRouteMap = {
   'dashboard': '/dashboard',
-  'users': '/mangers',
+  'managers': '/mangers',
   'pos': '/point-of-sale', 
   'invoices': '/invoice',
   'customers': '/customers',
@@ -15,7 +15,7 @@ export const permissionRouteMap = {
 
 export const routePermissionMap = {
   '/dashboard': 'dashboard',
-  '/mangers': 'users',
+  '/mangers': 'managers',
   '/point-of-sale': 'pos',
   '/invoice': 'invoices',
   '/customers': 'customers',

@@ -6,13 +6,14 @@ import { notifySuccess, notifyError } from '../utilities/Toastify';
 import { useUser } from '../utilities/user';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { Skeleton, Upload } from "antd";
-import { SaveOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import { Skeleton } from "antd";
+import { SaveOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Button from '@mui/material/Button';
 import { useCurrencyManager } from '../Config/globalCurrencyManager';
 import IconButton from '@mui/material/IconButton';
 import { CloseOutlined } from '@ant-design/icons';
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const Settings = () => {
   const queryClient = useQueryClient();
@@ -20,8 +21,8 @@ const Settings = () => {
   const timezones = moment.tz.names();
   const { t, i18n } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imageError, setImageError] = useState(false);
+  const fileInputRef = React.useRef(null);
   
   const { currentSettings: currencySettings, updateSettings: updateCurrencySettings } = useCurrencyManager();
 
@@ -35,9 +36,9 @@ const Settings = () => {
     enTitle: '',
     arDescription: '',
     enDescription: '',
-    description: '',
     imgUrl: '',
-    image: '',
+    image: null,
+    imageBase64: '',
     enCurrency: null,
     arCurrency: null,
     timezone: 'Asia/Baghdad',
@@ -69,7 +70,6 @@ const Settings = () => {
         arDescription: data.arDescription || '',
         enDescription: data.enDescription || '',
         imgUrl: data.imgUrl || '',
-        image: data.imgUrl || '',
         pointsPerDollar: parseFloat(data.pointsPerDollar) || 0,
         pointsPerIQD: parseFloat(data.pointsPerIQD) || 0,
         usdToIqd: parseFloat(data.usdToIqd) || 0,
@@ -89,31 +89,51 @@ const Settings = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setImageError(true);
+        notifyError(t('Settings.ImageSizeError'));
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // إرسال base64 كامل مع data URL prefix
+        setSettings(prev => ({
+          ...prev,
+          image: file,
+          imageBase64: reader.result, // full data URL
+          imgUrl: reader.result // For preview
+        }));
+        setImageError(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const settingsMutation = useMutation({
     mutationFn: async (settingsToSave) => {
-      const formData = new FormData();
+      console.log('Sending settings:', settingsToSave);
       
-      Object.keys(settingsToSave).forEach((key) => {
-        const value = settingsToSave[key];
-        if (value !== null && value !== undefined) {
-          formData.append(key, typeof value === "object" ? JSON.stringify(value) : value);
-        }
-      });
-      
+      const payload = {
+        ...settingsToSave,
+        // إرسال base64 كامل
+        image: settingsToSave.imageBase64 || null
+      };
 
-      if (imageFile) {
-        formData.append("file", imageFile);
-      } else if (settings.imgUrl) {
-        formData.append("imgUrl", settings.imgUrl); 
-      }
+      // إزالة الحقول غير الضرورية
+      delete payload.imageBase64;
+      delete payload.imgUrl;
       
-      
-      return await Api.post('/api/settings', formData, {
+      const response = await Api.post('/api/settings', payload, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
+      
+      return response;
     },
     onSuccess: (response, variables) => {
       notifySuccess(t('Settings.SettingsSavedSuccessfully'));
@@ -126,13 +146,23 @@ const Settings = () => {
       queryClient.setQueryData(['settings'], response.data);
       
       // Clear image state after successful save
-      setImageFile(null);
-      setImagePreview(null);
+      setSettings(prev => ({
+        ...prev,
+        image: null,
+        imageBase64: '',
+        imgUrl: response.data.imgUrl // Use the URL from response
+      }));
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       
       // Trigger event to update navbar immediately
       window.dispatchEvent(new CustomEvent('settingsUpdated'));
     },
     onError: (error) => {
+      console.error('Save error:', error);
       notifyError(error.response?.data?.message || t('Errors.generalError'));
     }
   });
@@ -166,45 +196,19 @@ const Settings = () => {
     }
   };
 
-  const handleImageChange = (info) => {
-    const file = info.file.originFileObj;
-    if (file) {
-      setImageFile(file);
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
-      
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSettings(prev => ({ 
-          ...prev, 
-          imgUrl: previewUrl,
-          image: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      // If no new file, clear the preview
-      setImagePreview(null);
-    }
-  };
-
   const handleRemoveImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    // Also clear the current image URL if we want to remove the existing image
-    setSettings(prev => ({ 
-      ...prev, 
-      imgUrl: '',
-      image: ''
-    }));
-    
-    // Update the query cache to reflect the image removal
-    queryClient.setQueryData(['settings'], (oldData) => ({
-      ...oldData,
+    setSettings(prev => ({
+      ...prev,
+      image: null,
+      imageBase64: '',
       imgUrl: ''
     }));
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
+    setImageError(false);
   };
 
   const handlePrinterChange = (e) => {
@@ -242,7 +246,6 @@ const Settings = () => {
     let settingsToSave;
     if (user.role !== 'USER') {
       settingsToSave = {
-        ...settings,
         arTitle: settings.arTitle,
         enTitle: settings.enTitle,
         arDescription: settings.arDescription,
@@ -254,12 +257,14 @@ const Settings = () => {
         arCurrency: settings.arCurrency,
         timezone: settings.timezone,
         printerType: settings.printerType,
-        printerIp: settings.printerType === 'LAN' ? settings.printerIp : null
+        printerIp: settings.printerType === 'LAN' ? settings.printerIp : null,
+        imageBase64: settings.imageBase64 // إرسال base64
       };
     } else {
       settingsToSave = { timezone: settings.timezone };
     }
-
+    
+    console.log('Saving settings:', settingsToSave);
     settingsMutation.mutate(settingsToSave);
   };
 
@@ -308,7 +313,6 @@ const Settings = () => {
               sx={{ mb: 2 }}
             />
 
-
             <TextField
               fullWidth
               size="small"
@@ -321,65 +325,77 @@ const Settings = () => {
               sx={{ mb: 2 }}
             />
 
-            <Upload
-              name="image"
-              onChange={handleImageChange}
-              maxCount={1}
-              beforeUpload={(file) => {
-                console.log(file);
-                return false;
-              }}
-              accept="image/*"
-              showUploadList={true}
-            >
+            <Box sx={{ position: 'relative', mb: 2 }}>
+              <input
+                ref={fileInputRef}
+                accept="image/*"
+                type="file"
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
               <Button
                 variant="outlined"
-                startIcon={<UploadOutlined />}
                 component="span"
                 fullWidth
+                onClick={() => fileInputRef.current.click()}
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  mb: 1,
+                  borderColor: imageError ? 'error.main' : undefined,
+                  color: imageError ? 'error.main' : undefined
+                }}
               >
                 {t('Settings.UploadImage')}
               </Button>
-            </Upload>
-            
-            {/* Image Preview */}
-            {(imagePreview || settings.imgUrl) && (
-              <Box sx={{ mt: 2, textAlign: 'center', position: 'relative', display: 'inline-block' }}>
-                <IconButton
-                  size="small"
-                  onClick={handleRemoveImage}
-                  sx={{
-                    position: 'absolute',
-                    top: -6,
-                    right: -1,
-                    backgroundColor: 'error.main',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: 'error.dark',
-                    },
-                    zIndex: 1,
-                    width: 20,
-                    height: 20,
-                    minWidth: 'auto',
-                    padding: '4px'
-                  }}
-                >
-                  <CloseOutlined style={{ fontSize: '14px' }} />
-                </IconButton>
-                <img 
-                  src={imagePreview || settings.imgUrl} 
-                  alt="Preview" 
-                  style={{ 
-                    maxWidth: '50%', 
-                    maxHeight: '100px', 
-                    objectFit: 'contain',
-                    borderRadius: '4px',
-                    position: 'relative',
-                    zIndex: 0
-                  }} 
-                />
-              </Box>
-            )}
+              
+              {/* Image Preview */}
+              {settings.imgUrl && (
+                <Box sx={{ mt: 2, textAlign: 'center', position: 'relative', display: 'inline-block', width: '100%' }}>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <img 
+                      src={settings.imgUrl}
+                      alt="Preview"
+                      style={{
+                        maxWidth: '30%',
+                        maxHeight: '80px',
+                        objectFit: 'contain',
+                        borderRadius: '4px'
+                      }}
+                      onError={(e) => {
+                        console.error('Image load error:', e);
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={handleRemoveImage}
+                      sx={{
+                        position: 'absolute',
+                        top: -8,
+                        right: '37%',
+                        backgroundColor: 'error.main',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'error.dark',
+                        },
+                        width: 24,
+                        height: 24,
+                        padding: '4px'
+                      }}
+                    >
+                      <CloseOutlined style={{ fontSize: '14px' }} />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+            </Box>
           </Box>
         )}
 

@@ -9,7 +9,6 @@ import Api from '../Config/Api';
 import { useTranslation } from 'react-i18next';
 import { updateUserProfile } from '../utilities/user.jsx';
 import { getFirstAccessibleRoute } from '../utilities/permissions.js';
-import '../utilities/debugPermissions.js';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Helmet } from 'react-helmet-async';
