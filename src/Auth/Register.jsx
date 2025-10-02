@@ -1,10 +1,9 @@
 import { useFormik } from 'formik';
 import React from 'react';
-import { Box, TextField, Button, Typography, Container, Paper, IconButton, InputAdornment, LinearProgress } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Paper, IconButton, InputAdornment, LinearProgress,CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
-import { Spin } from "antd";
 import { useNavigate } from 'react-router-dom';
 import Api from '../Config/Api';
 import { useTranslation } from 'react-i18next';
@@ -310,7 +309,7 @@ const Register = () => {
             size="large"
             disabled={loading}
           >
-            {loading ? <Spin size="large" /> : <FaUserPlus style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+            {loading ? <CircularProgress size={24} /> : <FaUserPlus style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
             {t('Register.signUp')}
           </Button>
 

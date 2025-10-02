@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import React from 'react';
-import { Box, TextField, Button, Typography, Container, Paper, Link, IconButton, InputAdornment } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Paper, Link, IconButton, InputAdornment, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { notifyError, notifySuccess } from '../utilities/Toastify';
@@ -12,7 +12,6 @@ import '../utilities/debugPermissions.js';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Helmet } from 'react-helmet-async';
-import { Spin } from "antd";
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { FaSignInAlt } from 'react-icons/fa';
 const Login = () => {
@@ -185,7 +184,7 @@ const Login = () => {
             size="large"
             disabled={loading}
           >
-            {loading ? <Spin size="large" /> : <FaSignInAlt style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
+            {loading ? <CircularProgress size={24} /> : <FaSignInAlt style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />}
             {t('Login.login')}
           </Button>
 
