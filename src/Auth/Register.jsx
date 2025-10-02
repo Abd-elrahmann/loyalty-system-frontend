@@ -248,6 +248,7 @@ const Register = () => {
                     fullWidth
                     name="enName"
                     label={t('Register.enName')}
+                    placeholder={isMobile ? '' : t('Register.enName')}
                     value={formik.values.enName}
                     onChange={formik.handleChange}
                     error={formik.touched.enName && Boolean(formik.errors.enName)}
@@ -264,6 +265,7 @@ const Register = () => {
                     fullWidth
                     name="arName"
                     label={t('Register.arName')}
+                    placeholder={isMobile ? '' : t('Register.arName')}
                     value={formik.values.arName}
                     onChange={formik.handleChange}
                     error={formik.touched.arName && Boolean(formik.errors.arName)}
