@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { FaEnvelope } from 'react-icons/fa';
-import { MailOutlined } from '@ant-design/icons';
+import { MailOutlined, GlobalOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import ForgetPasswordImage from '/assets/images/forget-password.webp';
 
@@ -17,10 +17,15 @@ const MotionPaper = motion(Paper);
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const [loading, setLoading] = useState(false);
   const isMobile = useMediaQuery('(max-width: 600px)');
   const [isExiting, setIsExiting] = useState(false);
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'ar' : 'en';
+    i18n.changeLanguage(newLang);
+  };
 
   const validate = values => {
     const errors = {};
@@ -64,7 +69,7 @@ const ForgetPassword = () => {
       <Box sx={{ 
         display: 'flex', 
         minHeight: '100vh',
-        flexDirection: isMobile ? 'column' : 'row'
+        flexDirection: isMobile ? 'column' : 'row-reverse'
       }}>
         {!isMobile && (
         <Box sx={{
@@ -92,11 +97,11 @@ const ForgetPassword = () => {
           <Box sx={{
             position: 'absolute',
             top: 0,
-            right: 0,
+            left: 0,
             width: '100px',
             height: '100%',
-            background: 'linear-gradient(to bottom right, transparent 50%, #f5f5f5 50%)',
-            transform: isMobile ? 'none' : 'translateX(50%)',
+            background: 'linear-gradient(to bottom left, transparent 50%, #f5f5f5 50%)',
+            transform: isMobile ? 'none' : 'translateX(-50%)',
             display: isMobile ? 'none' : 'block'
           }} />
         </Box>
@@ -139,10 +144,15 @@ const ForgetPassword = () => {
                 boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
               }}
             >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
               <Typography component="h1" variant={isMobile ? 'h5' : 'h4'} color="primary" sx={{ mb: 3, fontWeight: 'bold' }}>
                 {t('ForgetPassword.forgetPassword')}
               </Typography>
-
+              <Button onClick={toggleLanguage} sx={{ mb: 2, fontSize: '1rem', fontWeight: 'bold' }}>
+                <GlobalOutlined style={{marginRight: '8px', marginLeft: '8px', fontSize: '18px', color: '#800080'}} />
+                {i18n.language === 'en' ? 'Ar' : 'EN'}
+              </Button>
+              </Box>
               <Typography 
                 variant="body1" 
                 align="center" 
@@ -198,7 +208,7 @@ const ForgetPassword = () => {
                     <Spin size={isMobile ? 'medium' : 'large'} />
                   ) : (
                     <>
-                      <FaEnvelope style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />
+                      <FaEnvelope style={{marginRight: '8px', marginLeft: '8px', fontSize: '18px', color: 'white'}} />
                       {t('ForgetPassword.sendResetLink')}
                     </>
                   )}
