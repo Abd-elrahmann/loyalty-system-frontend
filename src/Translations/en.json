@@ -40,7 +40,8 @@
     "email": "Email Address",
     "sendResetLink": "Send Reset Link",
     "backToLogin": "Back to Login",
-    "forgetPasswordDescription": "Send a reset link to your email"
+    "forgetPasswordDescription": "Send a reset link to your email",
+    "forgetPassword": "Forgot Password?"
   },
   "ResetPassword": {
     "title": "Reset Password",

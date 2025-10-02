@@ -40,7 +40,8 @@
     "email": "البريد الإلكتروني",
     "sendResetLink": "إرسال رابط إعادة التعيين",
     "backToLogin": "العودة إلى تسجيل الدخول",
-    "forgetPasswordDescription": "إرسال رابط إعادة التعيين لكلمة المرور"
+    "forgetPasswordDescription": "إرسال رابط إعادة التعيين لكلمة المرور",
+    "forgetPassword": "هل نسيت كلمة المرور؟"
   },
   "ResetPassword": {
     "title": "إعادة تعيين كلمة المرور",

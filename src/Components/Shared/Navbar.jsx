@@ -148,6 +148,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
               {settings.imgUrl && (
                 <img 
                   src={settings.imgUrl} 
+                  loading="lazy"
                   alt="Logo" 
                   style={{ 
                     width: isMobile ? 30 : 40, 
@@ -200,6 +201,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                 >
                   {profile?.profileImage ? (
                     <Avatar 
+                      loading="lazy"
                       src={profile.profileImage}
                       sx={{ width: isMobile ? 32 : 40, height: isMobile ? 32 : 40 }}
                     />
