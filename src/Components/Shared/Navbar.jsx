@@ -151,8 +151,8 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                   loading="lazy"
                   alt="Logo" 
                   style={{ 
-                    width: isMobile ? 30 : 40, 
-                    height: isMobile ? 30 : 40,
+                    width: isMobile ? 30 : 35, 
+                    height: isMobile ? 30 : 35,
                     objectFit: 'cover',
                     borderRadius: '4px'
                   }}

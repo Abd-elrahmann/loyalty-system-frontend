@@ -44,17 +44,16 @@ const LogsTable = ({
 
   const getScreenLabel = (screen) => {
     const screenLabels = {
-      dashboard: 'Dashboard',
-      managers: 'Managers',
-      pos: 'Point of Sale',
-      invoices: 'Invoices', 
-      customers: 'Customers',
+      login: 'Login',
       products: 'Products',
-      transactions: 'Transactions',
-      reports: 'Reports',
-      rewards: 'Rewards',
+      invoices: 'Invoices',
+      pos: 'POS',
+      redeem: 'Redeem',
+      rewards: 'Rewards', 
+      managers: 'Managers',
       settings: 'Settings',
-      roles: 'Roles'
+      transactions: 'Transactions',
+      customers: 'Customers'
     };
     return screenLabels[screen] || screen;
   };

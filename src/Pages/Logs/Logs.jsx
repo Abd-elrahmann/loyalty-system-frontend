@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 
 import LogsToolbar from "../../Components/Logs/LogsToolbar";
 import LogsTable from "../../Components/Logs/LogsTable";
@@ -16,9 +17,10 @@ const Logs = () => {
   const [rowsPerPage, setRowsPerPage] = useState(50);
   const [filters, setFilters] = useState({
     table: "",
-    screen: "",
+    screen: "", 
     userName: "",
-    dateRange: null,
+    fromDate: null,
+    toDate: null,
   });
 
   const buildQueryParams = () => {
@@ -38,8 +40,12 @@ const Logs = () => {
       params.userName = filters.userName;
     }
 
-    if (filters.dateRange && filters.dateRange.length === 2) {
-      params.date = `${filters.dateRange[0].format('YYYY-MM-DD')},${filters.dateRange[1].format('YYYY-MM-DD')}`;
+    if (filters.fromDate) {
+      params.fromDate = dayjs(filters.fromDate).format('YYYY-MM-DD');
+    }
+
+    if (filters.toDate) {
+      params.toDate = dayjs(filters.toDate).format('YYYY-MM-DD');
     }
 
     return params;
@@ -72,7 +78,8 @@ const Logs = () => {
       table: "",
       screen: "",
       userName: "",
-      dateRange: null,
+      fromDate: null,
+      toDate: null,
     });
     setPage(1);
   };

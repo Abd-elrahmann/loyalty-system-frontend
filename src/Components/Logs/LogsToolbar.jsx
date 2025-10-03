@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import {
   Box,
   Stack,
@@ -13,6 +13,7 @@ import { RestartAltOutlined } from "@mui/icons-material";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from "dayjs";
 import { Skeleton } from "antd";
+import { debounce } from 'lodash';
 
 const LogsToolbar = ({
   filters,
@@ -25,8 +26,11 @@ const LogsToolbar = ({
     table,
     screen,
     userName,
-    dateRange,
+    fromDate,
+    toDate,
   } = filters;
+
+  const searchInputRef = useRef(null);
 
   const handleActionChange = (event) => {
     onFilterChange('table', event.target.value);
@@ -36,15 +40,37 @@ const LogsToolbar = ({
     onFilterChange('screen', event.target.value);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      onFilterChange('userName', value);
+    }, 600),
+    []
+  );
+
   const handleUserNameChange = (event) => {
-    onFilterChange('userName', event.target.value);
+    debouncedSearch(event.target.value);
   };
 
-  const handleDateRangeChange = (dates) => {
-    onFilterChange('dateRange', dates);
+  const handleFromDateChange = (newValue) => {
+    // Convert to dayjs object if it's not null
+    onFilterChange('fromDate', newValue ? dayjs(newValue) : null);
   };
 
-  const hasActiveFilters = table || screen || userName || (dateRange && dateRange.length === 2);
+  const handleToDateChange = (newValue) => {
+    // Convert to dayjs object if it's not null
+    onFilterChange('toDate', newValue ? dayjs(newValue) : null);
+  };
+
+  const handleReset = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
+    onResetFilters();
+  };
+
+  // Check if any filters are active (including dates)
+  const hasActiveFilters = table || screen || userName || fromDate || toDate;
 
   return (
     <Stack 
@@ -98,9 +124,11 @@ const LogsToolbar = ({
           ) : (
             <>
               <InputBase
-                value={userName || ""}
-                onChange={(e) => handleUserNameChange(e)}
+                inputRef={searchInputRef}
+                defaultValue={userName || ""}
+                onChange={handleUserNameChange}
                 placeholder="Search by user name..."
+                autoFocus
                 sx={{ 
                   width: isMobile ? "100%" : "200px",
                   padding: "4px 12px",
@@ -192,26 +220,30 @@ const LogsToolbar = ({
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <DatePicker
                   label="Start Date"
-                  value={dateRange ? dayjs(dateRange[0]) : null}
-                  onChange={(newValue) => {
-                    const endDate = dateRange?.[1] ? dayjs(dateRange[1]) : null;
-                    handleDateRangeChange([newValue, endDate]);
+                  value={fromDate ? dayjs(fromDate) : null}
+                  onChange={handleFromDateChange}
+                  slotProps={{ 
+                    textField: { 
+                      size: 'small',
+                    } 
                   }}
-                  slotProps={{ textField: { size: 'small' } }}
+                  format="YYYY-MM-DD"
                 />
                 <DatePicker
                   label="End Date"
-                  value={dateRange ? dayjs(dateRange[1]) : null}
-                  onChange={(newValue) => {
-                    const startDate = dateRange?.[0] ? dayjs(dateRange[0]) : null;
-                    handleDateRangeChange([startDate, newValue]);
+                  value={toDate ? dayjs(toDate) : null}
+                  onChange={handleToDateChange}
+                  slotProps={{ 
+                    textField: { 
+                      size: 'small',
+                    } 
                   }}
-                  slotProps={{ textField: { size: 'small' } }}
-                />
+                  format="YYYY-MM-DD"
+                />  
               </Box>
               {hasActiveFilters && (
                 <IconButton
-                  onClick={onResetFilters}
+                  onClick={handleReset}
                   sx={{
                     border: "1px solid",
                     borderColor: "divider",
