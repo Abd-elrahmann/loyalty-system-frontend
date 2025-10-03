@@ -17,7 +17,7 @@ const Logs = () => {
   const [rowsPerPage, setRowsPerPage] = useState(50);
   const [filters, setFilters] = useState({
     table: "",
-    screen: "", 
+    screen: "",
     userName: "",
     fromDate: null,
     toDate: null,
@@ -41,11 +41,11 @@ const Logs = () => {
     }
 
     if (filters.fromDate) {
-      params.fromDate = dayjs(filters.fromDate).format('YYYY-MM-DD');
+      params.fromDate = dayjs(filters.fromDate).startOf('day').format('YYYY-MM-DD');
     }
 
     if (filters.toDate) {
-      params.toDate = dayjs(filters.toDate).format('YYYY-MM-DD');
+      params.toDate = dayjs(filters.toDate).endOf('day').format('YYYY-MM-DD');
     }
 
     return params;
@@ -63,6 +63,7 @@ const Logs = () => {
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    retry: false,
   });
 
   const handleFilterChange = (filterName, value) => {

@@ -32,6 +32,7 @@ const Products = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [productId, setProductId] = useState(null);
   const [productToEdit, setProductToEdit] = useState(null);
+  const [categoryToEdit, setCategoryToEdit] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState('');
   // eslint-disable-next-line no-unused-vars
@@ -181,10 +182,12 @@ const Products = () => {
       queryClient.invalidateQueries(['categories']);
       notifySuccess(t('Products.CategoryAdded'));
       setOpenCategoryModal(false);
+      setCategoryToEdit(null);
     },
     onError: (error) => {
       handleApiError(error);
       notifyError(t('Products.CategoryNotAdded'));
+      setCategoryToEdit(null);
     }
   });
 
@@ -273,10 +276,12 @@ const Products = () => {
 
   const handleOpenCategoryModal = () => {
     setOpenCategoryModal(true);
+    setCategoryToEdit(null);
   };
 
   const handleCloseCategoryModal = () => {
     setOpenCategoryModal(false);
+    setCategoryToEdit(null);
   };
 
   const handleAddCategory = (categoryData) => {
@@ -299,6 +304,7 @@ const Products = () => {
           <Tab label={t('Products.Cafe')} value="cafe"  />
           <Tab label={t('Products.Restaurant')} value="restaurant" />
         </Tabs>
+
       </Box>
 
       <Box sx={{ 
@@ -737,6 +743,8 @@ const Products = () => {
         onClose={handleCloseCategoryModal}
         onSubmit={handleAddCategory}
         type={activeTab}
+        category={categoryToEdit}
+        onOpenCategoryModal={handleOpenCategoryModal}
       />
       
       <DeleteModal

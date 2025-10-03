@@ -53,12 +53,10 @@ const LogsToolbar = ({
   };
 
   const handleFromDateChange = (newValue) => {
-    // Convert to dayjs object if it's not null
     onFilterChange('fromDate', newValue ? dayjs(newValue) : null);
   };
 
   const handleToDateChange = (newValue) => {
-    // Convert to dayjs object if it's not null
     onFilterChange('toDate', newValue ? dayjs(newValue) : null);
   };
 
@@ -69,7 +67,7 @@ const LogsToolbar = ({
     onResetFilters();
   };
 
-  // Check if any filters are active (including dates)
+  // Check if any filters are active
   const hasActiveFilters = table || screen || userName || fromDate || toDate;
 
   return (
@@ -219,7 +217,7 @@ const LogsToolbar = ({
             <>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <DatePicker
-                  label="Start Date"
+                  label="From Date"
                   value={fromDate ? dayjs(fromDate) : null}
                   onChange={handleFromDateChange}
                   slotProps={{ 
@@ -230,7 +228,7 @@ const LogsToolbar = ({
                   format="YYYY-MM-DD"
                 />
                 <DatePicker
-                  label="End Date"
+                  label="To Date"
                   value={toDate ? dayjs(toDate) : null}
                   onChange={handleToDateChange}
                   slotProps={{ 

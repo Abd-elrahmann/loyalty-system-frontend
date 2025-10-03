@@ -7,15 +7,15 @@ import { useFormik } from 'formik';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FaCoins } from 'react-icons/fa';
 import { MailOutlined, PhoneOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
-import { queryClient } from '@tanstack/react-query';
-const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, customer = null }) => {
+import { useQueryClient } from '@tanstack/react-query';
+const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const isEdit = Boolean(customer);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+  const queryClient = useQueryClient();
   const validateForm = () => {
     const newErrors = {};
     if (!formik.values.enName) newErrors.enName = t('Validation.required');
@@ -60,6 +60,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         notifySuccess(t('Customers.CustomerUpdated'));
         formik.resetForm();
         onClose();
+        queryClient.invalidateQueries({ queryKey: ['customers'] });
       } else {
         delete dataToSubmit.points; 
         await Api.post('/api/users', dataToSubmit);
@@ -68,7 +69,6 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         onClose();
         queryClient.invalidateQueries({ queryKey: ['customers'] });
       }
-      await fetchCustomers();
     } catch (error) {
       notifyError(error.response?.data?.message || t('Errors.generalError'));
     } finally {

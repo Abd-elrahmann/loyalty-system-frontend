@@ -346,7 +346,6 @@ const Customers = () => {
           onClose={() => setOpenAddCustomer(false)}
           isLoading={isLoadingAddCustomer}
           setIsLoading={setIsLoadingAddCustomer}
-          fetchCustomers={fetchCustomers}
           customer={customer}
         />
       )}
@@ -369,7 +368,6 @@ const Customers = () => {
           open={openAddPointsModal}
           onClose={() => setOpenAddPointsModal(false)}
           customer={customerToAddPoints}
-          fetchCustomers={fetchCustomers}
         />
       )}
       {openScanQR && (

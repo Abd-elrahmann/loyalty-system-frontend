@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, TextField, Button, Grid, IconButton, Modal } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import { useFormik } from 'formik';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { Spin } from "antd";
 
 const style = {
@@ -22,10 +22,11 @@ const style = {
   alignItems: "center",
 };
 
-const AddCategoryModal = ({ open, onClose, onSubmit, type }) => {
+const AddCategoryModal = ({ open, onClose, onSubmit, type, category = null }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const isMobile = useMediaQuery('(max-width: 400px)');
+  const isEdit = Boolean(category);
 
   const formik = useFormik({
     initialValues: {
@@ -35,7 +36,7 @@ const AddCategoryModal = ({ open, onClose, onSubmit, type }) => {
     onSubmit: async (values) => {
       try {
         setLoading(true);
-        await onSubmit(values);
+        await onSubmit(values, isEdit ? category.id : null);
         formik.resetForm();
       } catch (error) {
         console.error("Error submitting form:", error);
@@ -44,6 +45,18 @@ const AddCategoryModal = ({ open, onClose, onSubmit, type }) => {
       }
     },
   });
+
+  useEffect(() => {
+    if (category) {
+      formik.setValues({
+        enName: category.enName || "",
+        arName: category.arName || "",
+      });
+    } else {
+      formik.resetForm();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,7 +70,7 @@ const AddCategoryModal = ({ open, onClose, onSubmit, type }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(formik.values);
+      await onSubmit(formik.values, isEdit ? category.id : null);
       formik.setValues({
         enName: "",
         arName: "",
@@ -83,9 +96,11 @@ const AddCategoryModal = ({ open, onClose, onSubmit, type }) => {
           }}
         >
           <Typography variant="h6">
-            {type === "cafe"
-              ? t("Products.AddCafeCategory")
-              : t("Products.AddRestaurantCategory")}
+            {isEdit ? (
+              type === "cafe" ? t("Products.EditCafeCategory") : t("Products.EditRestaurantCategory")
+            ) : (
+              type === "cafe" ? t("Products.AddCafeCategory") : t("Products.AddRestaurantCategory")
+            )}
           </Typography>
           <IconButton onClick={onClose}>
             <CloseIcon />
@@ -142,8 +157,12 @@ const AddCategoryModal = ({ open, onClose, onSubmit, type }) => {
                 <Spin size="small" />
               ) : (
                 <>
-                  <PlusOutlined style={{marginRight: '4px'}} />
-                  {t("Products.AddCategory")}
+                  {isEdit ? (
+                    <EditOutlined style={{marginRight: '4px'}} />
+                  ) : (
+                    <PlusOutlined style={{marginRight: '4px'}} />
+                  )}
+                  {isEdit ? t("Products.EditCategory") : t("Products.AddCategory")}
                 </>
               )}
             </Button>

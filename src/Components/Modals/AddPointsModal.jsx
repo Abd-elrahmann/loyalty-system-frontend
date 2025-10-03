@@ -1,33 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Button, TextField, Divider, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, InputAdornment } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
-import { updateUserProfile } from "../../utilities/user";
 import { FaCoins } from 'react-icons/fa';
-
-const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
+import { useQueryClient } from '@tanstack/react-query';
+const AddPointsModal = ({ open, onClose, customer }) => {
   const { t, i18n } = useTranslation();
   const [points, setPoints] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      fetchProfile();
-    }
-  }, [open]);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await Api.get('/api/auth/profile');
-      if (response.data) {
-        localStorage.setItem('profile', JSON.stringify(response.data));
-        updateUserProfile();
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
+  const queryClient = useQueryClient();
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,12 +25,11 @@ const AddPointsModal = ({ open, onClose, customer, fetchCustomers }) => {
       await Api.post(`/api/users/add-points/${customer?.id}`, {
         points: Number(points)
       });
-      await fetchProfile();
       
       notifySuccess(`${points} ${t("Customers.pointsAdded")}`);
-      await fetchCustomers();
-
       handleClose();
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     } finally {
