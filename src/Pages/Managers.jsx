@@ -16,7 +16,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import debounce from "lodash.debounce";
 import { useMediaQuery } from "@mui/material";
 
-const Mangers = () => {
+const Managers = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -253,4 +253,4 @@ const Mangers = () => {
   );
 };
 
-export default Mangers;
+export default Managers;

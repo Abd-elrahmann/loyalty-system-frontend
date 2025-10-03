@@ -118,34 +118,15 @@ getCurrentCurrency() {
     return currency;
   }
 
-  async updateSettings(newSettings) {
-    try {
-      const response = await Api.post('/api/settings', {
-        enCurrency: newSettings.enCurrency,
-        arCurrency: newSettings.arCurrency,
-        usdToIqd: newSettings.usdToIqd,
-        pointsPerDollar: newSettings.pointsPerDollar,
-        pointsPerIQD: newSettings.pointsPerIQD
-      });
-
-      if (response.data) {
-        this.currentSettings = {
-          enCurrency: response.data.enCurrency,
-          arCurrency: response.data.arCurrency,
-          usdToIqd: response.data.usdToIqd,
-          pointsPerDollar: response.data.pointsPerDollar,
-          pointsPerIQD: response.data.pointsPerIQD
-        };
-        this.notifyListeners();
-        localStorage.setItem('currencySettings', JSON.stringify(this.currentSettings));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error updating settings:', error);
-      return false;
-    }
+  updateSettings(newSettings) {
+    this.currentSettings = {
+      ...this.currentSettings,
+      ...newSettings
+    };
+    localStorage.setItem('currencySettings', JSON.stringify(this.currentSettings));
+    this.notifyListeners();
   }
+  
 
   addListener(callback) {
     this.listeners.add(callback);

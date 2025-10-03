@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FaCoins } from 'react-icons/fa';
 import { MailOutlined, PhoneOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
+import { queryClient } from '@tanstack/react-query';
 const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, customer = null }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -65,6 +66,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, fetchCustomers, c
         notifySuccess(t('Customers.CustomerAdded'));
         formik.resetForm();
         onClose();
+        queryClient.invalidateQueries({ queryKey: ['customers'] });
       }
       await fetchCustomers();
     } catch (error) {

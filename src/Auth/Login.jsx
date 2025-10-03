@@ -17,7 +17,7 @@ import { FaSignInAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import LoginImage from '/assets/images/login.webp';
 
-const MotionPaper = motion(Paper);
+const MotionPaper = motion.create(Paper);
 
 const Login = () => {
   const isMobile = useMediaQuery('(max-width: 600px)');

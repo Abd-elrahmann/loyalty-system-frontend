@@ -360,7 +360,8 @@ const Customers = () => {
           message={t("Customers.DeleteCustomerMessage")}
           title={t("Customers.DeleteCustomer")}
           onConfirm={handleDelete}
-          isLoading={deleteMutation.isLoading}
+          isLoading={deleteMutation.isLoading}  
+          ButtonText={t("Customers.Delete")}
         />
       )}
       {openAddPointsModal && (
@@ -399,6 +400,7 @@ const Customers = () => {
           title={t("Customers.DeleteSelected") + ` (${selectedCustomers.length})`}
           onConfirm={handleConfirmBulkDelete}
           isLoading={bulkDeleteMutation.isLoading}
+          ButtonText={t("Customers.Delete")}
         />
       )}
     </Box>

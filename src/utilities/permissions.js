@@ -1,10 +1,11 @@
 
 export const permissionRouteMap = {
   'dashboard': '/dashboard',
-  'managers': '/mangers',
+  'managers': '/managers',
   'pos': '/point-of-sale', 
   'invoices': '/invoice',
   'customers': '/customers',
+  'logs': '/logs',
   'products': '/products',
   'transactions': '/transactions',
   'reports': '/reports',
@@ -15,10 +16,11 @@ export const permissionRouteMap = {
 
 export const routePermissionMap = {
   '/dashboard': 'dashboard',
-  '/mangers': 'managers',
+  '/managers': 'managers',
   '/point-of-sale': 'pos',
   '/invoice': 'invoices',
   '/customers': 'customers',
+  '/logs': 'logs',
   '/products': 'products',
   '/transactions': 'transactions',
   '/reports': 'reports',
@@ -115,7 +117,7 @@ export const getFirstAccessibleRoute = (userPermissionsOrUser) => {
     return '/login'; 
   }
   
-  const permissionPriority = ['dashboard', 'pos', 'invoices', 'customers', 'products', 'transactions', 'users', 'reports', 'rewards', 'settings'];
+  const permissionPriority = ['dashboard', 'managers', 'pos', 'invoices', 'customers', 'logs', 'products', 'transactions', 'users', 'reports', 'rewards', 'settings'];
   
   for (const permission of permissionPriority) {
     if (userPermissions.includes(permission) && permissionRouteMap[permission]) {

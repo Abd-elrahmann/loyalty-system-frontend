@@ -663,5 +663,23 @@
     "print": "Print",
     "exportExcel": "Export to Excel",
     "exportPdf": "Export to PDF"
+  },
+  "Logs": {
+    "ID": "User ID",
+    "User": "User",
+    "Action": "Action",
+    "Screen": "Screen",
+    "Message": "Message",
+    "Date & Time": "Date",
+    "NoLogsFound": "No logs found",
+    "Rows per page": "Rows per page",
+    "of": "of",
+    "more than": "more than",
+    "Action Type": "Action Type",
+    "All Actions": "All Actions",
+    "All Screens": "All Screens",
+    "Search by user name...": "Search by user name...",
+    "Start Date": "Start Date",
+    "End Date": "End Date"
   }
 }

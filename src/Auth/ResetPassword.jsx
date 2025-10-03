@@ -14,7 +14,7 @@ import { FaLock } from 'react-icons/fa';
 import ResetPasswordImage from '/assets/images/reset-passwoed.webp';
 import { motion } from 'framer-motion';
 import { GlobalOutlined } from '@ant-design/icons';
-const MotionPaper = motion(Paper);
+const MotionPaper = motion.create(Paper);
 
 const ResetPassword = () => {
     const {t, i18n} = useTranslation();

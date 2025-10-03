@@ -9,7 +9,6 @@ import {
   Paper,
   IconButton,
   Link,
-  Chip,
   Box,
   TableSortLabel,
   Checkbox

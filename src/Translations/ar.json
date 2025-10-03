@@ -661,5 +661,23 @@
     "print": "طباعة",
     "exportExcel": "تصدير إلى Excel",
     "exportPdf": "تصدير إلى PDF"
+  },
+  "Logs": {
+    "ID": "رقم المستخدم",
+    "User": "المستخدم",
+    "Action": "الإجراء",
+    "Screen": "الشاشة",
+    "Message": "الرسالة",
+    "Date & Time": "التاريخ",
+    "NoLogsFound": "لا توجد سجلات",
+    "Rows per page": "صفوف في الصفحة",
+    "of": "من",
+    "more than": "أكثر من",
+    "Action Type": "نوع الإجراء",
+    "All Actions": "جميع الإجراءات",
+    "All Screens": "جميع الشاشات",
+    "Search by user name...": "البحث باسم المستخدم...",
+    "Start Date": "تاريخ البداية",
+    "End Date": "تاريخ النهاية"
   }
 }

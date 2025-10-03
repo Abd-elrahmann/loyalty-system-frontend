@@ -22,7 +22,7 @@ const shakeAnimation = keyframes`
   75% { transform: translateX(5px); }
 `;
 
-const MotionPaper = motion(Paper);
+const MotionPaper = motion.create(Paper);
 
 const Register = () => {
   const isMobile = useMediaQuery('(max-width: 600px)');

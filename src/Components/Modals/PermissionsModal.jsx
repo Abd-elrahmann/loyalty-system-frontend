@@ -12,6 +12,7 @@ import {
   Typography,
   IconButton,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { CloseOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -25,16 +26,17 @@ import { updateUserPermissions } from "../../utilities/user.jsx";
 const PermissionsModal = ({ open, onClose, manager }) => {
   const { t, i18n } = useTranslation();
   const [selectedPages, setSelectedPages] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
   
   const availablePages = routes.map(route => {
     let pageName = route.path.replace('/', '').toLowerCase();
     
-    if (pageName === 'mangers') pageName = 'users';
+    if (pageName === 'managers') pageName = 'users';
     if (pageName === 'point-of-sale') pageName = 'pos';
     if (pageName === 'invoice') pageName = 'invoices';
     if (pageName === 'customers') pageName = 'customers';
-    
+    if (pageName === 'logs') pageName = 'logs';
     return pageName;
   });
 
@@ -60,6 +62,7 @@ const PermissionsModal = ({ open, onClose, manager }) => {
 
   const updatePermissionsMutation = useMutation({
     mutationFn: async (pages) => {
+      setIsSaving(true);
       const response = await Api.patch(`/api/roles/${manager.role}`, { pages });
       return response.data;
     },
@@ -70,9 +73,11 @@ const PermissionsModal = ({ open, onClose, manager }) => {
       triggerPermissionsUpdate(manager.role);
       queryClient.invalidateQueries({ queryKey: ['permissions', manager.role] });
       
+      setIsSaving(false);
       onClose();
     },
     onError: (error) => {
+      setIsSaving(false);
       notifyError(error.response?.data?.message || t("Errors.generalError"));
     }
   });
@@ -100,11 +105,11 @@ const PermissionsModal = ({ open, onClose, manager }) => {
 
   const getPageLabel = (page) => {
     let routePath = `/${page}`;
-    if (page === 'users') routePath = '/mangers';
+    if (page === 'users') routePath = '/managers';
     if (page === 'pos') routePath = '/point-of-sale';
     if (page === 'customers') routePath = '/customers';
     if (page === 'invoices') routePath = '/invoice';
-    
+    if (page === 'logs') routePath = '/logs';
     const route = routes.find(r => r.path === routePath);
     
     if (route) {
@@ -197,11 +202,10 @@ const PermissionsModal = ({ open, onClose, manager }) => {
         >
           {t("Mangers.Cancel")}
         </Button>
-        
         <Button
           variant="contained"
           onClick={handleSavePermissions}
-          disabled={updatePermissionsMutation.isLoading || isLoading}
+          disabled={isSaving || isLoading}
           sx={{
             minWidth: 120,
             backgroundColor: "primary.main",
@@ -210,7 +214,10 @@ const PermissionsModal = ({ open, onClose, manager }) => {
             },
           }}
         >
-          {updatePermissionsMutation.isLoading ? t("Mangers.Saving") : t("Mangers.SavePermissions")}
+          {isSaving ? (
+            <CircularProgress size={20} sx={{ color: 'white', mr: 1 }} />
+          ) : null}
+          {t("Mangers.SavePermissions")}
         </Button>
       </DialogActions>
     </Dialog>

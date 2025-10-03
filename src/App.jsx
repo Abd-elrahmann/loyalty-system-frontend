@@ -56,7 +56,7 @@ const createProtectedComponent = (importFunc, routePath) => {
 
 const routeComponents = {
   '/dashboard': createProtectedComponent(() => import('./Pages/Dashboard'), '/dashboard'),
-  '/mangers': createProtectedComponent(() => import('./Pages/Mangers'), '/mangers'),
+  '/managers': createProtectedComponent(() => import('./Pages/Managers'), '/managers'),
   '/customers': createProtectedComponent(() => import('./Pages/Customers'), '/customers'),
   '/transactions': createProtectedComponent(() => import('./Pages/Transactions'), '/transactions'),
   '/products': createProtectedComponent(() => import('./Pages/Products'), '/products'),
@@ -64,7 +64,8 @@ const routeComponents = {
   '/rewards': createProtectedComponent(() => import('./Pages/Rewards'), '/rewards'),
   '/point-of-sale': createProtectedComponent(() => import('./Pages/PointOfSale'), '/point-of-sale'),
   '/invoice': createProtectedComponent(() => import('./Pages/Invoice'), '/invoice'),
-  '/reports': createProtectedComponent(() => import('./Pages/Reports/Reports'), '/reports')
+  '/reports': createProtectedComponent(() => import('./Pages/Reports/Reports'), '/reports'),
+  '/logs': createProtectedComponent(() => import('./Pages/Logs/Logs'), '/logs')
 };
 
 const queryClient = new QueryClient();

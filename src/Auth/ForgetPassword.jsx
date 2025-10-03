@@ -13,7 +13,7 @@ import { MailOutlined, GlobalOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import ForgetPasswordImage from '/assets/images/forget-password.webp';
 
-const MotionPaper = motion(Paper);
+const MotionPaper = motion.create(Paper);
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
