@@ -194,6 +194,11 @@ const ProtectedRoute = ({ children }) => {
       const user = JSON.parse(profile);
       const currentPath = location.pathname;
       
+      // Allow all authenticated users to access their profile
+      if (currentPath === '/profile') {
+        return children;
+      }
+      
       // إذا كان المستخدم ADMIN، يسمح له بالوصول إلى كل الصفحات
       if (user.role === 'ADMIN') {
         return children;
