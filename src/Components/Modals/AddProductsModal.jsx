@@ -252,7 +252,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaProductHunt style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <FaProductHunt style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   )
                 }}
@@ -270,7 +270,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaProductHunt style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <FaProductHunt style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   )
                 }}
@@ -290,7 +290,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                   disabled={!categories || categories.length === 0}
                   startAdornment={
                     <InputAdornment position="start">
-                      <FaList style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <FaList style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   }
                 >
@@ -326,7 +326,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaDollarSign style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <FaDollarSign style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   )
                 }}
@@ -344,7 +344,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <FaCoins style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   )
                 }}
@@ -367,7 +367,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                     maxWidth: '200px'
                   }}
                 >
-                  <FaFile style={{marginRight: '8px', fontSize: '18px', color: imageUploadType === 'file' ? 'white' : '#800080'}} />
+                  <FaFile style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: imageUploadType === 'file' ? 'white' : '#0074BA'}} />
                   {t("Products.ImageUploadTypeFile")}
                 </Button>
                 <Button
@@ -378,7 +378,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
                     maxWidth: '200px'
                   }}
                 >
-                  <FaLink style={{marginRight: '8px', fontSize: '18px', color: imageUploadType === 'link' ? 'white' : '#800080'}} />
+                  <FaLink style={{marginRight: '8px',marginLeft:'8px', fontSize: '18px', color: imageUploadType === 'link' ? 'white' : '#0074BA'}} />
                   {t("Products.ImageUploadTypeLink")}
                 </Button>
               </Box>
@@ -579,6 +579,7 @@ const AddProductModal = ({ open, onClose, onSubmit, type, handleUpdateProduct, p
               width: "100%",
               display: "flex",
               justifyContent: "space-between",
+              flexDirection: i18n.language === "ar" ? "row-reverse" : "row"
             }}
           >
             <Button variant="outlined" onClick={onClose} sx={{ mr: 2 }} size="small">

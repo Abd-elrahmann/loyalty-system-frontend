@@ -45,9 +45,9 @@ const ManagersTable = ({
 
   const getRoleColor = (role) => {
     switch(role) {
-      case 'ADMIN': return '#1677FF';
+      case 'ADMIN': return '#4CAF50';
       case 'ACCOUNTANT': return '#FFA500';
-      case 'CASHIER': return '#800080';
+      case 'CASHIER': return '#0074BA';
       default: return '#4CAF50';
     }
   };
@@ -116,8 +116,6 @@ const ManagersTable = ({
                     label={getRoleLabel(manager.role)}
                     variant="outlined"
                     sx={{
-                      fontSize: i18n.language === 'ar' ? '14px' : '12px',
-                      fontWeight: 'bold',
                       textTransform: 'uppercase',
                       color:'white',
                       backgroundColor: getRoleColor(manager.role)

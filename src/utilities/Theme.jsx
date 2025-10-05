@@ -1,11 +1,11 @@
-  import { createTheme } from '@mui/material';
+import { createTheme } from '@mui/material';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#800080',       // purple
-      light: '#a64ca6',    // purple light
-      dark: '#4b004b',     // purple dark
+      main: '#0074BA',       // blue
+      light: '#0088dd',    // blue light
+      dark: '#005487',     // blue dark
       contrastText: '#ffffff'
     },
     secondary: {
@@ -22,13 +22,13 @@ const theme = createTheme({
     },
     background: {
       default: '#f5f5f5',
-      main: '#800080',
+      main: '#0074BA',
       paper: '#ffffff'     
     },
     text: {
       main: '#ffffff',
       primary: '#2a2a2a',
-      secondary: '#800080',
+      secondary: '#0074BA',
       black: '#2a2a2a'
     }
   },
@@ -63,7 +63,7 @@ const theme = createTheme({
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: '#a64ca6'
+            backgroundColor: '#0088dd'
           }
         },
         containedSecondary: {

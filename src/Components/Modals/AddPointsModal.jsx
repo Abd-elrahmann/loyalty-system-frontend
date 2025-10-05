@@ -5,11 +5,13 @@ import Api from "../../Config/Api";
 import { notifyError, notifySuccess } from "../../utilities/Toastify";
 import { FaCoins } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUser, updateUserProfile } from "../../utilities/user.jsx";
 const AddPointsModal = ({ open, onClose, customer }) => {
   const { t, i18n } = useTranslation();
   const [points, setPoints] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
+  const currentUser = useUser();
   
 
   const handleSubmit = async (e) => {
@@ -29,6 +31,17 @@ const AddPointsModal = ({ open, onClose, customer }) => {
       notifySuccess(`${points} ${t("Customers.pointsAdded")}`);
       handleClose();
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      
+      if (currentUser && customer?.id === currentUser.id) {
+        try {
+          const response = await Api.get('/api/auth/profile');
+          localStorage.setItem('profile', JSON.stringify(response.data));
+          console.log('Updating user profile with new points:', response.data.points);
+          updateUserProfile();
+        } catch (error) {
+          console.warn('Could not update user profile:', error);
+        }
+      }
 
     } catch (error) {
       notifyError(error.response?.data?.message || t("Errors.generalError"));
@@ -69,14 +82,14 @@ const AddPointsModal = ({ open, onClose, customer }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#ffd700'}} />
                   </InputAdornment>
                 )
               }}
             />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ display: "flex", justifyContent: "space-between" }}>
+        <DialogActions sx={{ display: "flex", justifyContent: "space-between",flexDirection: i18n.language === "ar" ? "row-reverse" : "row" }}>
           <Button onClick={handleClose} variant="outlined" size="small" disabled={isLoading}>
             {t("Customers.Cancel")}
           </Button>

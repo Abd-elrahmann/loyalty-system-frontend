@@ -71,6 +71,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
     const handleStorageChange = () => {
       const updatedProfile = JSON.parse(localStorage.getItem('profile'));
       if (updatedProfile) {
+        console.log('Navbar: Profile updated with points:', updatedProfile.points);
         setProfile(updatedProfile);
       }
     };
@@ -181,7 +182,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
               px: isMobile ? 1 : 2
             }}
           >
-            <GlobalOutlined style={{marginRight: '8px',marginLeft: '8px', fontSize: '18px', color: '#800080'}} />
+            <GlobalOutlined style={{marginRight: '8px',marginLeft: '8px', fontSize: '18px', color: 'primary.main'}} />
             {i18n.language === 'en' ? 'Ar' : 'EN'}
           </Button>
 
@@ -218,7 +219,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                     navigate('/profile');
                     setAnchorEl(null);
                   }}>
-                    <UserOutlined style={{marginRight: '4px',color: '#800080'}} />
+                    <UserOutlined style={{marginRight: '4px',color: 'primary.main'}} />
                     {i18n.language === 'en' ? user.enName.split(' ')[0] : user.arName.split('   ')[0]}
                   </MenuItem>
                   <MenuItem onClick={() => {
@@ -240,7 +241,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                 onClick={() => navigate('/login')}
                 sx={{ px: isMobile ? 3 : 2 }}
               >
-                <FaSignInAlt style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                <FaSignInAlt style={{marginRight: '8px', fontSize: '18px', color: 'primary.main'}} />
                 {t('Navbar.Login')}
               </Button>
               
@@ -251,7 +252,7 @@ const Navbar = ({ onMenuClick, sidebarVisible, setSidebarVisible }) => {
                 onClick={() => navigate('/signup')}
                 sx={{ px: isMobile ? 3 : 2 }}
               >
-                <FaUserPlus style={{marginRight: '8px', fontSize: '18px', color: 'white'}} />
+                <FaUserPlus style={{marginRight: '8px', fontSize: '18px', color: 'primary.main'}} />
                 {t('Navbar.SignUp')}
               </Button>
             </>

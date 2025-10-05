@@ -63,7 +63,7 @@ const Dashboard = () => {
   const filterSectionRef = useRef(null);
 
   const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ['dashboard', selectedDate.format('YYYY-MM-DD'), selectedPeriod],
+    queryKey: ['dashboard', selectedDate.format('YYYY-MM-DD'), selectedPeriod, user?.id],
     queryFn: async () => {
       const response = await Api.get('/api/dashboard');
       
@@ -88,8 +88,8 @@ const Dashboard = () => {
         ...response.data
       };
     },
-    staleTime: 5 * 1000,
-    cacheTime: 5 * 1000
+    staleTime: 0,
+    cacheTime: 0
   });
 
 

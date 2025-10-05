@@ -32,7 +32,7 @@ const ManagersCard = ({ manager, onEdit, onDelete, onPermissions, isLoading }) =
     switch(role) {
       case 'ADMIN': return '#1677FF';
       case 'ACCOUNTANT': return '#FFA500';
-      case 'CASHIER': return '#800080';
+      case 'CASHIER': return '#0074BA';
       default: return '#4CAF50';
     }
   };

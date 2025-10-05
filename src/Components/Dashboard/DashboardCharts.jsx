@@ -26,7 +26,7 @@ import { useUser } from '../../utilities/user';
 
 const { Title, Text } = Typography;
 
-const COLORS = ['#800080', '#b300b3', '#e600e6', '#ff33ff'];
+const COLORS = ['#0074BA', '#b300b3', '#e600e6', '#ff33ff'];
 
 const PointsComparisonChart = memo(({ data }) => (
   <ResponsiveContainer width="100%" height={300}>
@@ -36,7 +36,7 @@ const PointsComparisonChart = memo(({ data }) => (
       <YAxis />
       <Tooltip />
       <Legend />
-      <Bar dataKey="points" fill="#800080" />
+      <Bar dataKey="points" fill="#0074BA" />
     </BarChart>
   </ResponsiveContainer>
 ));
@@ -51,7 +51,7 @@ const ProductsChart = memo(({ data, nameKey }) => (
       <Legend />
       <Bar 
         dataKey="count" 
-        fill="#800080" 
+        fill="#0074BA" 
         radius={[4, 4, 0, 0]}
       />
     </BarChart>

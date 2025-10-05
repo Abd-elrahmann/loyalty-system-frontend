@@ -140,7 +140,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <UserOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                  <UserOutlined style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                 </InputAdornment>
               )
             }}
@@ -155,7 +155,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <UserOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                  <UserOutlined style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                 </InputAdornment>
               )
             }}
@@ -170,7 +170,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <MailOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                  <MailOutlined style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                 </InputAdornment>
               )
             }}
@@ -186,7 +186,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PhoneOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                  <PhoneOutlined style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                 </InputAdornment>
               )
             }}
@@ -203,7 +203,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                    <FaCoins style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                   </InputAdornment>
                 )
               }}
@@ -227,7 +227,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
                   ),
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <LockOutlined style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   )
                 }}
@@ -248,7 +248,7 @@ const AddCustomer = ({ open, onClose, isLoading, setIsLoading, customer = null }
                   ),
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockOutlined style={{marginRight: '8px', fontSize: '18px', color: '#800080'}} />
+                      <LockOutlined style={{marginRight: '8px', fontSize: '18px', color: '#0074BA'}} />
                     </InputAdornment>
                   )
                 }}

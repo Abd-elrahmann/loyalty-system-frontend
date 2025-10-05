@@ -88,7 +88,7 @@ const ManagersToolbar = ({
             sx={{
               width: { xs: "100%", sm: "auto" },
               height: { xs: "40px", sm: "40px" },
-              fontSize: "12px",
+              fontSize: "14px",
               "&:hover": {
                 backgroundColor: "primary.main",
                 color: "white",
