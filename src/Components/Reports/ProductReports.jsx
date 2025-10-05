@@ -22,22 +22,22 @@ const ProductReports = ({
       <Table>
         <TableHead>
           <TableRow>
-            <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+            <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
               {t('product.id')}
             </StyledTableCell>
-            <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+            <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
               {t('product.ProductName')}
             </StyledTableCell>
-            <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+            <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
               {t('product.price')}
             </StyledTableCell>
-            <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+            <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
               {t('product.points')}
             </StyledTableCell>
-            <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+            <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
               {t('product.type')}
             </StyledTableCell>
-            <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+            <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
               {t('product.category')}
             </StyledTableCell>
           </TableRow>

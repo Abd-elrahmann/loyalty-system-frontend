@@ -21,11 +21,11 @@ const ReportOptions = ({ reportType, setReportType, setReportData }) => {
     textAlign: 'center',
     cursor: 'pointer',
     borderRadius: 12,
-    boxShadow: active ? '0 0 10px #800080' : '0 2px 8px rgba(0,0,0,0.1)',
-    border: active ? '2px solid #800080' : '1px solid #f0f0f0',
+    boxShadow: active ? '0 0 10px #0074BA' : '0 2px 8px rgba(0,0,0,0.1)',
+    border: active ? '2px solid #0074BA' : '1px solid #f0f0f0',
     transition: 'all 0.3s ease',
     padding: 16,
-    height: '100%',
+    height: '100%', 
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -49,7 +49,7 @@ const ReportOptions = ({ reportType, setReportType, setReportData }) => {
     width: 'fit-content'
   };
 
-  const iconStyle = { fontSize: 24, color: '#800080', marginBottom: 12 };
+  const iconStyle = { fontSize: 24, color: '#0074BA', marginBottom: 12 };
 
   return (
     <div style={{ marginBottom: 20 }}>

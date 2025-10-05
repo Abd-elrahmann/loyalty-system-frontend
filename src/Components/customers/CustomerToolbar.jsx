@@ -102,7 +102,7 @@ const CustomerToolbar = ({
                   onClick={onClearFilter}
                   sx={{
                     whiteSpace: 'nowrap',
-                    fontSize: "12px",
+                    fontSize: "14px",
                   }}
                 >
                   {t("Customers.ClearFilter")}
@@ -151,7 +151,7 @@ const CustomerToolbar = ({
                   size="small"
                   sx={{
                     whiteSpace: 'nowrap',
-                    fontSize: "12px",
+                    fontSize: "14px",
                   }}
                 >
                   {t("Customers.Delete")} ({selectedCount})
@@ -164,7 +164,7 @@ const CustomerToolbar = ({
                 size="small"
                 sx={{
                   whiteSpace: 'nowrap',
-                  fontSize: "12px",
+                  fontSize: "14px",
                   minWidth: 'auto'
                 }}
               >

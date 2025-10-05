@@ -14,7 +14,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from "dayjs";
 import { Skeleton } from "antd";
 import { debounce } from 'lodash';
-
+import { useTranslation } from "react-i18next";
 const LogsToolbar = ({
   filters,
   onFilterChange,
@@ -31,7 +31,7 @@ const LogsToolbar = ({
   } = filters;
 
   const searchInputRef = useRef(null);
-
+  const { t } = useTranslation();
   const handleActionChange = (event) => {
     onFilterChange('table', event.target.value);
   };
@@ -125,7 +125,7 @@ const LogsToolbar = ({
                 inputRef={searchInputRef}
                 defaultValue={userName || ""}
                 onChange={handleUserNameChange}
-                placeholder="Search by user name..."
+                placeholder={t("Logs.SearchByUserName")}
                 autoFocus
                 sx={{ 
                   width: isMobile ? "100%" : "200px",
@@ -135,16 +135,16 @@ const LogsToolbar = ({
               />
 
               <FormControl sx={{ minWidth: 150, maxWidth: "200px" }} size="small">
-                <InputLabel>Action Type</InputLabel>
+                <InputLabel>{t("Logs.ActionType")}</InputLabel>
                 <Select
                   value={table || ""}
                   onChange={handleActionChange}
-                  label="Action Type"
+                  label={t("Logs.ActionType")}
                 >
-                  <MenuItem value="Login">Login</MenuItem>
-                  <MenuItem value="Create">Create</MenuItem>
-                  <MenuItem value="Update">Update</MenuItem>
-                  <MenuItem value="Delete">Delete</MenuItem>
+                  <MenuItem value="Login">{t("Logs.Login")}</MenuItem>
+                  <MenuItem value="Create">{t("Logs.Create")}</MenuItem>
+                  <MenuItem value="Update">{t("Logs.Update")}</MenuItem>
+                  <MenuItem value="Delete">{t("Logs.Delete")}</MenuItem>
                 </Select>
               </FormControl>
 
@@ -157,22 +157,22 @@ const LogsToolbar = ({
                 }} 
                 size="small"
               >
-                <InputLabel>Screen</InputLabel>
+                <InputLabel>{t("Logs.Screen")}</InputLabel>
                 <Select
                   value={screen || ""}
                   onChange={handleScreenChange}
-                  label="Screen"
+                  label={t("Logs.Screen")}
                 >
-                  <MenuItem value="dashboard">Dashboard</MenuItem>
-                  <MenuItem value="managers">Managers</MenuItem>
-                  <MenuItem value="pos">Point of Sale</MenuItem>
-                  <MenuItem value="invoices">Invoices</MenuItem>
-                  <MenuItem value="customers">Customers</MenuItem>
-                  <MenuItem value="products">Products</MenuItem>
-                  <MenuItem value="transactions">Transactions</MenuItem>
-                  <MenuItem value="reports">Reports</MenuItem>
-                  <MenuItem value="rewards">Rewards</MenuItem>
-                  <MenuItem value="settings">Settings</MenuItem>
+                  <MenuItem value="login">{t("Logs.Login")}</MenuItem>
+                  <MenuItem value="managers">{t("Logs.Managers")}</MenuItem>
+                  <MenuItem value="pos">{t("Logs.PointOfSale")}</MenuItem>
+                  <MenuItem value="redeem">{t("Logs.Redeem")}</MenuItem>
+                  <MenuItem value="invoices">{t("Logs.Invoices")}</MenuItem>
+                  <MenuItem value="customers">{t("Logs.Customers")}</MenuItem>
+                  <MenuItem value="products">{t("Logs.Products")}</MenuItem>
+                  <MenuItem value="transactions">{t("Logs.Transactions")}</MenuItem>
+                  <MenuItem value="rewards">{t("Logs.Rewards")}</MenuItem>
+                  <MenuItem value="settings">{t("Logs.Settings")}</MenuItem>
                 </Select>
               </FormControl>
             </>
@@ -217,7 +217,7 @@ const LogsToolbar = ({
             <>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <DatePicker
-                  label="From Date"
+                  label={t("Logs.FromDate")}
                   value={fromDate ? dayjs(fromDate) : null}
                   onChange={handleFromDateChange}
                   slotProps={{ 
@@ -228,7 +228,7 @@ const LogsToolbar = ({
                   format="YYYY-MM-DD"
                 />
                 <DatePicker
-                  label="To Date"
+                  label={t("Logs.ToDate")}
                   value={toDate ? dayjs(toDate) : null}
                   onChange={handleToDateChange}
                   slotProps={{ 
@@ -247,7 +247,7 @@ const LogsToolbar = ({
                     borderColor: "divider",
                   }}
                 >
-                  <RestartAltOutlined style={{ color: "red" }} />
+                  <RestartAltOutlined style={{ color: "primary.main" }} />
                 </IconButton>
               )}
             </>

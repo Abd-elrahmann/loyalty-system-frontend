@@ -392,6 +392,7 @@ const Products = () => {
               onClick={handleOpenCategoryModal}
               sx={{ 
                 height: '40px',
+                fontSize: isMobile ? '12px' : '14px',
                 minWidth: isMobile ? '100%' : '120px',
                 "&:hover": {
                   backgroundColor: "primary.main",
@@ -413,7 +414,7 @@ const Products = () => {
             flexShrink: 0,
             width: isMobile && activeTab === 'cafe' ? '100%' : '210px',
             height: '43px',
-            fontSize: isMobile ? '12px' : '13px',
+            fontSize: isMobile ? '12px' : '14px',
             borderRadius: isMobile ? '5px' : '10px',
             display: profile.role === 'ADMIN' ? '' : 'none',
             "&:hover": {
@@ -630,7 +631,7 @@ const Products = () => {
                             confirmButtonText: t('Products.Redeem'),
                             cancelButtonText: t('Products.RedeemProductTextCancel'),
                             showCancelButton: true,
-                            confirmButtonColor: '#800080',
+                            confirmButtonColor: '#0074BA',
                             cancelButtonColor: '#D91656',
                             reverseButtons: i18n.language === 'ar' ? false : true,
                             allowOutsideClick: false,

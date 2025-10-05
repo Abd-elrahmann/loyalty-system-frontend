@@ -207,7 +207,7 @@ const Profile = () => {
               <Avatar
                 size={80}
                 src={profile?.profileImage}
-                style={{ backgroundColor: '#800080' }}
+                style={{ backgroundColor: '#0074BA' }}
               >
                 {i18n.language === 'en' ? profile?.enName?.[0] : profile?.arName?.[0]}
               </Avatar>
@@ -226,13 +226,13 @@ const Profile = () => {
                     position: 'absolute',
                     bottom: -4,
                     right: -4,
-                    backgroundColor: '#800080',
+                    backgroundColor: '#0074BA',
                     color: '#fff'
                   }}
                 />
               </Dropdown>
             </div>
-            <Title level={4} style={{ marginTop: '16px', color: '#800080' }}>
+            <Title level={4} style={{ marginTop: '16px', color: '#0074BA' }}>
               {i18n.language === 'en' ? profile?.enName : profile?.arName}
             </Title>
           </div>
@@ -279,7 +279,7 @@ const Profile = () => {
                     <Button 
                       icon={<DownloadOutlined />}
                       onClick={handleDownloadQRCode}
-                      style={{ marginTop: '16px', backgroundColor: '#800080', color: '#fff' }}
+                      style={{ marginTop: '16px', backgroundColor: '#0074BA', color: '#fff' }}
                     />
                   </div>
                 ) : (
@@ -312,7 +312,7 @@ const Profile = () => {
               <Button 
                 onClick={handleNameUpdate}
                 icon={<EditOutlined />}
-                style={{ backgroundColor: '#800080', color: '#fff' }}
+                style={{ backgroundColor: '#0074BA', color: '#fff' }}
               >
                 {t('Profile.Update')}
               </Button>
@@ -349,7 +349,7 @@ const Profile = () => {
               <Button 
                 onClick={handlePasswordUpdate}
                 icon={<EditOutlined />}
-                style={{ backgroundColor: '#800080', color: '#fff' }}
+                style={{ backgroundColor: '#0074BA', color: '#fff' }}
               >
                 {t('Profile.Update')}
               </Button>

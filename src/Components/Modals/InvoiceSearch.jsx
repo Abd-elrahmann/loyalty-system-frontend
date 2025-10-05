@@ -440,7 +440,7 @@ const InvoiceSearch = ({ onViewInvoice }) => {
                           {invoice.points}
                         </StyledTableCell>
                         <StyledTableCell align="center">
-                          {dayjs(invoice.createdAt).format("DD/MM/YYYY HH:mm a")}
+                          {dayjs(invoice.createdAt).format("DD/MM/YYYY hh:mm A")}
                         </StyledTableCell>
                         <StyledTableCell align="center">
                           <Button

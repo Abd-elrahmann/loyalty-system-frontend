@@ -25,7 +25,7 @@ const LogsTable = ({
 }) => {
   const logs = logsData?.logs || [];
   const total = logsData?.total || 0;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const getActionColor = (action) => {
     switch (action) {
@@ -44,18 +44,18 @@ const LogsTable = ({
 
   const getScreenLabel = (screen) => {
     const screenLabels = {
-      login: 'Login',
-      products: 'Products',
-      invoices: 'Invoices',
-      pos: 'POS',
-      redeem: 'Redeem',
-      rewards: 'Rewards', 
-      managers: 'Managers',
-      settings: 'Settings',
-      transactions: 'Transactions',
-      customers: 'Customers'
+      login: t('Logs.Login'),
+      products: t('Logs.Products'),
+      invoices: t('Logs.Invoices'),
+      pos: t('Logs.PointOfSale'),
+      redeem: t('Logs.Redeem'),
+      rewards: t('Logs.Rewards'),
+      managers: t('Logs.Managers'),
+      settings: t('Logs.Settings'),
+      transactions: t('Logs.Transactions'),
+      customers: t('Logs.Customers')
     };
-    return screenLabels[screen] || screen;
+    return screenLabels[screen.toLowerCase()] || screen;
   };
 
   // Skeleton rows for loading state
@@ -215,11 +215,11 @@ const LogsTable = ({
                   {log.userId}
                 </StyledTableCell>
                 <StyledTableCell align="center">
-                  {log.userName}
+                  {i18n.language === 'ar' ? log.user?.arName : log.user?.enName}
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   <Chip
-                    label={log.table}
+                    label={i18n.language === 'ar' ? t(`Logs.${log.table}`) : log.table}
                     color={getActionColor(log.table)}
                     size="medium"
                     variant="outlined"
@@ -234,7 +234,7 @@ const LogsTable = ({
                   />
                 </StyledTableCell>
                 <StyledTableCell align="center" style={{ wordWrap: "break-word", maxWidth: "170px" }}>
-                  {log.message}
+                  {i18n.language === 'ar' ? log.arMessage : log.enMessage}
                 </StyledTableCell>
                 <StyledTableCell align="center" sx={{ whiteSpace: "nowrap" }}>
                   {log.formattedDate}

@@ -63,7 +63,7 @@ const TransactionsToolbar = ({
                     variant="outlined"
                     onClick={onSearch}
                     sx={{
-                      color: "#800080",
+                      color: "#0074BA",
                       textAlign: "center",
                       fontSize: { xs: "12px", sm: "14px" },
                       width: { xs: "100%", sm: "auto" },
