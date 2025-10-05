@@ -9,6 +9,7 @@ import {
   Receipt as InvoiceIcon,
   BarChart as BarChartIcon,
   Security as SecurityIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 
 const routes = [
@@ -27,19 +28,19 @@ const routes = [
     role: ['ADMIN'],
   },
   {
-    name: 'Logs',
-    arName: 'السجلات',
-    path: '/logs',
-    icon: SecurityIcon,
-    role: ['ADMIN'],
-  },
-  {
     name: 'Customers',
     arName: 'العملاء', 
     path: '/customers',
     icon: PeopleIcon,
     role: ['ADMIN'],
     
+  },
+  {
+    name: 'Logs',
+    arName: 'السجلات',
+    path: '/logs',
+    icon: HistoryIcon,
+    role: ['ADMIN'],
   },
   {
     name: 'Transactions',

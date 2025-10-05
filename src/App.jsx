@@ -22,7 +22,6 @@ import OfflineAlert from './hooks/OfflineAlert.jsx';
 const Layout = React.lazy(() => import('./Layout'));
 const MainLayout = React.lazy(() => import('./Components/Shared/MainLayout'));
 
-// أنشئ كومبوننت محمية لكل route
 const createProtectedComponent = (importFunc, routePath) => {
   return function ProtectedComponentWrapper() {
     
@@ -75,8 +74,9 @@ function App() {
 
   useEffect(() => {
     document.dir = i18n.dir();
+    document.documentElement.lang = i18n.language;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [i18n.dir()]);
+  }, [i18n.dir(), i18n.language]);
 
   const cacheRtl = useMemo(() => {
     return createCache({
@@ -194,21 +194,17 @@ const ProtectedRoute = ({ children }) => {
       const user = JSON.parse(profile);
       const currentPath = location.pathname;
       
-      // Allow all authenticated users to access their profile
       if (currentPath === '/profile') {
         return children;
       }
       
-      // إذا كان المستخدم ADMIN، يسمح له بالوصول إلى كل الصفحات
       if (user.role === 'ADMIN') {
         return children;
       }
       
-      // التحقق من صلاحيات المستخدم للصفحة الحالية
       if (hasRouteAccess(user, currentPath)) {
         return children;
       } else {
-        // إذا لم يكن لديه صلاحية، إرجاعه إلى الصفحة الأولى المسموح له بها
         return <Navigate to={getFirstAccessibleRoute(user)} replace />;
       }
     }

@@ -10,11 +10,13 @@ import LogsToolbar from "../../Components/Logs/LogsToolbar";
 import LogsTable from "../../Components/Logs/LogsTable";
 
 import { logsApi, logsKeys } from "./logsApi";
+import { useTranslation } from "react-i18next";
 
 const Logs = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+  const { t } = useTranslation();
   const [filters, setFilters] = useState({
     table: "",
     screen: "",
@@ -101,8 +103,8 @@ const Logs = () => {
   return (
     <>
       <Helmet>
-        <title>System Logs</title>
-        <meta name="description" content="System activity logs and audit trail" />
+        <title>{t("Logs.Logs")}</title>
+        <meta name="description" content={t("Logs.LogsDescription")} />
       </Helmet>
     
         <LogsToolbar

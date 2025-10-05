@@ -301,8 +301,8 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                     {customer.email}
                   </Link>
                 </StyledTableCell>
-                <StyledTableCell align="center" sx={{ fontSize: i18n.language === 'ar' ? '14px' : '12px' }}>{customer.phone}</StyledTableCell>
-                <StyledTableCell align="center" sx={{ fontSize: i18n.language === 'ar' ? '14px' : '12px' }}>{customer.points}</StyledTableCell>
+                <StyledTableCell align="center">{customer.phone}</StyledTableCell>
+                <StyledTableCell align="center">{customer.points}</StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton 
                     size="small" 
@@ -312,7 +312,7 @@ const skeletonRows = Array.from({ length: rowsPerPage }, (_, index) => (
                     <QrcodeOutlined />
                   </IconButton>
                 </StyledTableCell>
-                <StyledTableCell align="center" sx={{ fontSize: i18n.language === 'ar' ? '14px' : '12px' }}>{dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}</StyledTableCell>
+                <StyledTableCell align="center">{dayjs(customer.createdAt).format('DD/MM/YYYY hh:mm')}</StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     size="small"

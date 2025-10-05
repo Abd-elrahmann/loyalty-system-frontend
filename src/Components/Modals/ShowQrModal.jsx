@@ -107,7 +107,7 @@ const ShowQrModal = ({ open, onClose, customer }) => {
         />
       </DialogContent>
       
-      <DialogActions sx={{ justifyContent: "center", pb: 3, gap: 2 }}>
+      <DialogActions sx={{ justifyContent: "center", pb: 3, gap: 2, flexDirection: i18n.language === 'ar' ? 'row-reverse' : 'row' }}>
         <Button
           variant="contained"
           startIcon={<DownloadOutlined />}

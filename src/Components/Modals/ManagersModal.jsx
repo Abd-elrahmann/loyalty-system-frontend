@@ -227,7 +227,7 @@ const ManagersModal = ({ open, onClose, manager, onSave, isLoading }) => {
                       sx={{ color: "primary.main" }}
                     />
                   ) : (
-                    <EyeOutlined sx={{ color: "primary.main" }} />
+                    <EyeOutlined sx={{ color: "#0074BA" }} />
                   )}
                 </IconButton>
               ),
@@ -237,7 +237,7 @@ const ManagersModal = ({ open, onClose, manager, onSave, isLoading }) => {
                     style={{
                       marginRight: "8px",
                       fontSize: "18px",
-                      color: "#800080",
+                      color: "#0074BA",
                     }}
                   />
                 </InputAdornment>
@@ -270,7 +270,7 @@ const ManagersModal = ({ open, onClose, manager, onSave, isLoading }) => {
                     style={{
                       marginRight: "8px",
                       fontSize: "18px",
-                      color: "#800080",
+                      color: "#0074BA",
                     }}
                   />
                 </InputAdornment>
@@ -280,7 +280,7 @@ const ManagersModal = ({ open, onClose, manager, onSave, isLoading }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: "center", pb: 3, gap: 2 }}>
+      <DialogActions sx={{ justifyContent: "center", pb: 3, gap: 2,flexDirection: i18n.language === "ar" ? "row-reverse" : "row" }}>
         <Button
           variant="outlined"
           onClick={onClose}

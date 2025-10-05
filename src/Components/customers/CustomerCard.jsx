@@ -57,7 +57,7 @@ const CustomerCard = ({ customer, onShowQR, onAddPoints, onEdit, onDelete, onVie
                 backgroundColor: 
                   customer.role === 'ADMIN' ? '#1677FF' : 
                   customer.role === 'ACCOUNTANT' ? '#FFA500' :
-                  customer.role === 'CASHIER' ? '#800080' :
+                  customer.role === 'CASHIER' ? '#0074BA' :
                   '#4CAF50',
                 height: '24px'
               }}

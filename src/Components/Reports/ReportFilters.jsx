@@ -120,8 +120,8 @@ const ReportFilters = ({
               onClick={onGenerateReport}
               loading={previewLoading}
               style={{
-                backgroundColor: '#800080',
-                borderColor: '#800080',
+                backgroundColor: '#0074BA',
+                borderColor: '#0074BA',
                 width: 140,
                 fontSize: '15px'
               }}

@@ -267,13 +267,13 @@ const Reports = () => {
           .print-header {
             text-align: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid #800080;
+            border-bottom: 2px solid #0074BA;
             padding-bottom: 10px;
           }
           .print-title {
             font-size: 24px;
             font-weight: bold;
-            color: #800080;
+            color: #0074BA;
           }
           .print-date {
             font-size: 14px;
@@ -291,7 +291,7 @@ const Reports = () => {
             text-align: right;
           }
           th {
-            background-color: #800080;
+            background-color: #0074BA;
             color: white;
             fontWeight: bold;
           }
@@ -303,7 +303,7 @@ const Reports = () => {
             font-weight: bold;
             margin-top: 25px;
             margin-bottom: 10px;
-            color: #800080;
+            color: #0074BA;
             border-bottom: 1px dashed #ccc;
             padding-bottom: 5px;
           }
@@ -450,8 +450,8 @@ const Reports = () => {
                 icon={<PrinterOutlined />}
                 onClick={printReport}
                 style={{
-                  color: '#800080',
-                  borderColor: '#800080',
+                  color: '#0074BA',
+                  borderColor: '#0074BA',
                   fontSize: '15px'
                 }}
               >
@@ -461,8 +461,8 @@ const Reports = () => {
                 icon={<DownloadOutlined />}
                 onClick={() => exportReport('excel')}
                 style={{
-                  color: '#800080',
-                  borderColor: '#800080',
+                  color: '#0074BA',
+                  borderColor: '#0074BA',
                   fontSize: '15px'
                 }}
               >
@@ -472,8 +472,8 @@ const Reports = () => {
                 icon={<DownloadOutlined />}
                 onClick={() => exportReport('pdf')}
                 style={{
-                  color: '#800080',
-                  borderColor: '#800080',
+                  color: '#0074BA',
+                  borderColor: '#0074BA',
                   fontSize: '15px'
                 }}
               >

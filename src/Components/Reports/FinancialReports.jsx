@@ -24,22 +24,22 @@ const FinancialReports = ({
         <Table>
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('customer.transactionId')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('customer.CustomerName')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {i18n.language === 'ar' ? t('customer.type') === 'earn' ? 'ربح نقاط' : t('customer.type') === 'redeem' ? 'مستبدل ب نقاط' : t('customer.type') : t('customer.type')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('customer.points')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('customer.currency')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('customer.date')}
               </StyledTableCell>
             </TableRow>
@@ -86,30 +86,30 @@ const FinancialReports = ({
         <Table>
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.id')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.CustomerName')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.phone')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.totalPrice')}
               </StyledTableCell>
               {reportData.discount && (
-                <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                   {t('Invoice.discount')}
                 </StyledTableCell>
               )}
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+                <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.points')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.currency')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('Invoice.date')}
               </StyledTableCell>
             </TableRow>
@@ -166,19 +166,19 @@ const FinancialReports = ({
         <Table>
           <TableHead>
             <TableRow>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('reward.id')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('reward.rewardName')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {i18n.language === 'ar' ? t('reward.type') === 'cafe' ? 'كافيه' : 'مطعم' : t('reward.type') === 'cafe' ? 'cafe' : 'restaurant'}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('reward.points')}
               </StyledTableCell>
-              <StyledTableCell align="center" style={{ backgroundColor: '#800080', color: 'white' }}>
+              <StyledTableCell align="center" style={{ backgroundColor: '#0074BA', color: 'white' }}>
                 {t('reward.date')}
               </StyledTableCell>
             </TableRow>

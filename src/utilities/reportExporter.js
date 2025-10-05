@@ -9,10 +9,10 @@ const hexToRgb = (hex) => {
     parseInt(result[1], 16),
     parseInt(result[2], 16), 
     parseInt(result[3], 16)
-  ] : [128, 0, 128];
+  ] : [0, 116, 186];
 };
 
-const headerColor = hexToRgb('#800080');
+const headerColor = hexToRgb('#0074BA');
  const fetchSettings = async () => {
   const response = await Api.get('/api/settings');
   return response.data;

@@ -243,7 +243,7 @@ const Register = () => {
                 {t('Register.createNewAccount')}
               </Typography>
               <Button onClick={toggleLanguage} sx={{ mb: 2, fontSize: '1rem', fontWeight: 'bold' }}>
-                <GlobalOutlined style={{marginRight: '8px', marginLeft: '8px', fontSize: '18px', color: '#800080'}} />
+                <GlobalOutlined style={{marginRight: '8px', marginLeft: '8px', fontSize: '18px', color: '#0074BA'}} />
                 {i18n.language === 'en' ? 'Ar' : 'EN'}
               </Button>
               </Box>
@@ -261,7 +261,7 @@ const Register = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <UserOutlined style={{color: '#800080'}} />
+                          <UserOutlined style={{color: '#0074BA'}} />
                         </InputAdornment>
                       )
                     }}
@@ -278,7 +278,7 @@ const Register = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <UserOutlined style={{color: '#800080'}} />
+                          <UserOutlined style={{color: '#0074BA'}} />
                         </InputAdornment>
                       )
                     }}
@@ -299,7 +299,7 @@ const Register = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <MailOutlined style={{color: '#800080'}} />
+                        <MailOutlined style={{color: '#0074BA'}} />
                       </InputAdornment>
                     )
                   }}
@@ -318,7 +318,7 @@ const Register = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PhoneOutlined style={{color: '#800080'}} />
+                        <PhoneOutlined style={{color: '#0074BA'}} />
                       </InputAdornment>
                     )
                   }}
@@ -334,7 +334,7 @@ const Register = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlined style={{color: '#800080'}} />
+                        <LockOutlined style={{color: '#0074BA'}} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -376,7 +376,7 @@ const Register = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlined style={{color: '#800080'}} />
+                        <LockOutlined style={{color: '#0074BA'}} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -398,7 +398,7 @@ const Register = () => {
                   size={isMobile ? 'medium' : 'large'}
                   disabled={loading}
                   sx={{
-                    background: 'linear-gradient(45deg, #800080 30%, #FF8E53 90%)',
+                    background: 'linear-gradient(45deg, #0074BA 30%, #FF8E53 90%)',
                     opacity: loading ? 0.7 : 1,
                     cursor: loading ? 'not-allowed' : 'pointer',
                     py: 1.5,
@@ -406,7 +406,7 @@ const Register = () => {
                     fontWeight: 'bold',
                     borderRadius: 2,
                     '&:hover': {
-                      background: 'linear-gradient(45deg, #6a006a 30%, #e87e45 90%)',
+                      background: 'linear-gradient(45deg, #0074BA 30%, #e87e45 90%)',
                       transform: 'translateY(-2px)',
                       boxShadow: '0 5px 15px rgba(128, 0, 128, 0.3)'
                     },
@@ -434,7 +434,7 @@ const Register = () => {
                         fontWeight: 500,
                         textDecoration: 'underline',
                         '&:hover': {
-                          color: '#6a006a'
+                          color: '#0074BA'
                         }
                       }}
                       onClick={() => {
